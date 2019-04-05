@@ -10,12 +10,12 @@
 >
 >> file.help()
 >> dir.help()
->>   Prints out examples of all commands
+>>> Prints out examples of all commands
 >
 >> dir.setExtensions(['wav', 'mp3', 'ogg'])
->>   select which extensions to apply commands to within a directory
+>>> select which extensions to apply commands to within a directory
 >
 >> file.convert()
 >> dir.convert()
->>   converts all audio files to a specific file type, sample rate, and bit depth
->>   uses FFMPEG for high quality conversions
+>>> converts all audio files to a specific file type, sample rate, and bit depth
+>>>> uses FFMPEG for high quality conversions
