@@ -1,4 +1,6 @@
 from pathlib import Path, PurePath
+import begin
+import colorlog
 
 class AudFile:
     filepath = ""
@@ -26,4 +28,19 @@ class AudDir:
     def __init__(self, _dir, _output_directory="_Processed"):
         _files = listdir(_dir)
         for _file in _files:
-            files.append(new AudFile(_file))
+            files.append(AudFile(_file))
+
+def setupLogger(level="ERROR"):
+    '''
+    Config and setup the logger
+    '''
+    pass
+
+def main():
+    '''
+    aud: Quick tools for an audio studio environment
+    '''
+    setupLogger("DEBUG")
+    ## Decipher arguments and run the right command
+    ## Designed to work well in the interpreter
+    pass
