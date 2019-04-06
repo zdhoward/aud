@@ -1,0 +1,11 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "aud"
+author = "Zach Howard"
+author-email = "zach.d.howard@gmail.com"
+home-page = "https://www.github.com/zdhoward/aud"
+classifiers = ["License :: OSI Approved :: MIT License"]
+
