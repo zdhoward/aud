@@ -33,6 +33,9 @@ class AudFile:
     def __str__(self):
         return str(self.filepath)
 
+    def __add__(self, _string):
+        return str(self.filepath + _string)
+
     ### OS IO METHODS ###
     def renameUpper(self):
         '''
@@ -65,6 +68,12 @@ class AudFile:
     ### UNORGANIZED METHODS ###
     def convertTo(self, _target_samplerate=44100, _target_bitdepth=16):
         logger.info("convertTo:" + self.filepath)
+
+        createFolder(self.base + self.output_directory)
+
+        # Get FFMPEG to run the job
+        if _target_bitdepth == 16:
+            os.system("ffmpeg -i " + "\"" + str(self.filepath) + "\"" + " -vn -acodec pcm_s16le -ac 1 -ar " + str(_target_samplerate) + " -f wav " + "\"" + self.base + self.output_directory + "\\" + self.name + "\"")
 
     def pad(self, _in=0.0, _out=0.0):
         '''
@@ -147,19 +156,15 @@ class AudFile:
         if self.extension ==".mp3":
             audio = AudioSegment.from_mp3(self.filepath)
             audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3", tags=_tags)
-            pass
         if self.extension ==".wav":
             audio = AudioSegment.from_wav(self.filepath)
             audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav", tags=_tags)
-            pass
         if self.extension ==".ogg":
             audio = AudioSegment.from_ogg(self.filepath)
             audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg", tags=_tags)
-            pass
         if self.extension ==".flv":
             audio = AudioSegment.from_flv(self.filepath)
             audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv", tags=_tags)
-            pass
 
         #read wav file to an audio segment
         audio = AudioSegment.from_flv(self.filepath)

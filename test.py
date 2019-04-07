@@ -7,4 +7,6 @@ logger = setupLogger()
 
 dirpath = AudDir("test")
 
-dirpath.pad(2.0,2.0)
+#dirpath.pad(2.0,2.0)
+#dirpath.renameReplaceSpaces()
+dirpath.convertTo(_target_samplerate=44100)

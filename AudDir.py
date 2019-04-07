@@ -9,19 +9,41 @@ class AudDir:
     '''
     A wrapper for a directory path to ease use
     '''
-    extensions = [".wav"]
+    extensions = [".wav", ".mp3", ".ogg", ".flv"]
     files = []
     output_directory = "_Processed"
+    count = 0
+    dir = ""
 
     def __init__(self, _dir, _output_directory="_Processed"):
         '''
         Initialization
         '''
-        _files = os.listdir(_dir)
+        self.dir = _dir
+        self.update()
+
+    def __len__(self):
+        return self.count
+
+    def __getitem__(self, _index):
+        return self.files[_index]
+
+    def __contains__(self, value):
+        ret = False
+        if value in self.files:
+            ret = True
+        return ret
+
+    def update(self):
+        self.files=[]
+        _files = os.listdir(self.dir)
         for _file in _files:
-            _file = AudFile(os.path.abspath(_dir + '\\' + _file))
-            if str(_file.extension).lower() in str(self.extensions).lower():
-                self.files.append(_file)
+            _file = AudFile(os.path.abspath(self.dir + '\\' + _file))
+            if os.path.isfile(str(_file)):
+                logger.error(_file)
+                if str(_file.extension).lower() in str(self.extensions).lower():
+                    self.count += 1
+                    self.files.append(_file)
 
     ### UTILITIES ###
     def log(self, _dirpath):
@@ -29,7 +51,6 @@ class AudDir:
         log the files that match the list of extensions into a meta file
         '''
         output = ""
-        count = 0
         path = os.path.abspath(_dirpath)
         _files = os.listdir(path)
         ## Analyse each file
@@ -37,11 +58,10 @@ class AudDir:
             filepath = os.path.abspath(file)
             if filepath.suffix in self.extensions:
                 output += '' + str(path) + "\\" + str(filepath) + '\n'
-                count += 1
 
         ## Summary of files
         output += '\n\nSUMMARY\n'
-        output += "Count: " + str(count) + '\n'
+        output += "Count: " + str(self.count) + '\n'
         output += "Timestamp: " + str(arrow.now())
         self.writeFile(_dirpath, "meta", output)
 
@@ -68,6 +88,7 @@ class AudDir:
         '''
         for file in self.files:
             file.renameUpper()
+        self.update()
 
     def renameLower(self):
         '''
@@ -75,6 +96,7 @@ class AudDir:
         '''
         for file in self.files:
             file.renameLower()
+        self.update()
 
     def renameReplaceSpaces(self):
         '''
@@ -82,15 +104,17 @@ class AudDir:
         '''
         for file in self.files:
             file.renameReplaceSpaces()
+        self.update()
 
     def renamePrepend(self, _prefix):
         for file in self.files:
             file.renameReplaceSpaces(_prefix)
+        self.update()
 
     ### UNORGANIZED METHODS ###
     def convertTo(self, _target_samplerate=44100, _target_bitdepth=16):
         for file in self.files:
-            file.convertTo(self, _target_samplerate, _target_bitdepth)
+            file.convertTo(_target_samplerate, _target_bitdepth)
 
     def pad(self, _in=0.0, _out=0.0):
         for file in self.files:
@@ -103,6 +127,7 @@ class AudDir:
     def move(self, _target_directory):
         for file in self.files:
             file.move(_target_directory)
+        self.update()
 
     def metadata(self, tags):
         for file in self.files:
