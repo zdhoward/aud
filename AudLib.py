@@ -1,4 +1,6 @@
 import colorlog
+from os import makedirs
+from os.path import exists
 
 def setupLogger():
     '''
@@ -12,3 +14,11 @@ def setupLogger():
     handler.setFormatter(colorlog.ColoredFormatter())
     logger.addHandler(handler)
     return logger
+
+def createFolder(path):
+    # Create folder if it does not already exist
+    try:
+        if not exists(path):
+            makedirs(path)
+    except OSError:
+        logger.error("Creating directory failed")

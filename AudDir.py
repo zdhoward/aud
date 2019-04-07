@@ -1,16 +1,15 @@
 from AudFile import AudFile
-from os import listdir
 import arrow
 import os
+from AudLib import setupLogger
+
+logger = setupLogger()
 
 class AudDir:
     '''
     A wrapper for a directory path to ease use
     '''
-    filepath = ""
-    name = ""
     extensions = [".wav"]
-    dir = ""
     files = []
     output_directory = "_Processed"
 
@@ -18,7 +17,7 @@ class AudDir:
         '''
         Initialization
         '''
-        _files = listdir(_dir)
+        _files = os.listdir(_dir)
         for _file in _files:
             _file = AudFile(os.path.abspath(_dir + '\\' + _file))
             if str(_file.extension).lower() in str(self.extensions).lower():
@@ -32,7 +31,7 @@ class AudDir:
         output = ""
         count = 0
         path = os.path.abspath(_dirpath)
-        _files = listdir(path)
+        _files = os.listdir(path)
         ## Analyse each file
         for file in _files:
             filepath = os.path.abspath(file)
@@ -46,12 +45,12 @@ class AudDir:
         output += "Timestamp: " + str(arrow.now())
         self.writeFile(_dirpath, "meta", output)
 
-    def writeFile(self, _dirpath, name, content, filetype=".txt"):
+    def writeFile(self, _dirpath, _name, _content, _filetype=".txt"):
         '''
         A quick helper to create a simple file cleanly
         '''
-        file = open(_dirpath + "/" + name + filetype, "w")
-        file.write(content)
+        file = open(_dirpath + "/" + _name + _filetype, "w")
+        file.write(_content)
         file.close()
 
     ### SET METHODS ###
@@ -68,7 +67,6 @@ class AudDir:
         Rename file to UPPERCASE
         '''
         for file in self.files:
-            print(str(file))
             file.renameUpper()
 
     def renameLower(self):
@@ -84,3 +82,28 @@ class AudDir:
         '''
         for file in self.files:
             file.renameReplaceSpaces()
+
+    def renamePrepend(self, _prefix):
+        for file in self.files:
+            file.renameReplaceSpaces(_prefix)
+
+    ### UNORGANIZED METHODS ###
+    def convertTo(self, _target_samplerate=44100, _target_bitdepth=16):
+        for file in self.files:
+            file.convertTo(self, _target_samplerate, _target_bitdepth)
+
+    def pad(self, _in=0.0, _out=0.0):
+        for file in self.files:
+            file.pad(_in, _out)
+
+    def fade(self, _in=0.0, _out=0.0, _type='log|lin', _ratio=0.0):
+        for file in self.files:
+            file.fade(_in, _out, _type, _ratio)
+
+    def move(self, _target_directory):
+        for file in self.files:
+            file.move(_target_directory)
+
+    def metadata(self, tags):
+        for file in self.files:
+            file.metadata(tags)

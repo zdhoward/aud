@@ -7,4 +7,4 @@ logger = setupLogger()
 
 dirpath = AudDir("test")
 
-dirpath.renameUpper()
+dirpath.pad(2.0,2.0)
