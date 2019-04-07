@@ -79,28 +79,48 @@ class AudFile:
         trailing_segment = AudioSegment.silent(duration=(1000*_out))
 
         if self.extension ==".mp3":
-            logger.debug("Processing mp3")
+            logger.info("Processing mp3: " + self.filepath)
             #read wav file to an audio segment
             audio = AudioSegment.from_mp3(self.filepath)
 
-            #Add above two audio segments
+            # Add above two audio segments
             final_song = leading_segment + audio + trailing_segment
 
             #Either save modified audio
-            final_song.export(self.output_directory + self.name, format="mp3")
+            final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3")
 
         if self.extension ==".wav":
-            logger.debug("Processing wav: " + self.filepath)
+            logger.info("Processing wav: " + self.filepath)
             #read wav file to an audio segment
             audio = AudioSegment.from_wav(self.filepath)
-            logger.debug(self.filepath)
 
-            #Add above two audio segments
+            # Add above two audio segments
             final_song = leading_segment + audio + trailing_segment
 
             #Either save modified audio
             final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav")
-            logger.debug(self.base + '/' + self.output_directory + '/' + self.name)
+
+        if self.extension ==".ogg":
+            logger.info("Processing ogg: " + self.filepath)
+            #read wav file to an audio segment
+            audio = AudioSegment.from_ogg(self.filepath)
+
+            # Add above two audio segments
+            final_song = leading_segment + audio + trailing_segment
+
+            #Either save modified audio
+            final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg")
+
+        if self.extension ==".flv":
+            logger.info("Processing flv: " + self.filepath)
+            #read wav file to an audio segment
+            audio = AudioSegment.from_flv(self.filepath)
+
+            # Add above two audio segments
+            final_song = leading_segment + audio + trailing_segment
+
+            #Either save modified audio
+            final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv")
 
         ## This works with ogg or flv too
 
@@ -116,10 +136,37 @@ class AudFile:
         '''
         logger.info("moving:" + self.filepath)
 
-    def metadata(self, tags=[]):
+    def metadata(self, _tags={}):
         '''
-        add tags to a file like tags=[["Artist", "Nobukazu Takemura"]["Type", "Sfx"]]
+        add tags to a file like tags={"Artist": "Nobukazu Takemura", "Type": "Sfx"}
         You can add any tag you like but if you want them to come up in a particular
         application you will need to lookup what they use
         '''
+        logger.info("metadata: " + self.filepath)
+
+        if self.extension ==".mp3":
+            audio = AudioSegment.from_mp3(self.filepath)
+            audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3", tags=_tags)
+            pass
+        if self.extension ==".wav":
+            audio = AudioSegment.from_wav(self.filepath)
+            audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav", tags=_tags)
+            pass
+        if self.extension ==".ogg":
+            audio = AudioSegment.from_ogg(self.filepath)
+            audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg", tags=_tags)
+            pass
+        if self.extension ==".flv":
+            audio = AudioSegment.from_flv(self.filepath)
+            audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv", tags=_tags)
+            pass
+
+        #read wav file to an audio segment
+        audio = AudioSegment.from_flv(self.filepath)
+
+        # Add above two audio segments
+        final_song = leading_segment + audio + trailing_segment
+
+        #Either save modified audio
+        final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv")
         pass
