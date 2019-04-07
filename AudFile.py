@@ -66,14 +66,37 @@ class AudFile:
         os.rename(self.filepath, self.base + '\\' + _prefix + self.name)
 
     ### UNORGANIZED METHODS ###
-    def convertTo(self, _target_samplerate=44100, _target_bitdepth=16):
+    def convertTo(self, _extension=".wav", _target_samplerate=44100, _target_bitdepth=16, _target_bitrate="320k"):
         logger.info("convertTo:" + self.filepath)
 
         createFolder(self.base + self.output_directory)
 
         # Get FFMPEG to run the job
-        if _target_bitdepth == 16:
-            os.system("ffmpeg -i " + "\"" + str(self.filepath) + "\"" + " -vn -acodec pcm_s16le -ac 1 -ar " + str(_target_samplerate) + " -f wav " + "\"" + self.base + self.output_directory + "\\" + self.name + "\"")
+        ## THIS NEEDS TO BE REDOONE ##
+        command = ""
+        if _extension.lower() == ".mp3":
+            ## full 320k with constant bitrate, may be wasteful
+            if _target_bitrate.lower() == "320k":
+                command = "ffmpeg -i {0} -codec:a libmp3lame -b:a 320k {1}.mp3".format(self.filepath, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+            ## variable bitrate
+            elif _target_bitrate.lower() == "0":
+                command = "ffmpeg -i {0} -codec:a libmp3lame -q:a 0 {1}.mp3".format(self.filepath, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+        elif _extension.lower() == ".wav":
+            if _target_bitdepth == 16:
+                command = "ffmpeg -i {0} {1}.wav".format(self.filepath, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+            elif _target_bitdepth == 24:
+                command = "ffmpeg -i {0} -acodec s24le -ar {1} {2}.wav".format(self.filepath, _target_samplerate, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+            elif _target_bitdepth == 32:
+                command = "ffmpeg -i {0} -acodec s32le -ar {1} {2}.wav".format(self.filepath, _target_samplerate, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+            elif _target_bitdepth == 64:
+                command = "ffmpeg -i {0} -acodec s64le -ar {1} {2}.wav".format(self.filepath, _target_samplerate, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+
+        if command:
+            print(self.extension)
+            print(self.name.split(".")[0])
+            pass
+            logger.debug("COMMAND:" + command)
+                #os.system("ffmpeg -i " + "\"" + str(self.filepath) + "\"" + " -vn -acodec pcm_s16le -ac 1 -ar " + str(_target_samplerate) + " -f " + _extension.lstrip(".") + " " + "\"" + self.base + self.output_directory + "\\" + self.name.split(".")[0] + _extension + "\"")
 
     def pad(self, _in=0.0, _out=0.0):
         '''
@@ -98,7 +121,7 @@ class AudFile:
             #Either save modified audio
             final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3")
 
-        if self.extension ==".wav":
+        elif self.extension ==".wav":
             logger.info("Processing wav: " + self.filepath)
             #read wav file to an audio segment
             audio = AudioSegment.from_wav(self.filepath)
@@ -109,7 +132,7 @@ class AudFile:
             #Either save modified audio
             final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav")
 
-        if self.extension ==".ogg":
+        elif self.extension ==".ogg":
             logger.info("Processing ogg: " + self.filepath)
             #read wav file to an audio segment
             audio = AudioSegment.from_ogg(self.filepath)
@@ -120,7 +143,7 @@ class AudFile:
             #Either save modified audio
             final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg")
 
-        if self.extension ==".flv":
+        elif self.extension ==".flv":
             logger.info("Processing flv: " + self.filepath)
             #read wav file to an audio segment
             audio = AudioSegment.from_flv(self.filepath)

@@ -9,7 +9,7 @@ class AudDir:
     '''
     A wrapper for a directory path to ease use
     '''
-    extensions = [".wav", ".mp3", ".ogg", ".flv"]
+    extensions = [".wav", ".mp3"]
     files = []
     output_directory = "_Processed"
     count = 0
@@ -35,12 +35,14 @@ class AudDir:
         return ret
 
     def update(self):
+        '''
+        Update class to make sure changes are reflected
+        '''
         self.files=[]
         _files = os.listdir(self.dir)
         for _file in _files:
             _file = AudFile(os.path.abspath(self.dir + '\\' + _file))
             if os.path.isfile(str(_file)):
-                logger.error(_file)
                 if str(_file.extension).lower() in str(self.extensions).lower():
                     self.count += 1
                     self.files.append(_file)
@@ -112,9 +114,9 @@ class AudDir:
         self.update()
 
     ### UNORGANIZED METHODS ###
-    def convertTo(self, _target_samplerate=44100, _target_bitdepth=16):
+    def convertTo(self, _extension=".wav", _target_samplerate=44100, _target_bitdepth=16, _target_bitrate="320k"):
         for file in self.files:
-            file.convertTo(_target_samplerate, _target_bitdepth)
+            file.convertTo(_extension, _target_samplerate, _target_bitdepth, _target_bitrate)
 
     def pad(self, _in=0.0, _out=0.0):
         for file in self.files:
