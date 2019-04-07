@@ -1,6 +1,8 @@
 # Custom ignores
 test/
 test.py
+.pypirc
+dist/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

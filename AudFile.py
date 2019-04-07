@@ -92,10 +92,8 @@ class AudFile:
                 command = "ffmpeg -i {0} -acodec s64le -ar {1} {2}.wav".format(self.filepath, _target_samplerate, self.base + self.output_directory + "\\" + self.name.split(".")[0])
 
         if command:
-            print(self.extension)
-            print(self.name.split(".")[0])
-            pass
             logger.debug("COMMAND:" + command)
+            os.system(command)
                 #os.system("ffmpeg -i " + "\"" + str(self.filepath) + "\"" + " -vn -acodec pcm_s16le -ac 1 -ar " + str(_target_samplerate) + " -f " + _extension.lstrip(".") + " " + "\"" + self.base + self.output_directory + "\\" + self.name.split(".")[0] + _extension + "\"")
 
     def pad(self, _in=0.0, _out=0.0):

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["flit"]
+requires = ["flit", "pydub", "begin", "colorlog", "arrow"]
 build-backend = "flit.buildapi"
 
 [tool.flit.metadata]
@@ -8,4 +8,6 @@ author = "Zach Howard"
 author-email = "zach.d.howard@gmail.com"
 home-page = "https://www.github.com/zdhoward/aud"
 classifiers = ["License :: OSI Approved :: MIT License"]
-
+requires = ["flit", "pydub", "begin", "colorlog", "arrow"]
+requires-python=">=3"
+description-file="README.md"
