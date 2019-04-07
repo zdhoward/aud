@@ -3,11 +3,19 @@ This is the documentation for aud
 """
 
 __version__ = "0.1.0"
-
+#import .AudFile
+#import .AudDir
+#import .AudLib
 from AudFile import AudFile
 from AudDir import AudDir
 from AudLib import setupLogger, createFolder
 import begin
+
+__all__ = [
+    'AudFile',
+    'AudDir',
+    'AudLib'
+]
 
 @begin.start(auto_convert=True)
 def main(file: 'File' = "", dir: 'Directory' = "", rename: 'Rename' = [], convert: 'Convert' = [], pad: 'Padding' = [], metadata: 'Metadata Tags' = [], extensions: 'Extensions' = []):
