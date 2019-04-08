@@ -1,8 +1,5 @@
-# aud
+# aud - Quick tools for an audio studio environment
 
-## Quick tools for an audio studio environment
-
-### Functionality:
 #### Import The Package:
 ```python
 >> import aud
