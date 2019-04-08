@@ -14,7 +14,7 @@ dirpath.renameUpper()
 
 dirpath.renameLower()
 
-dirpath.pad(2.0, 3.5)
+dirpath.pad(_in=2.0, _out=3.5)
 
 dirpath.log("_Processed")
 
