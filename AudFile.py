@@ -195,4 +195,3 @@ class AudFile:
 
         #Either save modified audio
         final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv")
-        pass
