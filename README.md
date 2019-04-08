@@ -3,61 +3,54 @@
 ## Quick tools for an audio studio environment
 
 ### Functionality:
-  import aud
+Import The Package:
+>> import aud
 
-  file = AudFile(filepath)
-  dir = AudDir(filepath, extensions=['wav', 'mp3'])
+Setup a colored logger
+>> logger = setupLogger()
 
-  file.help()
-  dir.help()
-    prints out examples of all commands
+#### AudFile
+>> filepath = aud.AudFile("test.wav")
 
-  ####dir.setExtensions(['wav', 'mp3', 'ogg'])
-    select which extensions to apply commands to within a directory
+#### AudDir
+>> dirpath = aud.AudDir("test")
 
-  ####dir.setOutputDir(dirpath)
-    select which directory to output to
+Set which file types in the directory to effect
+>> dirpath.extensions = [".wav", ".mp3"]
 
-  file.convert(target_samplerate=44100, target_bitdepth=16)
-  ####dir.convert(target_samplerate=44100, target_bitdepth=16)
-    converts all audio files to a specific file type, sample rate, and bit depth
-    uses FFMPEG for high quality conversions
+For commands that change more than the name of an audio file, set the output folder
+>> dirpath.setOutputDir("_Processed")
 
-  file.pad(lead=0.0, trail=0.0)
-  ####dir.pad(lead=0.0, trail=0.0)
-    add leading or trailing space
+Generate a log file for a particular directory
+>> dirpath.log("_Processed")
 
-  file.fade(in=0.0, out=0.0, type='log|lin', ratio=0.0)
-  ####dir.fade(in=0.0, out=0.0, type='log|lin', ratio=0.0)
-    add fades in and out of tracks
+Add metadata tags to a file. There are standards but you can make up your own
+>> dirpath.metadata(["Artist": "Nobukazu Takemura", "Type": "sfx", "Keywords": "sword oneshot stereo"])
+>> filepath.metadata(["Artist": "Rei Harakami", "Project": "Game Jam", "Keywords": "loop bgm"])
 
-  ####file.prepend(prefix="", numbered=False, padding=2)
-  ####dir.prependAll(prefix="", numbered=False, padding=2)
-    prepend to file name like 02_prefix_filename
+Rename a file to be all lowercase
+>> dirpath.renameLower()
+>> filepath.renameLower()
 
-  ####file.upper()
-  ####dir.upper()
-    make file name uppercase
+Rename a file to be all UPPERCASE
+>> dirpath.renameUpper()
+>> filepath.renameUpper()
 
-  ####file.lower()
-  ####dir.lower()
-    make file name lowercase
+Rename a file to prepend a string
+>> dirpath.renamePrepend("bgm_loop_")
+>> filepath.renamePrepend("sword_sfx_")
 
-  ####file.replaceSpace()
-  ####dir.replaceSpace()
-    replace spaces with underscores
+Rename a file to replace_spaces_with_underscores
+>> dirpath.renameReplaceSpaces()
+>> filepath.renameReplaceSpaces()
 
-  file.move(target_dirpath)
-  ####dir.move(target_dirpath)
-    move audio files
+Add leading and/or trailing space for an audio file
+>> dirpath.pad(_in = 2.0, _out = 3.5)
+>> filepath.pad(_out = 2.2)
 
-  file.metadata(tags=["Artist Name": "Rei Harakami"])
-  ####dir.metadata(tags=["Artist Name": "Nobukazu Takemura", "Type": "sfx", "Keywords": "short oneshot upbeat"])
-    add metadata to a file. use common fields or make up your own to help batch categorize all of those new samples!
+Convert a file to a particular format
+>> dirpath.convertTo(_extension=".wav", _target_samplerate=44100, _target_bitdepth=16)
+>> filepath.convertTo(_extension=".mp3", _target_samplerate=44100, _target_bitrate="320k") #bitrate="0" for lossy compression
 
-  ####dir.log(meta=['samplerate', 'bitdepth', 'length', 'size', 'tags'], format='txt')
-    log all files with metadata to txt
-    uses the set params and overwrites old log
-    txt, csv, json
-
-    >> Add metadata tags
+>> logger.debug(filepath)
+>> # C:\Folder\test.wav
