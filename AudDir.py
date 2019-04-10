@@ -48,7 +48,7 @@ class AudDir:
                     self.files.append(_file)
 
     ### UTILITIES ###
-    def log(self, _dirpath = self.dir):
+    def log(self, _dirpath):
         '''
         log the files that match the list of extensions into a meta file
         '''
