@@ -1,6 +1,10 @@
 import os
 from setuptools import setup
 
+import sys
+if sys.version_info < (2,7):
+    sys.exit('Sorry, Python < 2.7 is not supported')
+
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
 # README file and 2) it's easier to type in the README file than to put a raw
@@ -10,7 +14,7 @@ def read(fname):
 
 setup(
     name = "aud",
-    version = "0.1",
+    version = "0.1.2",
     author = "Zach Howard",
     author_email = "zach.d.howard@gmail.com",
     description = ("Quick tools for audio busy-work"),
@@ -25,5 +29,5 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: MIT License",
     ],
-    install_requires=['pydub', 'arrow', 'colorlog']
+    install_requires=['pydub', 'arrow', 'colorlog', 'setuptools>24.2.0', 'pip>9.0.0']
 )
