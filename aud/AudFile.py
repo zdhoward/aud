@@ -1,5 +1,5 @@
 import os
-from AudLib import setupLogger, createFolder
+from aud.AudLib import setupLogger, createFolder
 from pydub import AudioSegment
 
 logger = setupLogger()

@@ -6,9 +6,9 @@ __version__ = "0.1.0"
 #import .AudFile
 #import .AudDir
 #import .AudLib
-from AudFile import AudFile
-from AudDir import AudDir
-from AudLib import setupLogger, createFolder
+from aud.AudFile import AudFile
+from aud.AudDir import AudDir
+from aud.AudLib import setupLogger, createFolder
 import begin
 
 __all__ = [

@@ -1,7 +1,7 @@
-from AudFile import AudFile
+from aud.AudFile import AudFile
 import arrow
 import os
-from AudLib import setupLogger
+from aud.AudLib import setupLogger
 
 logger = setupLogger()
 
