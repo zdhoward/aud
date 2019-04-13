@@ -14,7 +14,7 @@ def read(fname):
 
 setup(
     name = "aud",
-    version = "0.1.2",
+    version = "0.1.14",
     author = "Zach Howard",
     author_email = "zach.d.howard@gmail.com",
     description = ("Quick tools for audio busy-work"),

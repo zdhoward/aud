@@ -16,7 +16,9 @@ def setupLogger():
     return logger
 
 def createFolder(path):
-    # Create folder if it does not already exist
+    '''
+    Create folder if it does not already exist
+    '''
     try:
         if not exists(path):
             makedirs(path)
