@@ -118,6 +118,7 @@ class AudDir:
         for file in self.files:
             file.renamePrepend(str(count).zfill(_zeroes) + "_")
             count += 1
+        self.update()
 
     ### UNORGANIZED METHODS ###
     def convertTo(self, _extension=".wav", _target_samplerate=44100, _target_bitdepth=16, _target_bitrate="320k"):
