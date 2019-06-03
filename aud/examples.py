@@ -14,6 +14,10 @@ dirpath.renameUpper()
 
 dirpath.renameLower()
 
+dirpath.renamePrepend("FX_")
+
+dirpath.renameIterate(3)
+
 dirpath.pad(_in=2.0, _out=3.5)
 
 dirpath.log("_Processed")
