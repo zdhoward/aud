@@ -54,6 +54,11 @@
 >> filepath.renamePrepend("sword_sfx_")
 ```
 
+#### Rename files to prepend iterated numbers with variable zerofill
+```python
+>> dirpath.renameIterate(3)
+```
+
 #### Rename a file to replace_spaces_with_underscores
 ```python
 >> dirpath.renameReplaceSpaces()
