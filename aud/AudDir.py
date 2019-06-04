@@ -125,6 +125,10 @@ class AudDir:
         for file in self.files:
             file.convertTo(_extension, _target_samplerate, _target_bitdepth, _target_bitrate)
 
+    def normalize(self, _type=None, _target=None):
+        for file in self.files:
+            file.normalize(_type, _target)
+
     def pad(self, _in=0.0, _out=0.0):
         for file in self.files:
             file.pad(_in, _out)

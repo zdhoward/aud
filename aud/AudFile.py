@@ -96,6 +96,32 @@ class AudFile:
             os.system(command)
                 #os.system("ffmpeg -i " + "\"" + str(self.filepath) + "\"" + " -vn -acodec pcm_s16le -ac 1 -ar " + str(_target_samplerate) + " -f " + _extension.lstrip(".") + " " + "\"" + self.base + self.output_directory + "\\" + self.name.split(".")[0] + _extension + "\"")
 
+    def normalize(self, _type=None, _target=None):
+        '''
+        Normalize audio
+        Type: ebu(default)|rms|peak
+        Target (optional): The desired db level to normalize to
+        target not valid for ebu
+        '''
+        # ffmpeg-normalize in.wav -o out.wav
+        # if _type exists, ffmpeg-normalize in.wav -nt _type
+        # if _type and _target exists, ffmpeg-normalize -nt _type -t _target
+        logger.info("normalize:" + self.filepath)
+        createFolder(self.base + self.output_directory)
+
+        command = ""
+
+        if (_type == None and _target == None):
+            command = "ffmpeg-normalize {0} -o {1}".format(self.filepath, self.base + self.output_directory + "\\" + self.name)
+        else if (_type != None and _target == None):
+            command = "ffmpeg-normalize {0} -nt {1} -o {2}".format(self.filepath, _type, self.base + self.output_directory + "\\" + self.name)
+        else if (_type != None and _target != None):
+            command = "ffmpeg-normalize {0} -nt {1} -t {2} -o {3}".format(self.filepath, _type, _target, self.base + self.output_directory + "\\" + self.name)
+
+        if command:
+            logger.debug("COMMAND:" + command)
+            os.system(command)
+
     def pad(self, _in=0.0, _out=0.0):
         '''
         Add leading and trailing blank audio to an audio file

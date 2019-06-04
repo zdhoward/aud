@@ -71,6 +71,13 @@
 >> filepath.pad(_out = 2.2)
 ```
 
+#### Normalize audio
+```python
+>> dirpath.normalize()
+>> dirpath.normalize(_type="peak")
+>> filepath.normalize(_type="peak", _target=-6)
+```
+
 #### Convert a file to a particular format
 ```python
 >> dirpath.convertTo(_extension=".wav", _target_samplerate=44100, _target_bitdepth=16)
