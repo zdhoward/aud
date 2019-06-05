@@ -22,8 +22,11 @@ def createFolder(path):
     try:
         if not exists(path):
             makedirs(path)
+            return True
     except OSError:
         logger.error("Creating directory failed")
+        return False
+
 
 def program_exists(program):
     import os
@@ -38,4 +41,4 @@ def program_exists(program):
             exe_file = os.path.join(path, program)
             if is_exe(exe_file):
                 return exe_file
-    return None
+    return False

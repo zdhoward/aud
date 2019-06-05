@@ -113,9 +113,9 @@ class AudFile:
 
         if (_type == None and _target == None):
             command = "ffmpeg-normalize {0} -o {1}".format(self.filepath, self.base + self.output_directory + "\\" + self.name)
-        else if (_type != None and _target == None):
+        elif (_type != None and _target == None):
             command = "ffmpeg-normalize {0} -nt {1} -o {2}".format(self.filepath, _type, self.base + self.output_directory + "\\" + self.name)
-        else if (_type != None and _target != None):
+        elif (_type != None and _target != None):
             command = "ffmpeg-normalize {0} -nt {1} -t {2} -o {3}".format(self.filepath, _type, _target, self.base + self.output_directory + "\\" + self.name)
 
         if command:
