@@ -22,7 +22,7 @@ def createFolder(path):
     try:
         if not exists(path):
             makedirs(path)
-            return True
+        return True
     except OSError:
         logger.error("Creating directory failed")
         return False

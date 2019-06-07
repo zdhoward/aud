@@ -42,28 +42,44 @@ class AudFile:
         Rename file to UPPERCASE
         '''
         logger.info("renameUpper:" + self.filepath)
-        os.rename(self.filepath, self.base + '\\' + self.name.upper())
+        try:
+            os.rename(self.filepath, self.base + '\\' + self.name.upper())
+            return True
+        except:
+            return False
 
     def renameLower(self):
         '''
         Rename file to lowercase
         '''
         logger.info("renameLower:" + self.filepath)
-        os.rename(self.filepath, self.base + '\\' + self.name.lower())
+        try:
+            os.rename(self.filepath, self.base + '\\' + self.name.lower())
+            return True
+        except:
+            return False
 
     def renameReplaceSpaces(self):
         '''
         Rename file to replace_all_spaces_with_underscored
         '''
         logger.info("renameReplaceSpaces:" + self.filepath)
-        os.rename(self.filepath, self.base + '\\' + self.name.replace(" ", "_"))
+        try:
+            os.rename(self.filepath, self.base + '\\' + self.name.replace(" ", "_"))
+            return True
+        except:
+            return False
 
     def renamePrepend(self, _prefix):
         '''
         Add a prefix for the filename
         '''
         logger.info("renamePrepend:" + self.filepath)
-        os.rename(self.filepath, self.base + '\\' + _prefix + self.name)
+        try:
+            os.rename(self.filepath, self.base + '\\' + _prefix + self.name)
+            return True
+        except:
+            return False
 
     ### UNORGANIZED METHODS ###
     def convertTo(self, _extension=".wav", _target_samplerate=44100, _target_bitdepth=16, _target_bitrate="320k"):
@@ -93,8 +109,12 @@ class AudFile:
 
         if command:
             logger.debug("COMMAND:" + command)
-            os.system(command)
+            try:
+                os.system(command)
                 #os.system("ffmpeg -i " + "\"" + str(self.filepath) + "\"" + " -vn -acodec pcm_s16le -ac 1 -ar " + str(_target_samplerate) + " -f " + _extension.lstrip(".") + " " + "\"" + self.base + self.output_directory + "\\" + self.name.split(".")[0] + _extension + "\"")
+                return True
+            except:
+                return False
 
     def normalize(self, _type=None, _target=None):
         '''
@@ -120,7 +140,11 @@ class AudFile:
 
         if command:
             logger.debug("COMMAND:" + command)
-            os.system(command)
+            try:
+                os.system(command)
+                return True
+            except:
+                return False
 
     def pad(self, _in=0.0, _out=0.0):
         '''
@@ -143,7 +167,11 @@ class AudFile:
             final_song = leading_segment + audio + trailing_segment
 
             #Either save modified audio
-            final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3")
+            try:
+                final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3")
+                return True
+            except:
+                return False
 
         elif self.extension ==".wav":
             logger.info("Processing wav: " + self.filepath)
@@ -154,8 +182,11 @@ class AudFile:
             final_song = leading_segment + audio + trailing_segment
 
             #Either save modified audio
-            final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav")
-
+            try:
+                final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav")
+                return True
+            except:
+                return False
         elif self.extension ==".ogg":
             logger.info("Processing ogg: " + self.filepath)
             #read wav file to an audio segment
@@ -165,7 +196,11 @@ class AudFile:
             final_song = leading_segment + audio + trailing_segment
 
             #Either save modified audio
-            final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg")
+            try:
+                final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg")
+                return True
+            except:
+                return False
 
         elif self.extension ==".flv":
             logger.info("Processing flv: " + self.filepath)
@@ -176,8 +211,11 @@ class AudFile:
             final_song = leading_segment + audio + trailing_segment
 
             #Either save modified audio
-            final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv")
-
+            try:
+                final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv")
+                return True
+            except:
+                return False
         ## This works with ogg or flv too
 
     def fade(self, _in=0.0, out=0.0, _type='log|lin', _ratio=0.0):
@@ -202,22 +240,29 @@ class AudFile:
 
         if self.extension ==".mp3":
             audio = AudioSegment.from_mp3(self.filepath)
-            audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3", tags=_tags)
+            try:
+                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3", tags=_tags)
+                return True
+            except:
+                return False
         if self.extension ==".wav":
             audio = AudioSegment.from_wav(self.filepath)
-            audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav", tags=_tags)
+            try:
+                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav", tags=_tags)
+                return True
+            except:
+                return False
         if self.extension ==".ogg":
             audio = AudioSegment.from_ogg(self.filepath)
-            audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg", tags=_tags)
+            try:
+                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg", tags=_tags)
+                return True
+            except:
+                return False
         if self.extension ==".flv":
             audio = AudioSegment.from_flv(self.filepath)
-            audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv", tags=_tags)
-
-        #read wav file to an audio segment
-        audio = AudioSegment.from_flv(self.filepath)
-
-        # Add above two audio segments
-        final_song = leading_segment + audio + trailing_segment
-
-        #Either save modified audio
-        final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv")
+            try:
+                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv", tags=_tags)
+                return True
+            except:
+                return False
