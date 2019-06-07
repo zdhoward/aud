@@ -223,12 +223,51 @@ class AudFile:
         Add fades to an audio file
         '''
         logger.info("fade:" + self.filepath)
+        if self.extension == ".mp3":
+            file = AudioSegment.from_mp3(self.filepath)
+            file = file.fade_in(_in * 1000).fade_out(_out * 1000)
+            try:
+                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3")
+                return True
+            except:
+                return False
+        elif self.extension == ".wav":
+            file = AudioSegment.from_wav(self.filepath)
+            file = file.fade_in(_in * 1000).fade_out(_out * 1000)
+            try:
+                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav")
+                return True
+            except:
+                return False
+        elif self.extension == ".ogg":
+            file = AudioSegment.from_ogg(self.filepath)
+            file = file.fade_in(_in * 1000).fade_out(_out * 1000)
+            try:
+                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg")
+                return True
+            except:
+                return False
+        elif self.extension == ".flv":
+            file = AudioSegment.from_flv(self.filepath)
+            file = file.fade_in(_in * 1000).fade_out(_out * 1000)
+            try:
+                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv")
+                return True
+            except:
+                return False
+        else:
+            return False
 
     def move(self, _target_directory):
         '''
         Move file to another folder
         '''
         logger.info("moving:" + self.filepath)
+        try:
+            os.rename(self.filepath, _target_directory + "/" + self.name)
+            return True
+        except:
+            return False
 
     def metadata(self, _tags={}):
         '''
@@ -245,24 +284,26 @@ class AudFile:
                 return True
             except:
                 return False
-        if self.extension ==".wav":
+        elif self.extension ==".wav":
             audio = AudioSegment.from_wav(self.filepath)
             try:
                 audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav", tags=_tags)
                 return True
             except:
                 return False
-        if self.extension ==".ogg":
+        elif self.extension ==".ogg":
             audio = AudioSegment.from_ogg(self.filepath)
             try:
                 audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg", tags=_tags)
                 return True
             except:
                 return False
-        if self.extension ==".flv":
+        elif self.extension ==".flv":
             audio = AudioSegment.from_flv(self.filepath)
             try:
                 audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv", tags=_tags)
                 return True
             except:
                 return False
+        else:
+            return False
