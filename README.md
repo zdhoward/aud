@@ -65,10 +65,23 @@
 >> filepath.renameReplaceSpaces()
 ```
 
+#### Move audio files
+```python
+>> dirpath.move("C://Share/Audio")
+>> filepath.move("/mnt/share")
+```
+
 #### Add leading and/or trailing space for an audio file
 ```python
 >> dirpath.pad(_in = 2.0, _out = 3.5)
 >> filepath.pad(_out = 2.2)
+```
+
+
+#### Add fade in or out for an audio file in seconds
+```python
+>> dirpath.fade(_in = 5.0, _out = 10.5)
+>> filepath.fade(_out = 2.2)
 ```
 
 #### Normalize audio
