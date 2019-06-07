@@ -10,9 +10,9 @@ When working with audio you may often end up with many arbitrary files your DAW 
 
 ```
 Requirements:
->> Python3
->> FFMPEG
->> FFMPEG-NORMALIZE
+>> python3
+>> ffmpeg
+>> ffmpeg-normalize
 ```
 
 Make sure all of the requirements are installed to your $PATH before use
