@@ -42,3 +42,10 @@ def program_exists(program):
             if is_exe(exe_file):
                 return exe_file
     return False
+
+def check_dependancies():
+    if (not program_exists('ffmpeg')):
+        return False
+    if (not program_exists('ffmpeg-normalize')):
+        return False
+    return True
