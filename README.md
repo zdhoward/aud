@@ -1,5 +1,22 @@
 # aud - Quick tools for an audio studio environment
 
+aud is an audio package meant to help streamline batch audio edits.
+It allows you to easily work with complex file structures and naming conventions.
+It is also meant to be easy enough for a beginner programmer to dive in and use.
+The foundation of this package relies on two core pieces; FFMPEG and PyDub.
+
+AudDir allows you perform batch audio actions on messy folders. 
+When working with audio you may often end up with many arbitrary files your DAW may produce so AudDir allows you to point only to specific extensions in a directory and to work with them on the fly.
+
+```
+Requirements:
+>> Python3
+>> FFMPEG
+>> FFMPEG-NORMALIZE
+```
+
+Make sure all of the requirements are installed to your $PATH before use
+
 #### Import The Package:
 ```python
 >> import aud
