@@ -25,7 +25,7 @@ def createFolder(path):
             makedirs(path)
         return True
     except OSError:
-        #logger.error("Creating directory failed")
+        logger.error("Creating directory failed")
         return False
 
 
@@ -42,6 +42,7 @@ def program_exists(program):
             exe_file = os.path.join(path, program)
             if is_exe(exe_file):
                 return exe_file
+    logger.error(program + " is not currently installed")
     return False
 
 def check_dependencies():

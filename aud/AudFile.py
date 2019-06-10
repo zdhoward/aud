@@ -162,7 +162,7 @@ class AudFile:
         '''
         Add leading and trailing blank audio to an audio file
         '''
-        #logger.info("pad:" + self.filepath)
+        logger.info("pad:" + self.filepath)
 
         # create processed folder
         createFolder(self.base + self.output_directory)
