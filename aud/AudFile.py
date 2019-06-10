@@ -28,13 +28,13 @@ class AudFile:
 
     ### override string and print
     def __repr__(self):
-        return str(self.filepath)
+        return str(self.base + self.name)
 
     def __str__(self):
-        return str(self.filepath)
+        return str(self.base + self.name)
 
     def __add__(self, _string):
-        return str(self.filepath + _string)
+        return str(self.base + self.name + _string)
 
     ### OS IO METHODS ###
     def renameUpper(self):
@@ -43,7 +43,10 @@ class AudFile:
         '''
         logger.info("renameUpper:" + self.filepath)
         try:
-            os.rename(self.filepath, self.base + '\\' + self.name.upper())
+            name = self.name.split('.')[0].upper() + self.extension
+            os.rename(self.filepath, self.base + '/' + name)
+            self.name = name
+            self.filepath = self.base + '/' + name
             return True
         except:
             return False
@@ -54,18 +57,24 @@ class AudFile:
         '''
         logger.info("renameLower:" + self.filepath)
         try:
-            os.rename(self.filepath, self.base + '\\' + self.name.lower())
+            name = self.name.split('.')[0].lower() + self.extension
+            os.rename(self.filepath, self.base + '/' + name)
+            self.name = name
+            self.filepath = self.base + '/' + name
             return True
         except:
             return False
 
-    def renameReplaceSpaces(self):
+    def renameReplaceSpaces(self, _spacer="_"):
         '''
         Rename file to replace_all_spaces_with_underscored
         '''
         logger.info("renameReplaceSpaces:" + self.filepath)
         try:
-            os.rename(self.filepath, self.base + '\\' + self.name.replace(" ", "_"))
+            name = self.name.replace(" ", _spacer)
+            os.rename(self.filepath, self.base + '/' + name)
+            self.name = name
+            self.filepath = self.base + '/' + name
             return True
         except:
             return False
@@ -76,7 +85,10 @@ class AudFile:
         '''
         logger.info("renamePrepend:" + self.filepath)
         try:
-            os.rename(self.filepath, self.base + '\\' + _prefix + self.name)
+            name = _prefix + self.name
+            os.rename(self.filepath, self.base + '/' + name)
+            self.name = name
+            self.filepath = self.base + '/' + name
             return True
         except:
             return False
@@ -262,9 +274,11 @@ class AudFile:
         '''
         Move file to another folder
         '''
-        logger.info("moving:" + self.filepath)
+        logger.info("moving:" + self.filepath + " to " + _target_directory)
         try:
             os.rename(self.filepath, _target_directory + "/" + self.name)
+            self.filepath = _target_directory + "/" + self.name
+            self.base = _target_directory + "/"
             return True
         except:
             return False

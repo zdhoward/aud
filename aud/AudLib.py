@@ -24,7 +24,7 @@ def createFolder(path):
             makedirs(path)
         return True
     except OSError:
-        logger.error("Creating directory failed")
+        #logger.error("Creating directory failed")
         return False
 
 
@@ -43,7 +43,7 @@ def program_exists(program):
                 return exe_file
     return False
 
-def check_dependancies():
+def check_dependencies():
     if (not program_exists('ffmpeg')):
         return False
     if (not program_exists('ffmpeg-normalize')):
