@@ -10,11 +10,11 @@ def test_lib_program_exists():
 
 ## AUDFILE TESTS
 file = aud.AudFile("./test/AudFile/test.wav")
-def test_file_moveTo():
+def test_file_move():
     assert file.move(file.base + "../AudDir")
     assert file.move(file.base + "../AudFile")
 
-def test_rename():
+def test_file_rename():
     assert file.renameUpper()
     assert file.renameLower()
     assert file.renamePrepend("test ")
@@ -25,3 +25,20 @@ def test_rename():
         assert True
     except:
         assert False
+
+def test_file_overloads():
+    assert True
+    # str(file)
+    # file + "test"
+    # repr(file)
+
+def test_file_meta():
+    assert True
+    #Metadata
+
+def test_file_ffmpeg():
+    assert True
+    #Fade
+    #Pad
+    #Convert
+    #Normalize
