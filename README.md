@@ -27,6 +27,7 @@ Make sure all of the requirements are installed to your $PATH before use
 #### Import The Package:
 ```python
 >> import aud
+>> from aud import AudFile, AudDir, AudLib
 ```
 
 #### AudFile
