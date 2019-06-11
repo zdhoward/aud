@@ -142,6 +142,11 @@ class AudDir:
             file.move(_target_directory)
         self.update()
 
+    def copy(self, _target_directory):
+        for file in self.files:
+            file.copy(_target_directory)
+        self.update()
+
     def metadata(self, tags):
         for file in self.files:
             file.metadata(tags)

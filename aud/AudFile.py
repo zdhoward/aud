@@ -1,4 +1,5 @@
 import os
+from shutil import copy2
 from aud.AudLib import setupLogger, createFolder
 from pydub import AudioSegment
 
@@ -24,17 +25,18 @@ class AudFile:
             self.base = path.rstrip(self.name)
             self.extension = str('.' + self.name.split('.')[1].lower())
         except:
+            logger.error(_input_file + " failed to instantiate")
             del self
 
     ### override string and print
     def __repr__(self):
-        return str(self.base + self.name)
+        return str(os.path.join(self.base, self.name))
 
     def __str__(self):
-        return str(self.base + self.name)
+        return str(os.path.join(self.base, self.name))
 
     def __add__(self, _string):
-        return str(self.base + self.name + _string)
+        return str(os.path.join(self.base, self.name) + _string)
 
     ### OS IO METHODS ###
     def renameUpper(self):
@@ -44,9 +46,9 @@ class AudFile:
         logger.info("renameUpper:" + self.filepath)
         try:
             name = self.name.split('.')[0].upper() + self.extension
-            os.rename(self.filepath, self.base + '/' + name)
+            os.rename(self.filepath, os.path.join(self.base, name))
             self.name = name
-            self.filepath = self.base + '/' + name
+            self.filepath = os.path.join(self.base, name)
             return True
         except:
             return False
@@ -58,9 +60,9 @@ class AudFile:
         logger.info("renameLower:" + self.filepath)
         try:
             name = self.name.split('.')[0].lower() + self.extension
-            os.rename(self.filepath, self.base + '/' + name)
+            os.rename(self.filepath, os.path.join(self.base, name))
             self.name = name
-            self.filepath = self.base + '/' + name
+            self.filepath = os.path.join(self.base, name)
             return True
         except:
             return False
@@ -72,9 +74,9 @@ class AudFile:
         logger.info("renameReplaceSpaces:" + self.filepath)
         try:
             name = self.name.replace(" ", _spacer)
-            os.rename(self.filepath, self.base + '/' + name)
+            os.rename(self.filepath, os.path.join(self.base, name))
             self.name = name
-            self.filepath = self.base + '/' + name
+            self.filepath = os.path.join(self.base, name)
             return True
         except:
             return False
@@ -86,9 +88,9 @@ class AudFile:
         logger.info("renamePrepend:" + self.filepath)
         try:
             name = _prefix + self.name
-            os.rename(self.filepath, self.base + '/' + name)
+            os.rename(self.filepath, os.path.join(self.base, name))
             self.name = name
-            self.filepath = self.base + '/' + name
+            self.filepath = os.path.join(self.base, name)
             return True
         except:
             return False
@@ -97,7 +99,7 @@ class AudFile:
     def convertTo(self, _extension=".wav", _target_samplerate=44100, _target_bitdepth=16, _target_bitrate="320k"):
         logger.info("convertTo:" + self.filepath)
 
-        createFolder(self.base + self.output_directory)
+        createFolder(os.path.join(self.base, self.output_directory))
 
         # Get FFMPEG to run the job
         ## THIS NEEDS TO BE REDOONE ##
@@ -105,19 +107,19 @@ class AudFile:
         if _extension.lower() == ".mp3":
             ## full 320k with constant bitrate, may be wasteful
             if _target_bitrate.lower() == "320k":
-                command = "ffmpeg -i {0} -codec:a libmp3lame -b:a 320k {1}.mp3".format(self.filepath, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+                command = "ffmpeg -i {0} -codec:a libmp3lame -b:a 320k {1}.mp3".format(self.filepath, os.path.join(self.base, self.output_directory, self.name.split(".")[0]))
             ## variable bitrate
             elif _target_bitrate.lower() == "0":
-                command = "ffmpeg -i {0} -codec:a libmp3lame -q:a 0 {1}.mp3".format(self.filepath, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+                command = "ffmpeg -i {0} -codec:a libmp3lame -q:a 0 {1}.mp3".format(self.filepath, os.path.join(self.base, self.output_directory, self.name.split(".")[0]))
         elif _extension.lower() == ".wav":
             if _target_bitdepth == 16:
-                command = "ffmpeg -i {0} {1}.wav".format(self.filepath, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+                command = "ffmpeg -i {0} {1}.wav".format(self.filepath, os.path.join(self.base, self.output_directory, self.name.split(".")[0]))
             elif _target_bitdepth == 24:
-                command = "ffmpeg -i {0} -acodec s24le -ar {1} {2}.wav".format(self.filepath, _target_samplerate, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+                command = "ffmpeg -i {0} -acodec s24le -ar {1} {2}.wav".format(self.filepath, _target_samplerate, os.path.join(self.base, self.output_directory, self.name.split(".")[0]))
             elif _target_bitdepth == 32:
-                command = "ffmpeg -i {0} -acodec s32le -ar {1} {2}.wav".format(self.filepath, _target_samplerate, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+                command = "ffmpeg -i {0} -acodec s32le -ar {1} {2}.wav".format(self.filepath, _target_samplerate, os.path.join(self.base, self.output_directory, self.name.split(".")[0]))
             elif _target_bitdepth == 64:
-                command = "ffmpeg -i {0} -acodec s64le -ar {1} {2}.wav".format(self.filepath, _target_samplerate, self.base + self.output_directory + "\\" + self.name.split(".")[0])
+                command = "ffmpeg -i {0} -acodec s64le -ar {1} {2}.wav".format(self.filepath, _target_samplerate, os.path.join(self.base, self.output_directory, self.name.split(".")[0]))
 
         if command:
             logger.debug("COMMAND:" + command)
@@ -139,16 +141,16 @@ class AudFile:
         # if _type exists, ffmpeg-normalize in.wav -nt _type
         # if _type and _target exists, ffmpeg-normalize -nt _type -t _target
         logger.info("normalize:" + self.filepath)
-        createFolder(self.base + self.output_directory)
+        createFolder(os.path.join(self.base, self.output_directory))
 
         command = ""
 
         if (_type == None and _target == None):
-            command = "ffmpeg-normalize {0} -o {1}".format(self.filepath, self.base + self.output_directory + "\\" + self.name)
+            command = "ffmpeg-normalize {0} -o {1}".format(self.filepath, os.path.join(self.base, self.output_directory, self.name))
         elif (_type != None and _target == None):
-            command = "ffmpeg-normalize {0} -nt {1} -o {2}".format(self.filepath, _type, self.base + self.output_directory + "\\" + self.name)
+            command = "ffmpeg-normalize {0} -nt {1} -o {2}".format(self.filepath, _type, os.path.join(self.base, self.output_directory, self.name))
         elif (_type != None and _target != None):
-            command = "ffmpeg-normalize {0} -nt {1} -t {2} -o {3}".format(self.filepath, _type, _target, self.base + self.output_directory + "\\" + self.name)
+            command = "ffmpeg-normalize {0} -nt {1} -t {2} -o {3}".format(self.filepath, _type, _target, os.path.join(self.base, self.output_directory, self.name))
 
         if command:
             logger.debug("COMMAND:" + command)
@@ -165,7 +167,7 @@ class AudFile:
         logger.info("pad:" + self.filepath)
 
         # create processed folder
-        createFolder(self.base + self.output_directory)
+        createFolder(os.path.join(self.base + self.output_directory))
 
         leading_segment = AudioSegment.silent(duration=(1000*_in))
         trailing_segment = AudioSegment.silent(duration=(1000*_out))
@@ -180,7 +182,7 @@ class AudFile:
 
             #Either save modified audio
             try:
-                final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3")
+                final_song.export(os.path.join(self.base, self.output_directory, self.name), format="mp3")
                 return True
             except:
                 return False
@@ -195,7 +197,7 @@ class AudFile:
 
             #Either save modified audio
             try:
-                final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav")
+                final_song.export(os.path.join(self.base, self.output_directory, self.name), format="wav")
                 return True
             except:
                 return False
@@ -209,7 +211,7 @@ class AudFile:
 
             #Either save modified audio
             try:
-                final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg")
+                final_song.export(os.path.join(self.base, self.output_directory, self.name), format="ogg")
                 return True
             except:
                 return False
@@ -224,7 +226,7 @@ class AudFile:
 
             #Either save modified audio
             try:
-                final_song.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv")
+                final_song.export(os.path.join(self.base, self.output_directory, self.name), format="flv")
                 return True
             except:
                 return False
@@ -239,7 +241,7 @@ class AudFile:
             file = AudioSegment.from_mp3(self.filepath)
             file = file.fade_in(_in * 1000).fade_out(_out * 1000)
             try:
-                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3")
+                audio.export(os.path.join(self.base, self.output_directory, self.name), format="mp3")
                 return True
             except:
                 return False
@@ -247,7 +249,7 @@ class AudFile:
             file = AudioSegment.from_wav(self.filepath)
             file = file.fade_in(_in * 1000).fade_out(_out * 1000)
             try:
-                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav")
+                audio.export(os.path.join(self.base, self.output_directory, self.name), format="wav")
                 return True
             except:
                 return False
@@ -255,7 +257,7 @@ class AudFile:
             file = AudioSegment.from_ogg(self.filepath)
             file = file.fade_in(_in * 1000).fade_out(_out * 1000)
             try:
-                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg")
+                audio.export(os.path.join(self.base, self.output_directory, self.name), format="ogg")
                 return True
             except:
                 return False
@@ -263,7 +265,7 @@ class AudFile:
             file = AudioSegment.from_flv(self.filepath)
             file = file.fade_in(_in * 1000).fade_out(_out * 1000)
             try:
-                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv")
+                audio.export(os.path.join(self.base, self.output_directory, self.name), format="flv")
                 return True
             except:
                 return False
@@ -276,9 +278,20 @@ class AudFile:
         '''
         logger.info("moving:" + self.filepath + " to " + _target_directory)
         try:
-            os.rename(self.filepath, _target_directory + "/" + self.name)
-            self.filepath = _target_directory + "/" + self.name
-            self.base = _target_directory + "/"
+            os.rename(self.filepath, os.path.join(_target_directory, self.name))
+            self.filepath = os.path.join(_target_directory, self.name)
+            self.base = _target_directory
+            return True
+        except:
+            return False
+
+    def copy(self, _target_directory):
+        '''
+        Copy a file to somewhere else
+        '''
+        logger.info("copy:" + self.filepath + " to " + _target_directory)
+        try:
+            copy2(self.filepath, os.path.join(_target_directory, self.name)
             return True
         except:
             return False
@@ -294,28 +307,28 @@ class AudFile:
         if self.extension ==".mp3":
             audio = AudioSegment.from_mp3(self.filepath)
             try:
-                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="mp3", tags=_tags)
+                audio.export(os.path.join(self.base, self.output_directory, self.name), format="mp3", tags=_tags)
                 return True
             except:
                 return False
         elif self.extension ==".wav":
             audio = AudioSegment.from_wav(self.filepath)
             try:
-                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="wav", tags=_tags)
+                audio.export(os.path.join(self.base, self.output_directory, self.name), format="wav", tags=_tags)
                 return True
             except:
                 return False
         elif self.extension ==".ogg":
             audio = AudioSegment.from_ogg(self.filepath)
             try:
-                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="ogg", tags=_tags)
+                audio.export(os.path.join(self.base, self.output_directory, self.name), format="ogg", tags=_tags)
                 return True
             except:
                 return False
         elif self.extension ==".flv":
             audio = AudioSegment.from_flv(self.filepath)
             try:
-                audio.export(self.base + '/' + self.output_directory + '/' + self.name, format="flv", tags=_tags)
+                audio.export(os.path.join(self.base, self.output_directory, self.name), format="flv", tags=_tags)
                 return True
             except:
                 return False
