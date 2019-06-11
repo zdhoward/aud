@@ -30,6 +30,8 @@ dirpath.convertTo(_extension=".wav", _target_samplerate=44100, _target_bitdepth=
 
 dirpath.fade(_in = 5.0, _out = 10.5)
 
+dirpath.copy("/usr/share")
+
 filepath = aud.AudDir("test.wav")
 
 filepath.renameReplaceSpaces()
@@ -43,6 +45,8 @@ filepath.convertTo(_extension=".mp3", _target_samplerate=44100, _target_bitrate=
 filepath.move("/mnt/share")
 
 filepath.fade(_out = 2.2)
+
+filepath.copy("../_backup")
 
 logger.debug(filepath)
 # C:\Folder\test.wav
