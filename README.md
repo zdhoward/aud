@@ -89,6 +89,12 @@ Make sure all of the requirements are installed to your $PATH before use
 >> filepath.move("/mnt/share")
 ```
 
+#### Copy audio files
+```python
+>> dirpath.copy("/usr/share")
+>> filepath.copy("../_backup")
+```
+
 #### Add leading and/or trailing space for an audio file
 ```python
 >> dirpath.pad(_in = 2.0, _out = 3.5)
