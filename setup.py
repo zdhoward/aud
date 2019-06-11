@@ -29,5 +29,5 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: MIT License",
     ],
-    install_requires=['pydub', 'arrow', 'colorlog', 'setuptools>24.2.0', 'pip>9.0.0']
+    install_requires=['pydub', 'arrow', 'colorlog', 'setuptools>24.2.0', 'pip3>9.0.0']
 )
