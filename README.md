@@ -12,6 +12,7 @@ When working with audio you may often end up with many arbitrary files your DAW 
 ```
 Requirements:
 >> python3
+>> pip3
 >> ffmpeg
 >> ffmpeg-normalize
 ```
