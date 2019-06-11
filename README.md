@@ -86,7 +86,7 @@ Make sure all of the requirements are installed to your $PATH before use
 
 #### Rename a file to replace_spaces_with_underscores
 ```python
->> dirpath.renameReplaceSpaces()
+>> dirpath.renameReplaceSpaces("_")
 >> filepath.renameReplaceSpaces()
 ```
 
