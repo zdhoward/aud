@@ -19,6 +19,11 @@ Requirements:
 
 Make sure all of the requirements are installed to your $PATH before use
 
+#### Install The Package:
+```python
+>> pip3 install aud
+```
+
 #### Import The Package:
 ```python
 >> import aud
