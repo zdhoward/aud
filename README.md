@@ -1,4 +1,5 @@
 # aud - Quick tools for an audio studio environment
+## v0.1.16
 
 aud is an audio package meant to help streamline batch audio edits.
 It allows you to easily work with complex file structures and naming conventions.
