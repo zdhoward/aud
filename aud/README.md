@@ -2,7 +2,7 @@
 
 #### Import The Package:
 ```python
->> import aud
+>> from aud import AudFile, AudDir, AudLib
 ```
 
 #### AudFile
