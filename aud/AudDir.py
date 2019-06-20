@@ -2,6 +2,7 @@ from aud.AudFile import AudFile
 import arrow
 import os
 from aud.AudLib import setupLogger
+from multiprocessing import Pool, cpu_count
 
 logger = setupLogger()
 
@@ -22,17 +23,44 @@ class AudDir:
         self.dir = _dir
         self.update()
 
+    # self.len()
     def __len__(self):
         return self.count
 
+    # self.getitem(2)
     def __getitem__(self, _index):
         return self.files[_index]
 
+    # self.get(2)
+    def __get__(self, _index):
+        return self.files[_index]
+
+    # self.contains("C:/Audio/Folder01/file.wav")
     def __contains__(self, value):
         ret = False
         if value in self.files:
             ret = True
         return ret
+
+    # self + value
+    def __add__(self, value):
+        temp = self.files
+        temp.append(value)
+        return temp
+
+    # self += value
+    def __iadd__(self, value):
+        self.files.append(value)
+
+    # self -= value
+    def __isub__(self, value):
+        self.files.remove(value)
+
+    # self - value
+    def __sub__(self, value):
+        temp = self.files
+        temp.remove(self.files)
+        return temp
 
     def update(self):
         '''
