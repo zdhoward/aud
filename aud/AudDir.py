@@ -69,7 +69,7 @@ class AudDir:
         self.files=[]
         _files = os.listdir(self.dir)
         for _file in _files:
-            _file = AudFile(os.path.abspath(self.dir + '\\' + _file))
+            _file = AudFile(os.path.abspath(os.path.join(self.dir, _file)))
             if os.path.isfile(str(_file)):
                 if str(_file.extension).lower() in str(self.extensions).lower():
                     self.count += 1
@@ -87,7 +87,8 @@ class AudDir:
         for file in _files:
             filepath = os.path.abspath(file)
             if filepath.suffix in self.extensions:
-                output += '' + str(path) + "\\" + str(filepath) + '\n'
+                #output += '' + str(path) + "\\" + str(filepath) + '\n'
+                output += '' + str(filepath) + '\n'
 
         ## Summary of files
         output += '\n\nSUMMARY\n'
@@ -99,7 +100,7 @@ class AudDir:
         '''
         A quick helper to create a simple file cleanly
         '''
-        file = open(_dirpath + "/" + _name + _filetype, "w")
+        file = open(os.path.join(_dirpath, _name + _filetype), "w")
         file.write(_content)
         file.close()
 
