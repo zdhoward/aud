@@ -46,6 +46,11 @@ def program_exists(program):
     return False
 
 def check_dependencies():
+    import sys
+    try:
+        assert sys.version_info >= (3, 0)
+    except:
+        return False
     if (not program_exists('ffmpeg')):
         return False
     if (not program_exists('ffmpeg-normalize')):
