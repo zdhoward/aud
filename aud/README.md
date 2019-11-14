@@ -1,7 +1,32 @@
 # aud - Quick tools for an audio studio environment
+## v0.1.17
+
+aud is an audio package meant to help streamline batch audio edits.
+It allows you to easily work with complex file structures and naming conventions.
+It is also meant to be easy enough for a beginner programmer to dive in and use.
+The foundation of this package relies on two core pieces; FFMPEG and PyDub.
+
+AudDir allows you perform batch audio actions on messy folders.
+When working with audio you may often end up with many arbitrary files your DAW may produce so AudDir allows you to point only to specific extensions in a directory and to work with them on the fly.
+
+```
+Requirements:
+>> python3
+>> pip3
+>> ffmpeg
+>> ffmpeg-normalize
+```
+
+Make sure all of the requirements are installed to your $PATH before use
+
+#### Install The Package:
+```python
+>> pip3 install aud
+```
 
 #### Import The Package:
 ```python
+>> import aud
 >> from aud import AudFile, AudDir, AudLib
 ```
 
@@ -54,16 +79,47 @@
 >> filepath.renamePrepend("sword_sfx_")
 ```
 
+#### Rename files to prepend iterated numbers with variable zerofill
+```python
+>> dirpath.renameIterate(3)
+```
+
 #### Rename a file to replace_spaces_with_underscores
 ```python
->> dirpath.renameReplaceSpaces()
+>> dirpath.renameReplaceSpaces("_")
 >> filepath.renameReplaceSpaces()
+```
+
+#### Move audio files
+```python
+>> dirpath.move("C://Share/Audio")
+>> filepath.move("/mnt/share")
+```
+
+#### Copy audio files
+```python
+>> dirpath.copy("/usr/share")
+>> filepath.copy("../_backup")
 ```
 
 #### Add leading and/or trailing space for an audio file
 ```python
 >> dirpath.pad(_in = 2.0, _out = 3.5)
 >> filepath.pad(_out = 2.2)
+```
+
+
+#### Add fade in or out for an audio file in seconds
+```python
+>> dirpath.fade(_in = 5.0, _out = 10.5)
+>> filepath.fade(_out = 2.2)
+```
+
+#### Normalize audio
+```python
+>> dirpath.normalize()
+>> dirpath.normalize(_type="peak")
+>> filepath.normalize(_type="peak", _target=-6)
 ```
 
 #### Convert a file to a particular format
