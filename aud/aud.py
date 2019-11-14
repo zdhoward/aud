@@ -2,20 +2,29 @@
 """
 This is the documentation for aud
 """
-#import .AudFile
-#import .AudDir
-#import .AudLib
+# import .AudFile
+# import .AudDir
+# import .AudLib
 
 from aud.AudFile import AudFile
 from aud.AudDir import AudDir
 from aud.AudLib import setupLogger, createFolder
 import begin
 
+
 @begin.start(auto_convert=True)
-def main(file: 'File' = "", dir: 'Directory' = "", rename: 'Rename' = [], convert: 'Convert' = [], pad: 'Padding' = [], metadata: 'Metadata Tags' = [], extensions: 'Extensions' = []):
-    '''
+def main(
+    file: "File" = "",
+    dir: "Directory" = "",
+    rename: "Rename" = [],
+    convert: "Convert" = [],
+    pad: "Padding" = [],
+    metadata: "Metadata Tags" = [],
+    extensions: "Extensions" = [],
+):
+    """
     aud: Quick tools for an audio studio environment
-    '''
+    """
     logger = setupLogger()
     ## Decipher arguments and run the right command
     ## Designed to work well in the interpreter
@@ -45,23 +54,28 @@ def main(file: 'File' = "", dir: 'Directory' = "", rename: 'Rename' = [], conver
         bd = "16"
         dr = "320k"
         if convert != []:
-            if convert['extension']:
-                ext = convert['extension']
-            if convert['samplerate']:
-                sr = convert['samplerate']
-            if convert['bitdepth']:
-                bd = convert['bitdepth']
-            if convert['bitrate']:
-                dr = convert['bitrate']
-            _file.convertTo(_extension=ext, _target_samplerate=sr, _target_bitdepth=bd, _target_bitrate=br)
+            if convert["extension"]:
+                ext = convert["extension"]
+            if convert["samplerate"]:
+                sr = convert["samplerate"]
+            if convert["bitdepth"]:
+                bd = convert["bitdepth"]
+            if convert["bitrate"]:
+                dr = convert["bitrate"]
+            _file.convertTo(
+                _extension=ext,
+                _target_samplerate=sr,
+                _target_bitdepth=bd,
+                _target_bitrate=br,
+            )
 
         _in = 0
         _out = 0
         if pad != []:
-            if pad['in']:
-                _in = pad['in']
-            if pad['out']:
-                _out = pad['out']
+            if pad["in"]:
+                _in = pad["in"]
+            if pad["out"]:
+                _out = pad["out"]
             _file.pad(_in=_in, _out=_out)
 
     ### DIR COMMANDS ###
@@ -92,21 +106,26 @@ def main(file: 'File' = "", dir: 'Directory' = "", rename: 'Rename' = [], conver
         bd = "16"
         dr = "320k"
         if convert != []:
-            if convert['extension']:
-                ext = convert['extension']
-            if convert['samplerate']:
-                sr = convert['samplerate']
-            if convert['bitdepth']:
-                bd = convert['bitdepth']
-            if convert['bitrate']:
-                dr = convert['bitrate']
-            _dir.convertTo(_extension=ext, _target_samplerate=sr, _target_bitdepth=bd, _target_bitrate=br)
+            if convert["extension"]:
+                ext = convert["extension"]
+            if convert["samplerate"]:
+                sr = convert["samplerate"]
+            if convert["bitdepth"]:
+                bd = convert["bitdepth"]
+            if convert["bitrate"]:
+                dr = convert["bitrate"]
+            _dir.convertTo(
+                _extension=ext,
+                _target_samplerate=sr,
+                _target_bitdepth=bd,
+                _target_bitrate=br,
+            )
 
         _in = 0.0
         _out = 0.0
         if pad != []:
-            if pad['in']:
-                _in = pad['in']
-            if pad['out']:
-                _out =pad['out']
+            if pad["in"]:
+                _in = pad["in"]
+            if pad["out"]:
+                _out = pad["out"]
             _dir.pad(_in=_in, _out=_out)
