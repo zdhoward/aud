@@ -111,7 +111,7 @@ class AudDir:
         """
         Select an output directory
         """
-        if Path(_dirpath).is_dir():
+        if os.path.abspath(_dirpath).is_dir():
             self.output_directory = _dirpath
 
     ### OS IO METHODS ###
