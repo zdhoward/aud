@@ -16,9 +16,9 @@
 
 ##### Getting Started
 ```
-import aud
+from aud import Dir
 
-[T] a = aud(directory)
+[T] a = Dir(directory)
 ```
 
 ##### Core Operations
