@@ -1,0 +1,4 @@
+pydub
+python-ffmpeg
+ffmpeg-normalize
+colorama

@@ -1,67 +1,86 @@
-# aud v0.1.18
+# aud-rework
+### v0.8.0
+[![CircleCI](https://circleci.com/gh/zdhoward/aud-rework/tree/master.svg?style=svg)](https://circleci.com/gh/zdhoward/aud-rework/tree/master)
 
-aud is an audio package meant to help streamline batch audio edits.
-It allows you to easily work with complex file structures and naming conventions.
-It is also meant to be easy enough for a beginner programmer to dive in and use.
-The foundation of this package relies on two core pieces; FFMPEG and PyDub.
+- Support for Python 3.8
+- Support for Windows & Ubuntu
+- Requires ffmpeg is already installed and updated
 
-AudDir allows you perform batch audio actions on messy folders.
-When working with audio you may often end up with many arbitrary files your DAW may produce so AudDir allows you to point only to specific extensions in a directory and to work with them on the fly.
-
-## Getting Started
-
-Getting started with aud is simple!
-Simply import and start playing with your files.
-
+##### To start contributing:
 ```
-from aud import AudDir
-
-# which files to operate on
-ad = AudDir('samples/')
-
-# which extensions in the folder to operate on
-ad.extensions = ['.wav', '.mp3']
-
-# which folder to output to when changing audio files
-ad.setOutputDir("_Processed")
-
-# rename all of the selected files
-ad.renameUpper()
-ad.renamePrepend('FX_')
-
-# finally create new files of the desired type in our output location
-ad.convertTo(_extension=".wav", _target_samplerate=44100, _target_bitdepth=16)
+>> git clone https://github.com/zdhoward/aud-rework.git
+>> cd aud-rework
+>> virtualenv venv
+>> python3 -m pip install -r requirements.txt
 ```
 
-### Prerequisites
-
-What things you need to install the software and how to install them
-
+##### Getting Started
 ```
->> python3
->> pip3
->> ffmpeg
->> ffmpeg-normalize
+import aud
+
+[T] a = aud(directory)
 ```
 
-### Installing
-
-Install prerequisites
-
+##### Core Operations
 ```
-ON LINUX:
->> sudo apt install python3
->> sudo python3 -m pip install pip
->> sudo add-apt-repository ppa:mc3man/trusty-media
->> sudo apt update
->> sudo apt install ffmpeg
->> sudo python3 -m pip install ffmpeg-normalize
+[T] a.get_all()
+[T] a.get_single()
+[T] a.backup(target_directory)
+[T] a.move(target_directory)
+[T] a.copy(target_directory)
+[T] a.zip(target_location, format, options[])
+[T] a.log(msg)
 ```
 
-And install aud
-
+##### Config
 ```
->> sudo python3 -m pip install aud
+[T] a.config_get_whitelist()
+[T] a.config_set_whitelist(list) # should accept regex too
+[T] a.config_get_blacklist()
+[T] a.config_set_blacklist(list) # should accept regex too
+[T] a.config_set_log_file(target_location)
+[T] a.config_set_extensions(extensions[])
+[T] a.config_get_extensions()
+```
+##### File Name Operations
+```
+[T] a.name_upper()
+[T] a.name_lower()
+[T] a.name_iterate(zerofill, seperator)
+[T] a.name_prepend(string)
+[T] a.name_append(string)
+[T] a.name_replace(target, replacement)
+[T] a.name_replace_spaces(replacement)
+```
+##### Audio FX Operations:
+```
+[T] a.afx_normalize(target_level, passes)
+[T] a.afx_fade(in_fade, out_fade)
+[T] a.afx_pad(in_pad, out_pad)
+[T] a.afx_watermark(file, frequency_min, frequency_max)
+[T] a.afx_join(files[])
+[T] a.afx_prepend(file)
+[T] a.afx_append(file)
+[T] a.afx_strip_silence(silence_length, silence_threshold, padding)
+[T] a.afx_invert_stereo_phase('left') ## accepts left, right, and both
+[T] a.afx_lpf(cutoff)
+[T] a.afx_hpf(cutoff)
+[T] a.afx_mono_gain(amount)
+[T] a.afx_stereo_gain(amount)
 ```
 
-Refer to example.py to see more in depth examples
+##### Conversion Operations:
+```
+[T] a.convert_to_mono()
+[T] a.convert_to_stereo()
+[T] a.convert_to_wav(sample_rate)
+[T] a.convert_to_mp3(bit_rate)
+[T] a.convert_to_flac()
+[T] a.convert_to_raw()
+[T] a.convert_to(format)
+```
+
+##### Things to come:
+```
+[ ] a.vfx_overlay_image(image)
+```
