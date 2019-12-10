@@ -1,6 +1,6 @@
-# aud-rework
+# aud
 ### v0.8.0
-[![CircleCI](https://circleci.com/gh/zdhoward/aud-rework/tree/master.svg?style=svg)](https://circleci.com/gh/zdhoward/aud-rework/tree/master)
+[![CircleCI](https://circleci.com/gh/zdhoward/aud.svg?style=svg)](https://circleci.com/gh/zdhoward/aud)
 
 - Support for Python 3.8
 - Support for Windows & Ubuntu
@@ -16,9 +16,9 @@
 
 ##### Getting Started
 ```
-import aud
+from aud import Dir
 
-[T] a = aud(directory)
+[T] a = Dir(directory)
 ```
 
 ##### Core Operations
