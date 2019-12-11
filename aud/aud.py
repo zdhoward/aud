@@ -422,7 +422,6 @@ class Dir(object):
             name, ext = self.split_filename(watermark_file)
             ext = ext.replace(".", "")
             watermark = AudioSegment.from_file(abspath(watermark_file), ext)
-            print("watermark file found: {} {}".format(name, ext))
         except:
             self.verbose_log(
                 Fore.RED + "WATERMARKING FAILED TO FIND WATERMARK" + Fore.RESET
