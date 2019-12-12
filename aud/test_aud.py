@@ -211,4 +211,8 @@ def test_export():
     a.config_set_extensions(["wav"])
 
     assert a.export_for("amuse", "mock/amuse")
-    assert sorted(listdir(join(dir, "amuse"))) == ["bloop.wav", "song.wav"]
+    assert sorted(listdir(join(dir, "amuse"))) == [
+        "bloop.wav",
+        "joined.wav",
+        "song.wav",
+    ]
