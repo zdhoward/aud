@@ -8,7 +8,7 @@ workflows:
   build-tests:
     jobs:
       - build-3.8
-      - build-latest
+      #- build-latest
       - build-3.6
 jobs:
   build-3.8: &build-template
@@ -51,7 +51,7 @@ jobs:
 
             sudo apt-get update && apt-get upgrade -y
 
-            yes | sudo apt install ffmpeg || true
+            yes | sudo apt install ffmpeg libavcodec-extra || true
 
             pip install pytest pytest-reportlog
             pip install -r requirements.txt
