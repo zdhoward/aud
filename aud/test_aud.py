@@ -51,29 +51,29 @@ def test_init():
 def test_dir():
     global dir
     a = aud.Dir(dir)
-    a.config_set_extensions(["txt"])
+    a.config_set_extensions(["wav"])
 
     a.config_set_log_file("mock/test.log")
     assert a.log("TESTING LOG")
 
-    assert sorted(a.get_all()) == ["abc.txt", "test.txt"]
+    assert sorted(a.get_all()) == ["bloop.wav", "song.wav"]
 
-    assert a.get_single(0) == "abc.txt"  # doesn't work because its not sorted
+    assert a.get_single(0) == "bloop.wav"  # doesn't work because its not sorted
 
     assert a.backup(join(dir, "backup"))
-    assert sorted(a.get_all()) == ["abc.txt", "test.txt"]
-    assert sorted(listdir(join(dir, "backup"))) == ["abc.txt", "test.txt"]
+    assert sorted(a.get_all()) == ["bloop.wav", "song.wav"]
+    assert sorted(listdir(join(dir, "backup"))) == ["bloop.wav", "song.wav"]
 
     assert a.copy(join(dir, "copy"))
-    assert sorted(a.get_all()) == ["abc.txt", "test.txt"]
-    assert sorted(listdir(join(dir, "copy"))) == ["abc.txt", "test.txt"]
+    assert sorted(a.get_all()) == ["bloop.wav", "song.wav"]
+    assert sorted(listdir(join(dir, "copy"))) == ["bloop.wav", "song.wav"]
 
     assert a.move(join(dir, "move"))
-    assert sorted(a.get_all()) == ["abc.txt", "test.txt"]
-    assert sorted(listdir(join(dir, "move"))) == ["abc.txt", "test.txt"]
+    assert sorted(a.get_all()) == ["bloop.wav", "song.wav"]
+    assert sorted(listdir(join(dir, "move"))) == ["bloop.wav", "song.wav"]
 
     assert a.move(dir)
-    assert sorted(a.get_all()) == ["abc.txt", "test.txt"]
+    assert sorted(a.get_all()) == ["bloop.wav", "song.wav"]
     assert sorted(listdir(dir)) == [
         "abc.txt",
         "backup",
@@ -88,7 +88,7 @@ def test_dir():
     assert a.zip("mock/test.zip")
     assert isfile("mock/test.zip")
     with zipfile.ZipFile("mock/test.zip") as file:
-        assert sorted(file.namelist()) == ["abc.txt", "test.txt"]
+        assert sorted(file.namelist()) == ["bloop.wav", "song.wav"]
 
 
 def test_config():
@@ -202,3 +202,13 @@ def test_convert():
     a.config_set_extensions(["wav", "mp3"])
     assert a.convert_to_mono()
     assert a.convert_to_stereo()
+
+
+def test_export():
+    global dir
+    a = aud.Dir(dir)
+
+    a.config_set_extensions(["wav"])
+
+    assert a.export_for("amuse", "mock/amuse")
+    assert sorted(listdir(join(dir, "amuse"))) == ["bloop.wav", "song.wav"]

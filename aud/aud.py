@@ -127,7 +127,10 @@ class Dir(object):
         self.checkdir(abspath(target_directory))
         try:
             for file in self.filtered_files:
-                copy2(join(self.directory_path, file), join(target_directory, file))
+                copy2(
+                    join(self.directory_path, file),
+                    join(abspath(target_directory), file),
+                )
         except:
             self.verbose_log(Fore.RED + "Backing Up Dir Failed" + Fore.RESET)
             return False
@@ -135,10 +138,20 @@ class Dir(object):
 
     def move(self, target_directory):
         self.verbose_log("Moving Selection To: " + target_directory)
+        print("MOVE: {}".format(abspath(target_directory)))
         self.checkdir(abspath(target_directory))
         try:
             for file in self.filtered_files:
-                move(join(self.directory_path, file), join(target_directory, file))
+                print(
+                    "Moving: {} => {}".format(
+                        join(self.directory_path, file),
+                        join(abspath(target_directory), file),
+                    )
+                )
+                move(
+                    join(self.directory_path, file),
+                    join(abspath(target_directory), file),
+                )
         except:
             self.verbose_log(Fore.RED + "Moving Dir Failed" + Fore.RESET)
             return False
@@ -148,10 +161,20 @@ class Dir(object):
 
     def copy(self, target_directory):
         self.verbose_log("Copying Selection To: " + target_directory)
+        print("COPY: {}".format(abspath(target_directory)))
         self.checkdir(abspath(target_directory))
         try:
             for file in self.filtered_files:
-                copy2(join(self.directory_path, file), join(target_directory, file))
+                print(
+                    "Copying: {} => {}".format(
+                        join(self.directory_path, file),
+                        join(abspath(target_directory), file),
+                    )
+                )
+                copy2(
+                    join(self.directory_path, file),
+                    join(abspath(target_directory), file),
+                )
         except:
             self.verbose_log(Fore.RED + "Copying Dir Failed" + Fore.RESET)
             return False
@@ -768,4 +791,25 @@ class Dir(object):
                     + Fore.RESET
                 )
                 return False
+        return True
+
+    def export_for(self, target_platform, target_directory):
+        platforms = ["amuse"]
+        dir = abspath(target_directory)
+
+        format = None
+        sample_rate = None
+        bit_depth = None
+
+        if target_platform.lower() in platforms:
+            if target_platform.lower() == "amuse":
+                format = "wav"
+                sample_rate = 44100
+                bit_depth = 16
+
+        try:
+            self.copy(dir)
+            self.convert_to(format, sample_rate, bit_depth)
+        except:
+            return False
         return True
