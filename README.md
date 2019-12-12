@@ -79,8 +79,7 @@ from aud import Dir
 [T] a.afx_invert_stereo_phase('left') ## accepts left, right, and both
 [T] a.afx_lpf(cutoff)
 [T] a.afx_hpf(cutoff)
-[T] a.afx_mono_gain(amount)
-[T] a.afx_stereo_gain(amount)
+[T] a.afx_gain(amount)
 ```
 
 ##### Conversion Operations:
