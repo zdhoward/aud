@@ -138,16 +138,9 @@ class Dir(object):
 
     def move(self, target_directory):
         self.verbose_log("Moving Selection To: " + target_directory)
-        print("MOVE: {}".format(abspath(target_directory)))
         self.checkdir(abspath(target_directory))
         try:
             for file in self.filtered_files:
-                print(
-                    "Moving: {} => {}".format(
-                        join(self.directory_path, file),
-                        join(abspath(target_directory), file),
-                    )
-                )
                 move(
                     join(self.directory_path, file),
                     join(abspath(target_directory), file),
@@ -161,16 +154,9 @@ class Dir(object):
 
     def copy(self, target_directory):
         self.verbose_log("Copying Selection To: " + target_directory)
-        print("COPY: {}".format(abspath(target_directory)))
         self.checkdir(abspath(target_directory))
         try:
             for file in self.filtered_files:
-                print(
-                    "Copying: {} => {}".format(
-                        join(self.directory_path, file),
-                        join(abspath(target_directory), file),
-                    )
-                )
                 copy2(
                     join(self.directory_path, file),
                     join(abspath(target_directory), file),
