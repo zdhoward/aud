@@ -5,6 +5,7 @@ test.py
 dist/
 venv/
 .idea/
+mock/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
