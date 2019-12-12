@@ -3,7 +3,7 @@ from os.path import abspath, dirname, join
 from io import open
 from m2r import parse_from_file
 
-VERSION = "0.8.2"
+VERSION = "0.8.3"
 DESCRIPTION = "aud is a python package that aims to make bulk file edits easy enough for anyone with minimal scripting or python knowledge"
 
 here = abspath(dirname(__file__))
