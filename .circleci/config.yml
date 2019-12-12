@@ -45,8 +45,7 @@ jobs:
             . venv/bin/activate
             yes | sudo apt install software-properties-common || true
 
-
-            sudo apt-get update && apt-get upgrade -y
+            yes | sudo apt-get update && apt-get upgrade || true
 
             yes | sudo apt install ffmpeg libavcodec-extra || true
 
