@@ -44,10 +44,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             yes | sudo apt install software-properties-common || true
-        #    yes | sudo apt update || true
-        #    yes | sudo add-apt-repository ppa:mc3man/trusty-media || true
-        #    yes | sudo apt update || true
-        #    yes | sudo apt dist-upgrade || true
+
 
             sudo apt-get update && apt-get upgrade -y
 
