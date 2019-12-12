@@ -624,65 +624,93 @@ class Dir(object):
                 return False
         return True
 
-    def convert_to_wav(self, sample_rate=None, cover=None):
+    def convert_to_wav(self, sample_rate=None, bit_depth=None, cover=None):
         self.verbose_log("Converting files to WAV")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            if ext.lower() != ".wav":
-                try:
-                    audio = AudioSegment.from_file(join(self.directory_path, file), ext)
-                    if sample_rate:
-                        audio.set_frame_rate(sample_rate)
-                    audio.export(
-                        join(self.directory_path, name + ".wav"),
-                        format="wav",
-                        cover=cover,
-                    )
-                except:
-                    self.verbose_log(
-                        Fore.RED
-                        + "CONVERTING TO WAV FAILED: "
-                        + join(self.directory_path, file)
-                        + Fore.RESET
-                    )
-                    return False
+            try:
+                audio = AudioSegment.from_file(join(self.directory_path, file), ext)
+                if sample_rate:
+                    audio.set_frame_rate(sample_rate)
+                if bit_depth:
+                    if bit_depth == 8:
+                        bit_depth = 1
+                    elif bit_depth == 16:
+                        bit_depth = 2
+                    # pydub doesn't support 24 bit audio yet, always converts to 32
+                    elif bit_depth == 24 or bit_depth == 32:
+                        bit_depth = 4
+                    audio.set_sample_width(bit_depth)
+
+                audio.export(
+                    join(self.directory_path, name + ".wav"), format="wav", cover=cover,
+                )
+            except:
+                self.verbose_log(
+                    Fore.RED
+                    + "CONVERTING TO WAV FAILED: "
+                    + join(self.directory_path, file)
+                    + Fore.RESET
+                )
+                return False
         self.update()
         return True
 
-    def convert_to_mp3(self, bit_rate=None, cover=None, tags=None):
+    def convert_to_mp3(self, bit_rate=None, bit_depth=None, cover=None, tags=None):
         self.verbose_log("Converting files to MP3")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            if ext.lower() != "mp3":
-                try:
-                    audio = AudioSegment.from_file(join(self.directory_path, file), ext)
-                    if bit_rate:
-                        audio.set_frame_rate(bit_rate)
-                    audio.export(
-                        join(self.directory_path, name + ".mp3"),
-                        format="mp3",
-                        bitrate=bit_rate,
-                        cover=cover,
-                        tags=tags,
-                    )
-                except:
-                    self.verbose_log(
-                        Fore.RED
-                        + "CONVERTING TO MP3 FAILED: "
-                        + join(self.directory_path, file)
-                        + Fore.RESET
-                    )
-                    return False
+            try:
+                audio = AudioSegment.from_file(join(self.directory_path, file), ext)
+                if bit_rate:
+                    audio.set_frame_rate(bit_rate)
+                if bit_depth:
+                    if bit_depth == 8:
+                        bit_depth = 1
+                    elif bit_depth == 16:
+                        bit_depth = 2
+                    # pydub doesn't support 24 bit audio yet, always converts to 32
+                    elif bit_depth == 24 or bit_depth == 32:
+                        bit_depth = 4
+                    audio.set_sample_width(bit_depth)
+
+                audio.export(
+                    join(self.directory_path, name + ".mp3"),
+                    format="mp3",
+                    cover=cover,
+                    tags=tags,
+                )
+            except:
+                self.verbose_log(
+                    Fore.RED
+                    + "CONVERTING TO MP3 FAILED: "
+                    + join(self.directory_path, file)
+                    + Fore.RESET
+                )
+                return False
         self.update()
         return True
 
-    def convert_to_raw(self):
+    def convert_to_raw(self, sample_rate=None, bit_depth=None, cover=None):
         self.verbose_log("Converting files to a RAW format")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
-                audio.export(join(self.directory_path, name + ".raw"), format="raw")
+                if sample_rate:
+                    audio.set_frame_rate(sample_rate)
+                if bit_depth:
+                    if bit_depth == 8:
+                        bit_depth = 1
+                    elif bit_depth == 16:
+                        bit_depth = 2
+                    # pydub doesn't support 24 bit audio yet, always converts to 32
+                    elif bit_depth == 24 or bit_depth == 32:
+                        bit_depth = 4
+                    audio.set_sample_width(bit_depth)
+                audio.export(
+                    join(self.directory_path, name + ".raw"), format="raw", cover=cover,
+                )
             except:
                 self.verbose_log(
                     Fore.RED
@@ -693,12 +721,23 @@ class Dir(object):
                 return False
         return True
 
-    def convert_to_flac(self):
+    def convert_to_flac(self, sample_rate=None, bit_depth=None, cover=None, tags=None):
         self.verbose_log("Converting files to a FLAC format")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
+                if sample_rate:
+                    audio.set_frame_rate(sample_rate)
+                if bit_depth:
+                    if bit_depth == 8:
+                        bit_depth = 1
+                    elif bit_depth == 16:
+                        bit_depth = 2
+                    # pydub doesn't support 24 bit audio yet, always converts to 32
+                    elif bit_depth == 24 or bit_depth == 32:
+                        bit_depth = 4
+                    audio.set_sample_width(bit_depth)
                 audio.export(join(self.directory_path, name + ".flac"), format="flac")
             except:
                 self.verbose_log(
@@ -710,15 +749,31 @@ class Dir(object):
                 return False
         return True
 
-    def convert_to(self, format="wav"):
+    def convert_to(
+        self, format="wav", sample_rate=None, bit_depth=None, cover=None, tags=None
+    ):
         self.verbose_log("Converting files to {}")
         format = format.replace(".", "")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
+                if sample_rate:
+                    audio.set_frame_rate(sample_rate)
+                if bit_depth:
+                    if bit_depth == 8:
+                        bit_depth = 1
+                    elif bit_depth == 16:
+                        bit_depth = 2
+                    # pydub doesn't support 24 bit audio yet, always converts to 32
+                    elif bit_depth == 24 or bit_depth == 32:
+                        bit_depth = 4
+                    audio.set_sample_width(bit_depth)
                 audio.export(
-                    join(self.directory_path, name + "." + format), format=format
+                    join(self.directory_path, name + "." + format),
+                    format=format,
+                    cover=cover,
+                    tags=tags,
                 )
             except:
                 self.verbose_log(
