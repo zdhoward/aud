@@ -6,6 +6,20 @@
 - Support for Windows & Ubuntu
 - Requires ffmpeg is already installed and updated
 
+##### Installing FFMPEG:
+```
+>> On Linux:
+apt-get install ffmpeg libavcodec-extra
+
+>> On Mac:
+brew install ffmpeg --with-libvorbis --with-sdl2 --with-theora
+
+>> On Windows:
+>> visit https://www.ffmpeg.org/download.html
+>> download and install the appropriate package
+>> ensure it is added to your PATH and you can call it from cmd
+```
+
 ##### To start contributing:
 ```
 >> git clone https://github.com/zdhoward/aud-rework.git

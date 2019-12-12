@@ -565,29 +565,14 @@ class Dir(object):
                     return False
         return True
 
-    def afx_stereo_gain(self, amount=0):
+    def afx_gain(self, amount=0):
         self.verbose_log("Applying {}db gain".format(str(amount)))
         if amount != 0:
             for file in self.filtered_files:
                 name, ext = self.split_filename(file)
                 try:
                     audio = AudioSegment.from_file(join(self.directory_path, file), ext)
-                    apply_gain_stereo(audio, amount, amount)
-                    audio.export(join(self.directory_path, file), format=ext)
-                except:
-                    self.verbose_log(Fore.RED + "Applying Gain FAILED" + Fore.RESET)
-                    return False
-        return True
-
-    def afx_mono_gain(self, amount=0):
-        self.verbose_log("Applying {}db gain".format(str(amount)))
-        if amount != 0:
-            for file in self.filtered_files:
-                name, ext = self.split_filename(file)
-                try:
-                    audio = AudioSegment.from_file(join(self.directory_path, file), ext)
-                    apply_gain_stereo(audio, amount, amount)
-                    audio.set_channels(1)
+                    audio = audio + amount
                     audio.export(join(self.directory_path, file), format=ext)
                 except:
                     self.verbose_log(Fore.RED + "Applying Gain FAILED" + Fore.RESET)

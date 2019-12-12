@@ -172,8 +172,8 @@ def test_afx_3():
 
     assert a.afx_strip_silence()
     assert a.afx_join("mock/joined.wav", "wav")
-    assert a.afx_mono_gain(3)
-    assert a.afx_stereo_gain(-3)
+    assert a.afx_gain(3)
+    assert a.afx_gain(-3)
 
 
 def test_convert():
