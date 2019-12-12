@@ -2,3 +2,4 @@ pydub
 python-ffmpeg
 ffmpeg-normalize
 colorama
+m2r
