@@ -28,15 +28,17 @@ class Dir(object):
     ##         UNDERSCORE METHODS         ##
     ########################################
 
-    def __init__(self, _directory_path):
+    def __init__(
+        self, _directory_path, _extensions=[], _logfile="", _blacklist=[], _whitelist=[]
+    ):
         self.verbose = False
         self.verbose_log("Instantiating: " + abspath(_directory_path))
         self.all_files = []
         self.filtered_files = []
-        self.extensions = []
-        self.blacklist = []
-        self.whitelist = []
-        self.logfile = ""
+        self.extensions = _extensions
+        self.blacklist = _blacklist
+        self.whitelist = _whitelist
+        self.logfile = _logfile
         self.directory_path = abspath(_directory_path)
 
         self.update()
@@ -101,7 +103,7 @@ class Dir(object):
     def split_filename(self, file):
         split_at = file.find(".")
         filename = file[:split_at]
-        ext = file[split_at:]
+        ext = file[split_at + 1 :]
         return filename, ext
 
     def checkdir(self, target_directory):
@@ -203,6 +205,7 @@ class Dir(object):
         self.verbose_log("Setting Log File To: " + filename)
         self.logfile = abspath(filename)
         self.log("Log created and set to: " + filename)
+        self.update()
         return True
 
     def config_set_extensions(self, _extensions):
@@ -230,7 +233,7 @@ class Dir(object):
         try:
             for file in self.filtered_files:
                 name, ext = self.split_filename(file)
-                new_file = name.upper() + ext
+                new_file = name.upper() + "." + ext
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
@@ -247,7 +250,7 @@ class Dir(object):
         try:
             for file in self.filtered_files:
                 name, ext = self.split_filename(file)
-                new_file = name.lower() + ext
+                new_file = name.lower() + "." + ext
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
@@ -280,7 +283,7 @@ class Dir(object):
         try:
             for file in self.filtered_files:
                 name, ext = self.split_filename(file)
-                new_file = str + name + ext
+                new_file = str + name + "." + ext
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
@@ -295,7 +298,7 @@ class Dir(object):
         try:
             for file in self.filtered_files:
                 name, ext = self.split_filename(file)
-                new_file = name + str + ext
+                new_file = name + str + "." + ext
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
@@ -310,7 +313,7 @@ class Dir(object):
         try:
             for file in self.filtered_files:
                 name, ext = self.split_filename(file)
-                new_file = name.replace(target, replacement) + ext
+                new_file = name.replace(target, replacement) + "." + ext
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
@@ -344,7 +347,6 @@ class Dir(object):
         )
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            ext = ext.replace(".", "")
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 for i in range(passes):
@@ -364,7 +366,6 @@ class Dir(object):
         self.verbose_log("Fading files in: " + str(in_fade) + " out: " + str(out_fade))
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            ext = ext.replace(".", "")
             try:
                 duration = mediainfo(join(self.directory_path, file)).get("duration")
                 if float(duration) > (in_fade + out_fade):
@@ -390,7 +391,6 @@ class Dir(object):
         trailing_segment = AudioSegment.silent(duration=(1000 * out_pad))
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            ext = ext.replace(".", "")
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 if in_pad > 0:
@@ -420,7 +420,6 @@ class Dir(object):
         max = frequency_max * 1000
         try:
             name, ext = self.split_filename(watermark_file)
-            ext = ext.replace(".", "")
             watermark = AudioSegment.from_file(abspath(watermark_file), ext)
         except:
             self.verbose_log(
@@ -429,7 +428,6 @@ class Dir(object):
             return False
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            ext = ext.replace(".", "")
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 if len(audio) > len(watermark) + max:
@@ -464,18 +462,17 @@ class Dir(object):
                 Fore.RED + "JOINING FAILED: " + target_location + Fore.RESET
             )
             return False
+        self.update()
         return True
 
     def afx_prepend(self, file):
         self.verbose_log("Prepending " + file)
         file = abspath(file)
         name, ext = self.split_filename(file)
-        ext = ext.replace(".", "")
         try:
             segment = AudioSegment.from_file(file, ext)
             for f in self.filtered_files:
                 name, ext = self.split_filename(f)
-                ext = ext.replace(".", "")
                 audio = AudioSegment.from_file(join(self.directory_path, f), ext)
                 audio = segment + audio
                 audio.export(join(self.directory_path, f), format=ext)
@@ -488,12 +485,10 @@ class Dir(object):
         self.verbose_log("Appending " + file)
         file = abspath(file)
         name, ext = self.split_filename(file)
-        ext = ext.replace(".", "")
         try:
             segment = AudioSegment.from_file(file, ext)
             for f in self.filtered_files:
                 name, ext = self.split_filename(f)
-                ext = ext.replace(".", "")
                 audio = AudioSegment.from_file(join(self.directory_path, f), ext)
                 audio = audio + segment
                 audio.export(join(self.directory_path, f), format=ext)
@@ -508,7 +503,6 @@ class Dir(object):
         self.verbose_log("Stripping Silence")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            ext = ext.replace(".", "")
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 strip_silence(audio, silence_length, silence_threshold, padding)
@@ -534,7 +528,6 @@ class Dir(object):
 
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            ext = ext.replace(".", "")
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 invert_phase(audio, sel)
@@ -549,7 +542,6 @@ class Dir(object):
         if cutoff:
             for file in self.filtered_files:
                 name, ext = self.split_filename(file)
-                ext = ext.replace(".", "")
                 try:
                     audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                     low_pass_filter(audio, cutoff)
@@ -564,7 +556,6 @@ class Dir(object):
         if cutoff:
             for file in self.filtered_files:
                 name, ext = self.split_filename(file)
-                ext = ext.replace(".", "")
                 try:
                     audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                     high_pass_filter(audio, cutoff)
@@ -579,7 +570,6 @@ class Dir(object):
         if amount != 0:
             for file in self.filtered_files:
                 name, ext = self.split_filename(file)
-                ext = ext.replace(".", "")
                 try:
                     audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                     apply_gain_stereo(audio, amount, amount)
@@ -594,7 +584,6 @@ class Dir(object):
         if amount != 0:
             for file in self.filtered_files:
                 name, ext = self.split_filename(file)
-                ext = ext.replace(".", "")
                 try:
                     audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                     apply_gain_stereo(audio, amount, amount)
@@ -613,7 +602,6 @@ class Dir(object):
         self.verbose_log("Converting to mono")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            ext = ext.replace(".", "")
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 audio.set_channels(1)
@@ -627,7 +615,6 @@ class Dir(object):
         self.verbose_log("Converting to stereo")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            ext = ext.replace(".", "")
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 apply_gain_stereo(audio, 0, 0)
@@ -643,9 +630,7 @@ class Dir(object):
             name, ext = self.split_filename(file)
             if ext.lower() != ".wav":
                 try:
-                    audio = AudioSegment.from_file(
-                        join(self.directory_path, file), ext.replace(".", "")
-                    )
+                    audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                     if sample_rate:
                         audio.set_frame_rate(sample_rate)
                     audio.export(
@@ -668,11 +653,9 @@ class Dir(object):
         self.verbose_log("Converting files to MP3")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            if ext.lower() != ".mp3":
+            if ext.lower() != "mp3":
                 try:
-                    audio = AudioSegment.from_file(
-                        join(self.directory_path, file), ext.replace(".", "")
-                    )
+                    audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                     if bit_rate:
                         audio.set_frame_rate(bit_rate)
                     audio.export(
@@ -697,7 +680,6 @@ class Dir(object):
         self.verbose_log("Converting files to a RAW format")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            ext = ext.replace(".", "")
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 audio.export(join(self.directory_path, name + ".raw"), format="raw")
@@ -715,7 +697,6 @@ class Dir(object):
         self.verbose_log("Converting files to a FLAC format")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            ext = ext.replace(".", "")
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 audio.export(join(self.directory_path, name + ".flac"), format="flac")
@@ -734,7 +715,6 @@ class Dir(object):
         format = format.replace(".", "")
         for file in self.filtered_files:
             name, ext = self.split_filename(file)
-            ext = ext.replace(".", "")
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 audio.export(
