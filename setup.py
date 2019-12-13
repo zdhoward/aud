@@ -3,7 +3,7 @@ from os.path import abspath, dirname, join
 from io import open
 from m2r import parse_from_file
 
-VERSION = "0.8.3"
+VERSION = "0.8.4"
 DESCRIPTION = "aud is a python package that aims to make bulk file edits easy enough for anyone with minimal scripting or python knowledge"
 
 here = abspath(dirname(__file__))
@@ -22,7 +22,7 @@ setup(
     author="Zach Howard",
     author_email="zach.d.howard@gmail.com",
     url="https://github.com/zdhoward/aud",
-    keywords=["audio", "studio", "batch", "easy", "sound", "high-level"],
+    keywords=["audio", "tool", "studio", "batch", "easy", "sound", "high-level"],
     install_requires=["pydub", "colorama"],
     python_requires=">=3.6.0",
     long_description=long_description,
