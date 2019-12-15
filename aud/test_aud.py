@@ -103,6 +103,11 @@ def test_config():
     assert a.config_set_blacklist(["test.txt"])
     assert a.config_get_blacklist() == ["test.txt"]
     assert sorted(a.get_all()) == ["abc.txt"]
+    assert a.config_set_whitelist(regex="test.txt")
+    assert sorted(a.get_all()) == ["abc.txt", "test.txt"]
+    assert a.config_set_whitelist([])
+    assert a.config_set_blacklist(regex="test.txt")
+    assert sorted(a.get_all()) == ["abc.txt"]
 
     print("SETTING WHITELIST")
     assert a.config_set_whitelist(["test.txt"])
