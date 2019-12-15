@@ -3,7 +3,7 @@ from os.path import abspath, dirname, join
 from io import open
 from m2r import parse_from_file
 
-VERSION = "0.8.4"
+VERSION = "0.8.5"
 DESCRIPTION = "aud is a python package that aims to make bulk file edits easy enough for anyone with minimal scripting or python knowledge"
 
 here = abspath(dirname(__file__))
@@ -26,7 +26,7 @@ setup(
     install_requires=["pydub", "colorama"],
     python_requires=">=3.6.0",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    # long_description_content_type="text/markdown",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",

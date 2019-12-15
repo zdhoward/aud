@@ -1,5 +1,5 @@
 # aud
-### v0.8.4
+### v0.8.5
 [![CircleCI](https://circleci.com/gh/zdhoward/aud.svg?style=svg)](https://circleci.com/gh/zdhoward/aud)
 
 - Support for Python 3.8
