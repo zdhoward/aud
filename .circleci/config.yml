@@ -8,8 +8,8 @@ workflows:
   build-tests:
     jobs:
       - build-3.8
-      #- build-latest
-      #- build-3.6
+      - build-3.7
+      - build-3.6
 jobs:
 
   build-3.8: &build-template
@@ -57,4 +57,8 @@ jobs:
   build-3.6:
     <<: *build-template
     docker:
-      - image: circleci/python:3.6.4
+      - image: circleci/python:3.6.9
+  build-3.7:
+    <<: *build-template
+    docker:
+      - image: circleci/python:3.7.5
