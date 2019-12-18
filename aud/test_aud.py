@@ -1,4 +1,4 @@
-import aud
+from aud import aud
 from os.path import abspath, exists, join, isfile, basename, dirname
 from os import mkdir, listdir
 from shutil import rmtree, copy2

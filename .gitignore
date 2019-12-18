@@ -6,6 +6,7 @@ dist/
 venv/
 .idea/
 mock/
+test-reports/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

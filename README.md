@@ -2,7 +2,7 @@
 ### v0.8.5
 [![CircleCI](https://circleci.com/gh/zdhoward/aud.svg?style=svg)](https://circleci.com/gh/zdhoward/aud)
 
-- Support for Python 3.8
+- Support for Python 3.8, 3.7, & 3.6
 - Support for Windows & Ubuntu
 - Requires ffmpeg is already installed and updated
 
