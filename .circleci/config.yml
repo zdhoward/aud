@@ -10,6 +10,7 @@ workflows:
       - build-3.8
       - build-3.7
       - build-3.6
+      - build-3.8.2
 jobs:
 
   build-3.8: &build-template
@@ -62,3 +63,7 @@ jobs:
     <<: *build-template
     docker:
       - image: circleci/python:3.7.5
+  build-3.8.2:
+    <<: *build-template
+    docker:
+      - image: circleci/python:3.8.2
