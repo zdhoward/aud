@@ -175,7 +175,7 @@ def test_afx_3():
     a = aud.Dir(dir)
     a.config_set_extensions(["wav"])
 
-    # assert a.afx_strip_silence()
+    assert a.afx_strip_silence()
     assert a.afx_join("mock/joined.wav", "wav")
     assert a.afx_gain(3)
     assert a.afx_gain(-3)
