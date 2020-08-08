@@ -36,25 +36,25 @@ class Dir(object):
         _directory_path=getcwd(),
         _extensions=[],
         _logfile="",
-        _blacklist=[],
-        _whitelist=[],
+        _denylist=[],
+        _allowlist=[],
     ):
         ## init variable
         verbose_log("Instantiating: " + abspath(_directory_path))
         self.all_files = []
         self.filtered_files = []
-        self.whitelist_regex = None
-        self.blacklist_regex = None
+        self.allowlist_regex = None
+        self.denylist_regex = None
         self.extensions = []
-        self.blacklist = []
-        self.whitelist = []
+        self.denylist = []
+        self.allowlist = []
         self.logfile = None
 
         self.directory_path = abspath(_directory_path)
 
         self.config_set_extensions(_extensions)
-        self.config_set_blacklist(_blacklist)
-        self.config_set_whitelist(_whitelist)
+        self.config_set_denylist(_denylist)
+        self.config_set_allowlist(_allowlist)
         self.config_set_log_file(_logfile)
 
         self.update()
@@ -107,24 +107,24 @@ class Dir(object):
         self.filtered_files = []
         for file in self.all_files:
             if (
-                self.has_valid_extension(file) and not self.is_blacklisted(file)
-            ) or self.is_whitelisted(file):
+                self.has_valid_extension(file) and not self.is_denylisted(file)
+            ) or self.is_allowlisted(file):
                 self.filtered_files.append(file)
         return True
 
-    def is_whitelisted(self, str):
-        if self.whitelist_regex:
-            if match(self.whitelist_regex, str):
+    def is_allowlisted(self, str):
+        if self.allowlist_regex:
+            if match(self.allowlist_regex, str):
                 return True
-        if str in self.whitelist:
+        if str in self.allowlist:
             return True
         return False
 
-    def is_blacklisted(self, str):
-        if self.blacklist_regex:
-            if match(self.blacklist_regex, str):
+    def is_denylisted(self, str):
+        if self.denylist_regex:
+            if match(self.denylist_regex, str):
                 return True
-        if str in self.blacklist:
+        if str in self.denylist:
             return True
         return False
 
@@ -201,25 +201,25 @@ class Dir(object):
     ##           CONFIG METHODS           ##
     ########################################
 
-    def config_get_whitelist(self):
-        verbose_log("Retreive Whitelist")
-        return self.whitelist
+    def config_get_allowlist(self):
+        verbose_log("Retreive allowlist")
+        return self.allowlist
 
-    def config_set_whitelist(self, _list=[], regex=None):
-        verbose_log("Set Whitelist")
-        self.whitelist = _list
-        self.whitelist_regex = regex
+    def config_set_allowlist(self, _list=[], regex=None):
+        verbose_log("Set allowlist")
+        self.allowlist = _list
+        self.allowlist_regex = regex
         self.update()
         return True
 
-    def config_get_blacklist(self):
-        verbose_log("Retreive Blacklist")
-        return self.blacklist
+    def config_get_denylist(self):
+        verbose_log("Retreive denylist")
+        return self.denylist
 
-    def config_set_blacklist(self, _list=[], regex=None):
-        verbose_log("Set Blacklist")
-        self.blacklist = _list
-        self.blacklist_regex = regex
+    def config_set_denylist(self, _list=[], regex=None):
+        verbose_log("Set denylist")
+        self.denylist = _list
+        self.denylist_regex = regex
         self.update()
         return True
 
@@ -512,6 +512,9 @@ class Dir(object):
     def afx_strip_silence(
         self, silence_length=1000, silence_threshold=-16, padding=100
     ):
+        ## TODO: https://github.com/jiaaro/pydub/issues/228
+        #### Need to restructure to work now that it is unbugged
+        #### v0.23.0 is the safe one in the meanwhile
         verbose_log("Stripping Silence")
         for file in self.filtered_files:
             name, ext = split_filename(file)
