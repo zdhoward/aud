@@ -99,19 +99,19 @@ def test_config():
     assert a.config_set_extensions(["txt"])
     assert a.config_get_extensions() == [".txt"]
 
-    print("SETTING BLACKLIST")
-    assert a.config_set_blacklist(["test.txt"])
-    assert a.config_get_blacklist() == ["test.txt"]
+    print("SETTING denylist")
+    assert a.config_set_denylist(["test.txt"])
+    assert a.config_get_denylist() == ["test.txt"]
     assert sorted(a.get_all()) == ["abc.txt"]
-    assert a.config_set_whitelist(regex="test.txt")
+    assert a.config_set_allowlist(regex="test.txt")
     assert sorted(a.get_all()) == ["abc.txt", "test.txt"]
-    assert a.config_set_whitelist([])
-    assert a.config_set_blacklist(regex="test.txt")
+    assert a.config_set_allowlist([])
+    assert a.config_set_denylist(regex="test.txt")
     assert sorted(a.get_all()) == ["abc.txt"]
 
-    print("SETTING WHITELIST")
-    assert a.config_set_whitelist(["test.txt"])
-    assert a.config_get_whitelist() == ["test.txt"]
+    print("SETTING allowlist")
+    assert a.config_set_allowlist(["test.txt"])
+    assert a.config_get_allowlist() == ["test.txt"]
     assert sorted(a.get_all()) == ["abc.txt", "test.txt"]
 
 
