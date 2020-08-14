@@ -631,10 +631,11 @@ class Dir(object):
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 if sample_rate:
-                    audio.set_frame_rate(sample_rate)
+                    print ("setting frame_rate to: " + str(sample_rate))
+                    audio = audio.set_frame_rate(sample_rate)
                 if bit_depth:
                     bit_depth = bit_depth(bit_depth)
-                    audio.set_sample_width(bit_depth)
+                    audio = audio.set_sample_width(bit_depth)
 
                 audio.export(
                     join(self.directory_path, name + ".wav"), format="wav", cover=cover,

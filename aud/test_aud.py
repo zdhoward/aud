@@ -185,6 +185,21 @@ def test_convert():
     global dir
     a = aud.Dir(dir)
 
+    def check_sample_rate(file, rate):
+        info = mediainfo(file)
+        print ("Checking " + str(rate) + " vs " + str(info.get("sample_rate")))
+        if str(info.get("sample_rate")) == str(rate):
+            print (str(info.get("sample_rate")) + " == " + str(rate))
+            return True
+        else:
+            print (str(info.get("sample_rate")) + " != " + str(rate))
+            return False
+
+
+    ## TODO: THIS NEEDS TO BE UPDATED
+    ## must also test and check sample rate conversion
+    from pydub.utils import mediainfo
+
     a.config_set_extensions(["wav"])
     assert a.convert_to_mp3()
     assert a.convert_to_raw()
@@ -192,7 +207,10 @@ def test_convert():
 
     a.config_set_extensions(["mp3"])
     assert len(a.get_all()) == 3
-    assert a.convert_to_wav()
+    assert a.convert_to_wav(44100)
+    assert check_sample_rate(join(a.directory_path, a.filtered_files[0]), 44100)
+    #assert a.convert_to_wav(48000)
+    #assert check_sample_rate(join(a.directory_path, a.filtered_files[0]), 48000)
 
     a.config_set_extensions(["wav"])
     assert a.convert_to("ogg")
