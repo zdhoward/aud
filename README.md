@@ -25,6 +25,7 @@ brew install ffmpeg --with-libvorbis --with-sdl2 --with-theora
 >> git clone https://github.com/zdhoward/aud.git
 >> cd aud
 >> virtualenv venv
+>> source venv/bin/activate
 >> python3 -m pip install -r requirements.txt
 ```
 
