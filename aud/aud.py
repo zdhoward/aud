@@ -623,7 +623,7 @@ class Dir(object):
                 audio.export(join(self.directory_path, file), format=ext)
             except Exception as e:
                 verbose_log(Fore.RED + "Converting To Stereo FAILED" + Fore.RESET)
-                raise ConvertError("stereo",e)
+                raise ConvertError("stereo", e)
         return True
 
     def convert_to_wav(self, sample_rate=None, bit_depth=None, cover=None):
@@ -633,14 +633,16 @@ class Dir(object):
             try:
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 if sample_rate:
-                    print ("setting frame_rate to: " + str(sample_rate))
+                    print("setting frame_rate to: " + str(sample_rate))
                     audio = audio.set_frame_rate(sample_rate)
                 if bit_depth:
-                    bit_depth = bit_depth(bit_depth)
+                    bit_depth = bit_depth_level(bit_depth)
                     audio = audio.set_sample_width(bit_depth)
 
                 audio.export(
-                    join(self.directory_path, name + ".wav"), format="wav", cover=cover,
+                    join(self.directory_path, name + ".wav"),
+                    format="wav",
+                    cover=cover,
                 )
             except Exception as e:
                 verbose_log(
@@ -662,7 +664,7 @@ class Dir(object):
                 if bit_rate:
                     audio.set_frame_rate(bit_rate)
                 if bit_depth:
-                    bit_depth = bit_depth(bit_depth)
+                    bit_depth = bit_depth_level(bit_depth)
                     audio.set_sample_width(bit_depth)
 
                 audio.export(
@@ -691,10 +693,12 @@ class Dir(object):
                 if sample_rate:
                     audio.set_frame_rate(sample_rate)
                 if bit_depth:
-                    bit_depth = bit_depth(bit_depth)
+                    bit_depth = bit_depth_level(bit_depth)
                     audio.set_sample_width(bit_depth)
                 audio.export(
-                    join(self.directory_path, name + ".raw"), format="raw", cover=cover,
+                    join(self.directory_path, name + ".raw"),
+                    format="raw",
+                    cover=cover,
                 )
             except Exception as e:
                 verbose_log(
@@ -715,7 +719,7 @@ class Dir(object):
                 if sample_rate:
                     audio.set_frame_rate(sample_rate)
                 if bit_depth:
-                    bit_depth = bit_depth(bit_depth)
+                    bit_depth = bit_depth_level(bit_depth)
                     audio.set_sample_width(bit_depth)
                 audio.export(join(self.directory_path, name + ".flac"), format="flac")
             except Exception as e:
@@ -740,7 +744,7 @@ class Dir(object):
                 if sample_rate:
                     audio.set_frame_rate(sample_rate)
                 if bit_depth:
-                    bit_depth = bit_depth(bit_depth)
+                    bit_depth = bit_depth_level(bit_depth)
                     audio.set_sample_width(bit_depth)
                 audio.export(
                     join(self.directory_path, name + "." + format),
@@ -787,7 +791,7 @@ class Dir(object):
 
 
 ### FUNCTIONS TO SEPARATE
-def bit_depth(bit_depth):
+def bit_depth_level(bit_depth):
     if bit_depth == 8:
         bit_depth = 1
     elif bit_depth == 16:
