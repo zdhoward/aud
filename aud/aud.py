@@ -22,6 +22,8 @@ from pydub.effects import (
     apply_gain_stereo,
 )
 
+from aud.exceptions import *
+
 verbose = False
 
 
@@ -147,9 +149,9 @@ class Dir(object):
                     join(self.directory_path, file),
                     join(abspath(target_directory), file),
                 )
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Backing Up Dir Failed" + Fore.RESET)
-            return False
+            raise FileError("backup", e)
         return True
 
     def move(self, target_directory):
@@ -161,9 +163,9 @@ class Dir(object):
                     join(self.directory_path, file),
                     join(abspath(target_directory), file),
                 )
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Moving Dir Failed" + Fore.RESET)
-            return False
+            raise FileError("move", e)
         self.directory_path = target_directory
         self.update()
         return True
@@ -177,9 +179,9 @@ class Dir(object):
                     join(self.directory_path, file),
                     join(abspath(target_directory), file),
                 )
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Copying Dir Failed" + Fore.RESET)
-            return False
+            raise FileError("copy", e)
         self.directory_path = target_directory
         self.update()
         return True
@@ -193,8 +195,8 @@ class Dir(object):
                 for item in self.filtered_files
             ]
             zip.close()
-        except:
-            return False
+        except Exception as e:
+            raise FileError("zip", e)
         return True
 
     ########################################
@@ -259,9 +261,9 @@ class Dir(object):
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Changing Filename To Uppercase Failed" + Fore.RESET)
-            return False
+            raise FilenameError("name to uppercase", e)
         self.update()
         return True
 
@@ -274,9 +276,9 @@ class Dir(object):
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Changing Filename To Lowercase Failed" + Fore.RESET)
-            return False
+            raise FilenameError("name to lowercase", e)
         self.update()
         return True
 
@@ -290,9 +292,9 @@ class Dir(object):
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Iterating Filename Failed" + Fore.RESET)
-            return False
+            raise FilenameError("iteration", e)
         self.update()
         return True
 
@@ -305,9 +307,9 @@ class Dir(object):
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Prepending Filename Failed" + Fore.RESET)
-            return False
+            raise FilenameError("prepend", e)
         self.update()
         return True
 
@@ -320,9 +322,9 @@ class Dir(object):
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Appending Filename Failed" + Fore.RESET)
-            return False
+            raise FilenameError("append", e)
         self.update()
         return True
 
@@ -335,9 +337,9 @@ class Dir(object):
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Replacing Characters Failed" + Fore.RESET)
-            return False
+            raise FilenameError("replace", e)
         self.update()
         return True
 
@@ -345,9 +347,9 @@ class Dir(object):
         verbose_log("Replacing spaces in files")
         try:
             self.name_replace(" ", replacement)
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Replacing Spaces Failed" + Fore.RESET)
-            return False
+            raise FilenameError("replace spaces", e)
         self.update()
         return True
 
@@ -370,14 +372,14 @@ class Dir(object):
                 for i in range(passes):
                     normalize(audio, headroom=target_level)
                 audio.export(join(self.directory_path, file), ext)
-            except:
+            except Exception as e:
                 verbose_log(
                     Fore.RED
                     + "NORMALIZING FAILED: "
                     + join(self.directory_path, file)
                     + Fore.RESET
                 )
-                return False
+                raise AudioFXError("normalize", e)
         return True
 
     def afx_fade(self, in_fade=0, out_fade=0):
@@ -393,14 +395,14 @@ class Dir(object):
                     if out_fade > 0:
                         audio = audio.fade_out(out_fade * 1000)
                     audio.export(join(self.directory_path, file), format=ext)
-            except:
+            except Exception as e:
                 verbose_log(
                     Fore.RED
                     + "FADING FAILED: "
                     + join(self.directory_path, file)
                     + Fore.RESET
                 )
-                return False
+                raise AudioFXError("fade", e)
         return True
 
     def afx_pad(self, in_pad=0, out_pad=0):
@@ -416,14 +418,14 @@ class Dir(object):
                 if out_pad > 0:
                     audio = audio + trailing_segment
                 audio.export(join(self.directory_path, file), format=ext)
-            except:
+            except Exception as e:
                 verbose_log(
                     Fore.RED
                     + "PADDING FAILED: "
                     + join(self.directory_path, file)
                     + Fore.RESET
                 )
-                return False
+                raise AudioFXError("pad", e)
         return True
 
     def afx_watermark(self, watermark_file, frequency_min, frequency_max):
@@ -439,9 +441,9 @@ class Dir(object):
         try:
             name, ext = split_filename(watermark_file)
             watermark = AudioSegment.from_file(abspath(watermark_file), ext)
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "WATERMARKING FAILED TO FIND WATERMARK" + Fore.RESET)
-            return False
+            raise FileError("find watermark", e)
         for file in self.filtered_files:
             name, ext = split_filename(file)
             try:
@@ -457,9 +459,9 @@ class Dir(object):
                         else:
                             break
                     audio.export(join(self.directory_path, file), format=ext)
-            except:
+            except Exception as e:
                 verbose_log(Fore.RED + "WATERMARKING FAILED TO EXPORT" + Fore.RESET)
-                return False
+                raise AudioFXError("watermark export", e)
         return True
 
     def afx_join(self, target_location, format="wav"):
@@ -471,9 +473,9 @@ class Dir(object):
                 new_audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 audio = audio + new_audio
             audio.export(target_location, format=format)
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "JOINING FAILED: " + target_location + Fore.RESET)
-            return False
+            raise AudioFXError("join", e)
         self.update()
         return True
 
@@ -488,9 +490,9 @@ class Dir(object):
                 audio = AudioSegment.from_file(join(self.directory_path, f), ext)
                 audio = segment + audio
                 audio.export(join(self.directory_path, f), format=ext)
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Prepending Audio FAILED" + Fore.RESET)
-            return False
+            raise AudioFXError("prepend", e)
         return True
 
     def afx_append(self, file):
@@ -504,9 +506,9 @@ class Dir(object):
                 audio = AudioSegment.from_file(join(self.directory_path, f), ext)
                 audio = audio + segment
                 audio.export(join(self.directory_path, f), format=ext)
-        except:
+        except Exception as e:
             verbose_log(Fore.RED + "Appending Audio FAILED" + Fore.RESET)
-            return False
+            raise AudioFXError("append", e)
         return True
 
     def afx_strip_silence(
@@ -522,9 +524,9 @@ class Dir(object):
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 strip_silence(audio, silence_length, silence_threshold, padding)
                 audio.export(join(self.directory_path, file), format=ext)
-            except:
+            except Exception as e:
                 verbose_log(Fore.RED + "Stripping Silence FAILED" + Fore.RESET)
-                return False
+                raise AudioFXError("strip silence", e)
         return True
 
     def afx_invert_stereo_phase(self, channel="both"):
@@ -547,9 +549,9 @@ class Dir(object):
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 invert_phase(audio, sel)
                 audio.export(join(self.directory_path, file), format=ext)
-            except:
+            except Exception as e:
                 verbose_log(Fore.RED + "Inverting Phase FAILED" + Fore.RESET)
-                return False
+                raise AudioFXError("invert phase", e)
         return True
 
     def afx_lpf(self, cutoff=None):
@@ -561,9 +563,9 @@ class Dir(object):
                     audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                     low_pass_filter(audio, cutoff)
                     audio.export(join(self.directory_path, file), format=ext)
-                except:
+                except Exception as e:
                     verbose_log(Fore.RED + "Low Pass Filter FAILED" + Fore.RESET)
-                    return False
+                    raise AudioFXError("lpf", e)
         return True
 
     def afx_hpf(self, cutoff=None):
@@ -575,9 +577,9 @@ class Dir(object):
                     audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                     high_pass_filter(audio, cutoff)
                     audio.export(join(self.directory_path, file), format=ext)
-                except:
-                    verbose_log(Fore.RED + "High PAss Filter FAILED" + Fore.RESET)
-                    return False
+                except Exception as e:
+                    verbose_log(Fore.RED + "High Pass Filter FAILED" + Fore.RESET)
+                    raise AudioFXError("hpf", e)
         return True
 
     def afx_gain(self, amount=0):
@@ -589,9 +591,9 @@ class Dir(object):
                     audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                     audio = audio + amount
                     audio.export(join(self.directory_path, file), format=ext)
-                except:
+                except Exception as e:
                     verbose_log(Fore.RED + "Applying Gain FAILED" + Fore.RESET)
-                    return False
+                    raise AudioFXError("gain", e)
         return True
 
     ########################################
@@ -606,9 +608,9 @@ class Dir(object):
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 audio.set_channels(1)
                 audio.export(join(self.directory_path, file), format=ext)
-            except:
+            except Exception as e:
                 verbose_log(Fore.RED + "Converting To Mono FAILED" + Fore.RESET)
-                return False
+                raise ConvertError("mono", e)
         return True
 
     def convert_to_stereo(self):
@@ -619,9 +621,9 @@ class Dir(object):
                 audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 apply_gain_stereo(audio, 0, 0)
                 audio.export(join(self.directory_path, file), format=ext)
-            except:
+            except Exception as e:
                 verbose_log(Fore.RED + "Converting To Stereo FAILED" + Fore.RESET)
-                return False
+                raise ConvertError("stereo",e)
         return True
 
     def convert_to_wav(self, sample_rate=None, bit_depth=None, cover=None):
@@ -640,14 +642,14 @@ class Dir(object):
                 audio.export(
                     join(self.directory_path, name + ".wav"), format="wav", cover=cover,
                 )
-            except:
+            except Exception as e:
                 verbose_log(
                     Fore.RED
                     + "CONVERTING TO WAV FAILED: "
                     + join(self.directory_path, file)
                     + Fore.RESET
                 )
-                return False
+                raise ConvertError("wav", e)
         self.update()
         return True
 
@@ -669,14 +671,14 @@ class Dir(object):
                     cover=cover,
                     tags=tags,
                 )
-            except:
+            except Exception as e:
                 verbose_log(
                     Fore.RED
                     + "CONVERTING TO MP3 FAILED: "
                     + join(self.directory_path, file)
                     + Fore.RESET
                 )
-                return False
+                raise ConvertError("mp3", e)
         self.update()
         return True
 
@@ -694,14 +696,14 @@ class Dir(object):
                 audio.export(
                     join(self.directory_path, name + ".raw"), format="raw", cover=cover,
                 )
-            except:
+            except Exception as e:
                 verbose_log(
                     Fore.RED
                     + "CONVERTING TO RAW FAILED: "
                     + join(self.directory_path, file)
                     + Fore.RESET
                 )
-                return False
+                raise ConvertError("raw", e)
         return True
 
     def convert_to_flac(self, sample_rate=None, bit_depth=None, cover=None, tags=None):
@@ -716,14 +718,14 @@ class Dir(object):
                     bit_depth = bit_depth(bit_depth)
                     audio.set_sample_width(bit_depth)
                 audio.export(join(self.directory_path, name + ".flac"), format="flac")
-            except:
+            except Exception as e:
                 verbose_log(
                     Fore.RED
                     + "CONVERTING TO FLAC FAILED: "
                     + join(self.directory_path, file)
                     + Fore.RESET
                 )
-                return False
+                raise ConvertError("flac", e)
         return True
 
     def convert_to(
@@ -746,14 +748,14 @@ class Dir(object):
                     cover=cover,
                     tags=tags,
                 )
-            except:
+            except Exception as e:
                 verbose_log(
                     Fore.RED
                     + "CONVERTING TO {} FAILED: ".format(format)
                     + join(self.directory_path, file)
                     + Fore.RESET
                 )
-                return False
+                raise ConvertError(format, e)
         return True
 
     def export_for(self, target_platform, target_directory):
@@ -773,12 +775,14 @@ class Dir(object):
                 format = "wav"
                 sample_rate = 44100
                 bit_depth = 16
+        else:
+            raise ExportError(target_platform.lower(), Exception("Unknown platform"))
 
         try:
             self.copy(dir)
             self.convert_to(format, sample_rate, bit_depth)
-        except:
-            return False
+        except Exception as e:
+            raise ExportError(target_platform.lower(), e)
         return True
 
 
