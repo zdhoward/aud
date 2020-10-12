@@ -27,7 +27,7 @@ brew install ffmpeg --with-libvorbis --with-sdl2 --with-theora
 >> virtualenv venv
 >> source venv/bin/activate
 >> python3 -m pip install -r requirements.txt
->> python3 -m aud --test
+>> python3 aud/. --test
 ```
 
 ##### Quickstart:
