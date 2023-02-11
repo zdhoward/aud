@@ -1,7 +1,6 @@
 from setuptools import setup, Extension
 from os.path import abspath, dirname, join
 from io import open
-from m2r import parse_from_file
 
 VERSION = "0.8.6"
 DESCRIPTION = "aud is a python package that aims to make bulk file edits easy enough for anyone with minimal scripting or python knowledge"
@@ -9,8 +8,9 @@ DESCRIPTION = "aud is a python package that aims to make bulk file edits easy en
 here = abspath(dirname(__file__))
 
 try:
+    from m2r import parse_from_file
     long_description = parse_from_file(join(here, "README.md"))
-except FileNotFoundError:
+except (FileNotFoundError, ModuleNotFoundError):
     long_description = DESCRIPTION
 
 setup(
