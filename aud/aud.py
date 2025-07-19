@@ -455,7 +455,9 @@ class Dir(object):
                         rng = randrange(min, max) + len(watermark)
                         cur += rng
                         if (cur + max + len(watermark)) < len(audio):
-                            audio.overlay(watermark, rng, gain_during_overlay=-2)
+                            audio = audio.overlay(
+                                watermark, rng, gain_during_overlay=-2
+                            )
                         else:
                             break
                     audio.export(join(self.directory_path, file), format=ext)
