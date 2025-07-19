@@ -204,7 +204,7 @@ class Dir(object):
     ########################################
 
     def config_get_allowlist(self):
-        verbose_log("Retreive allowlist")
+        verbose_log("Retrieve allowlist")
         return self.allowlist
 
     def config_set_allowlist(self, _list=[], regex=None):
@@ -215,7 +215,7 @@ class Dir(object):
         return True
 
     def config_get_denylist(self):
-        verbose_log("Retreive denylist")
+        verbose_log("Retrieve denylist")
         return self.denylist
 
     def config_set_denylist(self, _list=[], regex=None):
@@ -245,7 +245,7 @@ class Dir(object):
         return True
 
     def config_get_extensions(self):
-        verbose_log("Retreive extensions")
+        verbose_log("Retrieve extensions")
         return self.extensions
 
     ########################################
