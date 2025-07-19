@@ -19,10 +19,10 @@ a.log(msg)
 
 ##### Config
 ```
-a.config_get_whitelist()
-a.config_set_whitelist(list) # should accept regex too
-a.config_get_blacklist()
-a.config_set_blacklist(list) # should accept regex too
+a.config_get_allowlist()
+a.config_set_allowlist(list) # should accept regex too
+a.config_get_denylist()
+a.config_set_denylist(list) # should accept regex too
 a.config_set_log_file(target_location)
 a.config_set_extensions(extensions[])
 a.config_get_extensions()
