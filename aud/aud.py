@@ -555,7 +555,7 @@ class Dir(object):
         return True
 
     def afx_lpf(self, cutoff=None):
-        verbose_log("Appling Low Pass Filter")
+        verbose_log("Applying Low Pass Filter")
         if cutoff:
             for file in self.filtered_files:
                 name, ext = split_filename(file)
