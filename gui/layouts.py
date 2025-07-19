@@ -47,8 +47,8 @@ frm_layout_main = [
 frm_layout_config = [
     [
         sg.Button("Set Extensions", key="_config_set_extensions_"),
-        sg.Button("Set Blacklist", key="_config_set_blacklist_"),
-        sg.Button("Set Whitelist", key="_config_set_whitelist_"),
+        sg.Button("Set Denylist", key="_config_set_denylist_"),
+        sg.Button("Set Allowlist", key="_config_set_allowlist_"),
         sg.Button("Set Logfile", key="_config_set_logfile_"),
     ]
 ]

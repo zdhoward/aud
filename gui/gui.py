@@ -53,14 +53,14 @@ def process_input():
             ext_string = sg.PopupGetText("Extensions (separated by commas)")
             exts = ext_string.lower().replace(" ", "").replace(".", "").split(",")
             ## set extensions
-        elif event == "_config_set_whitelist_":
-            whitelist_string = sg.PopupGetText("Whitelist Files (separated by commas)")
-            whitelist = whitelist_string.split(",")
-            ## set whitelist
-        elif event == "_config_set_blacklist_":
-            blacklist_string = sg.PopupGetText("Blacklist Files (separated by commas)")
-            blacklist = blacklist_string.split(",")
-            ## set blacklist
+        elif event == "_config_set_allowlist_":
+            allowlist_string = sg.PopupGetText("Allowlist Files (separated by commas)")
+            allowlist = allowlist_string.split(",")
+            ## set allowlist
+        elif event == "_config_set_denylist_":
+            denylist_string = sg.PopupGetText("Denylist Files (separated by commas)")
+            denylist = denylist_string.split(",")
+            ## set denylist
         elif event == "_config_set_logfile_":
             logfile = sg.PopupGetText("Logfile", default_text=values["_selected_dir_"])
             ## set logfile
