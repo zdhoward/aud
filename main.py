@@ -4,6 +4,7 @@ from aud import Dir
 
 
 def main():
+    """Simple entry point used for manual testing."""
     a = Dir("mock")
     a.config_set_extensions(["wav"])
     return a.get_all()

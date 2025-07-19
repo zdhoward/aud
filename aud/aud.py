@@ -28,6 +28,7 @@ verbose = False
 
 
 class Dir(object):
+    """Manage a directory of audio files and perform bulk operations."""
 
     ########################################
     ##         UNDERSCORE METHODS         ##
@@ -41,6 +42,22 @@ class Dir(object):
         _denylist=[],
         _allowlist=[],
     ):
+        """Create a new ``Dir`` instance.
+
+        Parameters
+        ----------
+        _directory_path : str, optional
+            Path to the working directory. Defaults to the current working
+            directory.
+        _extensions : list[str], optional
+            List of file extensions to operate on.
+        _logfile : str, optional
+            Path to a log file for ``log()`` messages.
+        _denylist : list[str], optional
+            Initial denylist of file names.
+        _allowlist : list[str], optional
+            Initial allowlist of file names.
+        """
         ## init variable
         verbose_log("Instantiating: " + abspath(_directory_path))
         self.all_files = []
@@ -63,16 +80,20 @@ class Dir(object):
         return
 
     def __str__(self):
+        """Return the directory path as a string."""
         return self.directory_path
 
     def __len__(self):
+        """Return the number of filtered files."""
         return len(self.filtered_files)
 
     def __iter__(self):
+        """Return an iterator over the filtered file list."""
         self.cur = 0
         return self
 
     def __next__(self):
+        """Iterate through ``filtered_files``."""
         if self.cur >= len(self.filtered_files):
             raise StopIteration
         else:
@@ -84,14 +105,17 @@ class Dir(object):
     ########################################
 
     def get_all(self):
+        """Return the list of files matching the current filters."""
         verbose_log("Getting all filtered files")
         return self.filtered_files
 
     def get_single(self, num):
+        """Return a single filtered file by index."""
         verbose_log("Getting a single filtered file by number")
         return self.filtered_files[num]
 
     def log(self, message):
+        """Append ``message`` to the configured log file."""
         verbose_log("Logging: " + message)
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
         if not self.logfile:
@@ -104,6 +128,7 @@ class Dir(object):
         return True
 
     def update(self):
+        """Refresh internal file lists based on current configuration."""
         verbose_log("Updating filtered selection")
         self.all_files = sorted(listdir(self.directory_path))
         self.filtered_files = []
@@ -115,6 +140,7 @@ class Dir(object):
         return True
 
     def is_allowlisted(self, str):
+        """Return ``True`` if ``str`` is explicitly allowlisted."""
         if self.allowlist_regex:
             if match(self.allowlist_regex, str):
                 return True
@@ -123,6 +149,7 @@ class Dir(object):
         return False
 
     def is_denylisted(self, str):
+        """Return ``True`` if ``str`` is explicitly denylisted."""
         if self.denylist_regex:
             if match(self.denylist_regex, str):
                 return True
@@ -131,6 +158,7 @@ class Dir(object):
         return False
 
     def has_valid_extension(self, file):
+        """Check if ``file`` has one of the configured extensions."""
         name, ext = split_filename(file)
         if ("." + ext.lower()) in self.extensions:
             return True
@@ -141,6 +169,7 @@ class Dir(object):
     ########################################
 
     def backup(self, target_directory):
+        """Copy selected files into ``target_directory``."""
         verbose_log("Backing Up Selection In: " + target_directory)
         checkdir(abspath(target_directory))
         try:
@@ -155,6 +184,7 @@ class Dir(object):
         return True
 
     def move(self, target_directory):
+        """Move selected files into ``target_directory``."""
         verbose_log("Moving Selection To: " + target_directory)
         checkdir(abspath(target_directory))
         try:
@@ -171,6 +201,7 @@ class Dir(object):
         return True
 
     def copy(self, target_directory):
+        """Copy selected files into ``target_directory`` and update ``directory_path``."""
         verbose_log("Copying Selection To: " + target_directory)
         checkdir(abspath(target_directory))
         try:
@@ -187,6 +218,7 @@ class Dir(object):
         return True
 
     def zip(self, file_location):
+        """Create a ZIP archive containing the filtered files."""
         verbose_log("Zipping up filtered files")
         try:
             zip = ZipFile(file_location, "w")
@@ -204,10 +236,12 @@ class Dir(object):
     ########################################
 
     def config_get_allowlist(self):
+        """Return the current allowlist."""
         verbose_log("Retrieve allowlist")
         return self.allowlist
 
     def config_set_allowlist(self, _list=[], regex=None):
+        """Set allowed file names or regex and refresh the file list."""
         verbose_log("Set allowlist")
         self.allowlist = _list
         self.allowlist_regex = regex
@@ -215,10 +249,12 @@ class Dir(object):
         return True
 
     def config_get_denylist(self):
+        """Return the current denylist."""
         verbose_log("Retrieve denylist")
         return self.denylist
 
     def config_set_denylist(self, _list=[], regex=None):
+        """Set denied file names or regex and refresh the file list."""
         verbose_log("Set denylist")
         self.denylist = _list
         self.denylist_regex = regex
@@ -226,6 +262,7 @@ class Dir(object):
         return True
 
     def config_set_log_file(self, filename="main.log"):
+        """Configure the log file used by :meth:`log`."""
         verbose_log("Setting Log File To: " + filename)
         self.logfile = abspath(filename)
         self.log("Log created and set to: " + filename)
@@ -233,6 +270,7 @@ class Dir(object):
         return True
 
     def config_set_extensions(self, _extensions):
+        """Set valid file extensions and refresh the file list."""
         verbose_log("Setting Extensions To: " + ", ".join(_extensions))
         exts = []
         for ext in _extensions:
@@ -245,6 +283,7 @@ class Dir(object):
         return True
 
     def config_get_extensions(self):
+        """Return the list of configured extensions."""
         verbose_log("Retrieve extensions")
         return self.extensions
 
@@ -253,6 +292,7 @@ class Dir(object):
     ########################################
 
     def name_upper(self):
+        """Rename filtered files to all uppercase."""
         verbose_log("Changing file names to uppercase")
         try:
             for file in self.filtered_files:
@@ -268,6 +308,7 @@ class Dir(object):
         return True
 
     def name_lower(self):
+        """Rename filtered files to all lowercase."""
         verbose_log("Changing file names to lowercase")
         try:
             for file in self.filtered_files:
@@ -283,6 +324,7 @@ class Dir(object):
         return True
 
     def name_iterate(self, zerofill=0, separator="_"):
+        """Prefix files with an incrementing counter."""
         verbose_log("Changing file names to be iterated")
         num = 0
         try:
@@ -299,6 +341,7 @@ class Dir(object):
         return True
 
     def name_prepend(self, str):
+        """Prepend ``str`` to each filtered file name."""
         verbose_log("Changing names to prepend: " + str)
         try:
             for file in self.filtered_files:
@@ -314,6 +357,7 @@ class Dir(object):
         return True
 
     def name_append(self, str):
+        """Append ``str`` to each filtered file name."""
         verbose_log("Changing names to append: " + str)
         try:
             for file in self.filtered_files:
@@ -329,6 +373,7 @@ class Dir(object):
         return True
 
     def name_replace(self, target, replacement):
+        """Replace ``target`` with ``replacement`` in file names."""
         verbose_log("Replacing " + target + " with " + replacement)
         try:
             for file in self.filtered_files:
@@ -344,6 +389,7 @@ class Dir(object):
         return True
 
     def name_replace_spaces(self, replacement="_"):
+        """Replace spaces in file names with ``replacement``."""
         verbose_log("Replacing spaces in files")
         try:
             self.name_replace(" ", replacement)
@@ -358,6 +404,7 @@ class Dir(object):
     ########################################
 
     def afx_normalize(self, target_level=0.1, passes=1):
+        """Normalize audio files to a target level."""
         verbose_log(
             "Normalizing files to "
             + str(target_level)
@@ -383,6 +430,7 @@ class Dir(object):
         return True
 
     def afx_fade(self, in_fade=0, out_fade=0):
+        """Apply fade in/out effects."""
         verbose_log("Fading files in: " + str(in_fade) + " out: " + str(out_fade))
         for file in self.filtered_files:
             name, ext = split_filename(file)
@@ -406,6 +454,7 @@ class Dir(object):
         return True
 
     def afx_pad(self, in_pad=0, out_pad=0):
+        """Pad audio with silence at the beginning and/or end."""
         verbose_log("Padding files in: " + str(in_pad) + " out: " + str(out_pad))
         leading_segment = AudioSegment.silent(duration=(1000 * in_pad))
         trailing_segment = AudioSegment.silent(duration=(1000 * out_pad))
@@ -429,6 +478,7 @@ class Dir(object):
         return True
 
     def afx_watermark(self, watermark_file, frequency_min, frequency_max):
+        """Overlay ``watermark_file`` periodically on each audio file."""
         verbose_log(
             "Adding watermarks between "
             + str(frequency_min)
@@ -465,6 +515,7 @@ class Dir(object):
         return True
 
     def afx_join(self, target_location, format="wav"):
+        """Join all filtered files into a single file."""
         verbose_log("Joining all files into one file")
         try:
             audio = AudioSegment.silent(duration=1)
@@ -480,6 +531,7 @@ class Dir(object):
         return True
 
     def afx_prepend(self, file):
+        """Prepend the given audio to each file."""
         verbose_log("Prepending " + file)
         file = abspath(file)
         name, ext = split_filename(file)
@@ -496,6 +548,7 @@ class Dir(object):
         return True
 
     def afx_append(self, file):
+        """Append the given audio to each file."""
         verbose_log("Appending " + file)
         file = abspath(file)
         name, ext = split_filename(file)
@@ -514,9 +567,13 @@ class Dir(object):
     def afx_strip_silence(
         self, silence_length=1000, silence_threshold=-16, padding=100
     ):
-        ## TODO: https://github.com/jiaaro/pydub/issues/228
-        #### Need to restructure to work now that it is unbugged
-        #### v0.23.0 is the safe one in the meanwhile
+        """Remove silence from audio segments.
+
+        TODO
+        ----
+        Restructure once :func:`pydub.silence.strip_silence` stabilises
+        upstream (see issue #228).
+        """
         verbose_log("Stripping Silence")
         for file in self.filtered_files:
             name, ext = split_filename(file)
@@ -530,6 +587,7 @@ class Dir(object):
         return True
 
     def afx_invert_stereo_phase(self, channel="both"):
+        """Invert the phase of the specified stereo channel."""
         verbose_log("Inverting phase")
         ## LEFT, RIGHT, or BOTH
         both = (1, 1)
@@ -555,6 +613,7 @@ class Dir(object):
         return True
 
     def afx_lpf(self, cutoff=None):
+        """Apply a low-pass filter with the given cutoff."""
         verbose_log("Appling Low Pass Filter")
         if cutoff:
             for file in self.filtered_files:
@@ -569,6 +628,7 @@ class Dir(object):
         return True
 
     def afx_hpf(self, cutoff=None):
+        """Apply a high-pass filter with the given cutoff."""
         verbose_log("Applying High Pass Filter")
         if cutoff:
             for file in self.filtered_files:
@@ -583,6 +643,7 @@ class Dir(object):
         return True
 
     def afx_gain(self, amount=0):
+        """Apply a uniform gain to each audio file."""
         verbose_log("Applying {}db gain".format(str(amount)))
         if amount != 0:
             for file in self.filtered_files:
@@ -601,6 +662,7 @@ class Dir(object):
     ########################################
 
     def convert_to_mono(self):
+        """Down-mix all audio files to mono."""
         verbose_log("Converting to mono")
         for file in self.filtered_files:
             name, ext = split_filename(file)
@@ -614,6 +676,7 @@ class Dir(object):
         return True
 
     def convert_to_stereo(self):
+        """Ensure all audio files are stereo."""
         verbose_log("Converting to stereo")
         for file in self.filtered_files:
             name, ext = split_filename(file)
@@ -627,6 +690,7 @@ class Dir(object):
         return True
 
     def convert_to_wav(self, sample_rate=None, bit_depth=None, cover=None):
+        """Convert files to WAV format."""
         verbose_log("Converting files to WAV")
         for file in self.filtered_files:
             name, ext = split_filename(file)
@@ -656,6 +720,7 @@ class Dir(object):
         return True
 
     def convert_to_mp3(self, bit_rate=None, bit_depth=None, cover=None, tags=None):
+        """Convert files to MP3 format."""
         verbose_log("Converting files to MP3")
         for file in self.filtered_files:
             name, ext = split_filename(file)
@@ -685,6 +750,7 @@ class Dir(object):
         return True
 
     def convert_to_raw(self, sample_rate=None, bit_depth=None, cover=None):
+        """Convert files to RAW format."""
         verbose_log("Converting files to a RAW format")
         for file in self.filtered_files:
             name, ext = split_filename(file)
@@ -711,6 +777,7 @@ class Dir(object):
         return True
 
     def convert_to_flac(self, sample_rate=None, bit_depth=None, cover=None, tags=None):
+        """Convert files to FLAC format."""
         verbose_log("Converting files to a FLAC format")
         for file in self.filtered_files:
             name, ext = split_filename(file)
@@ -735,6 +802,7 @@ class Dir(object):
     def convert_to(
         self, format="wav", sample_rate=None, bit_depth=None, cover=None, tags=None
     ):
+        """Generic conversion helper used by other convert methods."""
         verbose_log("Converting files to {}")
         format = format.replace(".", "")
         for file in self.filtered_files:
@@ -763,6 +831,7 @@ class Dir(object):
         return True
 
     def export_for(self, target_platform, target_directory):
+        """Export files for a known platform (e.g. ``amuse`` or ``cd``)."""
         platforms = ["amuse", "cd"]
         dir = abspath(target_directory)
 
@@ -792,6 +861,7 @@ class Dir(object):
 
 ### FUNCTIONS TO SEPARATE
 def bit_depth_level(bit_depth):
+    """Translate bit depth in bits to sample width for pydub."""
     if bit_depth == 8:
         bit_depth = 1
     elif bit_depth == 16:
@@ -803,6 +873,7 @@ def bit_depth_level(bit_depth):
 
 
 def checkdir(target_directory):
+    """Ensure ``target_directory`` exists."""
     verbose_log("Checking if a directory already exists")
     target_directory = abspath(target_directory)
     if not (exists(target_directory)):
@@ -814,6 +885,7 @@ def checkdir(target_directory):
 
 
 def split_filename(file):
+    """Return ``(name, extension)`` for ``file``."""
     split_at = file.find(".")
     filename = file[:split_at]
     ext = file[split_at + 1 :]
@@ -821,6 +893,7 @@ def split_filename(file):
 
 
 def verbose_log(msg):
+    """Print ``msg`` when verbose logging is enabled."""
     if verbose:
         print(msg)
     return True

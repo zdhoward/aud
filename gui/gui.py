@@ -1,6 +1,8 @@
 import PySimpleGUIQt as sg
 from layouts import menu_def, layout
 
+"""Experimental PySimpleGUI interface for the :mod:`aud` package."""
+
 # https://pbaumgarten.com/python/gui-with-pysimplegui.html
 
 window = None
@@ -9,6 +11,7 @@ theme = "GreenMono"  # "Topanga" #"Dark Amber"
 
 
 def create_window():
+    """Create the main window or refresh it if it already exists."""
     global window
     global theme
 
@@ -26,6 +29,7 @@ def create_window():
 
 
 def create_system_tray_entry():
+    """Create a system tray icon with a basic menu."""
     global tray
     menu_def = [
         "BLANK",
@@ -35,11 +39,13 @@ def create_system_tray_entry():
 
 
 def process_input():
+    """Handle all window and tray events."""
     global window
     global tray
     global theme
 
     def process_window():
+        """Handle events coming from the main window."""
         global window
         global theme
         event, values = window.read()
@@ -117,6 +123,7 @@ def process_input():
             print("EVENT NOT FOUND: ", event)
 
     def process_tray():
+        """Handle system tray events."""
         menu_item = tray.Read()
         if menu_item == "Exit":
             exit()
@@ -136,6 +143,7 @@ def process_input():
 
 
 def main():
+    """Entry point for running the GUI directly."""
     create_window()
     # create_system_tray_entry()
     process_input()

@@ -6,6 +6,7 @@ import zipfile
 
 
 def checkdir(target_directory):
+    """Create ``target_directory`` if it does not exist."""
     target_directory = abspath(target_directory)
     if not (exists(target_directory)):
         try:
@@ -16,6 +17,7 @@ def checkdir(target_directory):
 
 
 def checkfile(target_directory, file_name):
+    """Ensure ``file_name`` exists within ``target_directory``."""
     if not exists(join(target_directory, file_name)):
         try:
             file = open(join(target_directory, file_name), "w")
@@ -30,6 +32,7 @@ dir = abspath("mock")
 
 
 def test_cleanup():
+    """Remove the mock directory before tests run."""
     global dir
     if exists(dir):
         rmtree(dir)
@@ -37,6 +40,7 @@ def test_cleanup():
 
 
 def test_init():
+    """Set up the mock directory with sample files."""
     global dir
     print("SETTING UP FOR TEST")
     test_cleanup()
@@ -49,6 +53,7 @@ def test_init():
 
 
 def test_dir():
+    """Exercise basic directory operations (backup, copy, move, zip)."""
     global dir
     a = aud.Dir(dir)
     a.config_set_extensions(["wav"])
@@ -92,6 +97,7 @@ def test_dir():
 
 
 def test_config():
+    """Test allow/deny lists and extension configuration."""
     global dir
     a = aud.Dir(dir)
 
@@ -116,6 +122,7 @@ def test_config():
 
 
 def test_name():
+    """Verify filename manipulation helpers."""
     global dir
     a = aud.Dir(dir)
 
@@ -147,6 +154,7 @@ def test_name():
 
 
 def test_afx_1():
+    """Test basic audio effects that modify length."""
     global dir
     a = aud.Dir(dir)
     a.config_set_extensions(["wav"])
@@ -160,6 +168,7 @@ def test_afx_1():
 
 
 def test_afx_2():
+    """Test normalization and filtering audio effects."""
     global dir
     a = aud.Dir(dir)
     a.config_set_extensions(["wav"])
@@ -171,6 +180,7 @@ def test_afx_2():
 
 
 def test_afx_3():
+    """Test silence stripping, joining and gain operations."""
     global dir
     a = aud.Dir(dir)
     a.config_set_extensions(["wav"])
@@ -182,10 +192,12 @@ def test_afx_3():
 
 
 def test_convert():
+    """Test file format conversion helpers."""
     global dir
     a = aud.Dir(dir)
 
     def check_sample_rate(file, rate):
+        """Return True if ``file`` has the expected sample rate."""
         info = mediainfo(file)
         print ("Checking " + str(rate) + " vs " + str(info.get("sample_rate")))
         if str(info.get("sample_rate")) == str(rate):
@@ -228,6 +240,7 @@ def test_convert():
 
 
 def test_export():
+    """Ensure export helpers create the expected output."""
     global dir
     a = aud.Dir(dir)
 
