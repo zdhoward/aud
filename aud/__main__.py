@@ -1,7 +1,7 @@
 import sys
-import os
+import pytest
 
 if "--test" in sys.argv:
-    os.system("pytest -xv")
+    sys.exit(pytest.main(["-x", "-v"]))
 elif len(sys.argv) > 1:
     print("--test is the only valid option")
