@@ -18,39 +18,39 @@ def checkdir(target_directory):
 def checkfile(target_directory, file_name):
     if not exists(join(target_directory, file_name)):
         try:
-            file = open(join(target_directory, file_name), "w")
-            file.close()
+            fp = open(join(target_directory, file_name), "w")
+            fp.close()
         except:
             assert False
     return True
 
 
 ### START TESTS ###
-dir = abspath("mock")
+mock_dir = abspath("mock")
 
 
 def test_cleanup():
-    global dir
-    if exists(dir):
-        rmtree(dir)
-    assert not exists(dir)
+    global mock_dir
+    if exists(mock_dir):
+        rmtree(mock_dir)
+    assert not exists(mock_dir)
 
 
 def test_init():
-    global dir
+    global mock_dir
     print("SETTING UP FOR TEST")
     test_cleanup()
-    checkdir(dir)
-    checkfile(dir, "test.txt")
-    checkfile(dir, "abc.txt")
+    checkdir(mock_dir)
+    checkfile(mock_dir, "test.txt")
+    checkfile(mock_dir, "abc.txt")
     copy2(join(abspath("mock_assets"), "bloop.wav"), join(abspath("mock"), "bloop.wav"))
     copy2(join(abspath("mock_assets"), "song.wav"), join(abspath("mock"), "song.wav"))
     assert True
 
 
-def test_dir():
-    global dir
-    a = aud.Dir(dir)
+def test_directory_operations():
+    global mock_dir
+    a = aud.Dir(mock_dir)
     a.config_set_extensions(["wav"])
 
     a.config_set_log_file("mock/test.log")
@@ -60,21 +60,21 @@ def test_dir():
 
     assert a.get_single(0) == "bloop.wav"  # doesn't work because its not sorted
 
-    assert a.backup(join(dir, "backup"))
+    assert a.backup(join(mock_dir, "backup"))
     assert sorted(a.get_all()) == ["bloop.wav", "song.wav"]
-    assert sorted(listdir(join(dir, "backup"))) == ["bloop.wav", "song.wav"]
+    assert sorted(listdir(join(mock_dir, "backup"))) == ["bloop.wav", "song.wav"]
 
-    assert a.copy(join(dir, "copy"))
+    assert a.copy(join(mock_dir, "copy"))
     assert sorted(a.get_all()) == ["bloop.wav", "song.wav"]
-    assert sorted(listdir(join(dir, "copy"))) == ["bloop.wav", "song.wav"]
+    assert sorted(listdir(join(mock_dir, "copy"))) == ["bloop.wav", "song.wav"]
 
-    assert a.move(join(dir, "move"))
+    assert a.move(join(mock_dir, "move"))
     assert sorted(a.get_all()) == ["bloop.wav", "song.wav"]
-    assert sorted(listdir(join(dir, "move"))) == ["bloop.wav", "song.wav"]
+    assert sorted(listdir(join(mock_dir, "move"))) == ["bloop.wav", "song.wav"]
 
-    assert a.move(dir)
+    assert a.move(mock_dir)
     assert sorted(a.get_all()) == ["bloop.wav", "song.wav"]
-    assert sorted(listdir(dir)) == [
+    assert sorted(listdir(mock_dir)) == [
         "abc.txt",
         "backup",
         "bloop.wav",
@@ -87,13 +87,13 @@ def test_dir():
 
     assert a.zip("mock/test.zip")
     assert isfile("mock/test.zip")
-    with zipfile.ZipFile("mock/test.zip") as file:
-        assert sorted(file.namelist()) == ["bloop.wav", "song.wav"]
+    with zipfile.ZipFile("mock/test.zip") as zip_file:
+        assert sorted(zip_file.namelist()) == ["bloop.wav", "song.wav"]
 
 
 def test_config():
-    global dir
-    a = aud.Dir(dir)
+    global mock_dir
+    a = aud.Dir(mock_dir)
 
     print("SETTING EXTENSIONS")
     assert a.config_set_extensions(["txt"])
@@ -116,8 +116,8 @@ def test_config():
 
 
 def test_name():
-    global dir
-    a = aud.Dir(dir)
+    global mock_dir
+    a = aud.Dir(mock_dir)
 
     a.config_set_extensions(["txt"])
     assert a.config_get_extensions() == [".txt"]
@@ -147,8 +147,8 @@ def test_name():
 
 
 def test_afx_1():
-    global dir
-    a = aud.Dir(dir)
+    global mock_dir
+    a = aud.Dir(mock_dir)
     a.config_set_extensions(["wav"])
 
     assert a.afx_fade(2, 2)
@@ -160,8 +160,8 @@ def test_afx_1():
 
 
 def test_afx_2():
-    global dir
-    a = aud.Dir(dir)
+    global mock_dir
+    a = aud.Dir(mock_dir)
     a.config_set_extensions(["wav"])
 
     assert a.afx_normalize(passes=2)
@@ -171,8 +171,8 @@ def test_afx_2():
 
 
 def test_afx_3():
-    global dir
-    a = aud.Dir(dir)
+    global mock_dir
+    a = aud.Dir(mock_dir)
     a.config_set_extensions(["wav"])
 
     assert a.afx_strip_silence()
@@ -182,11 +182,11 @@ def test_afx_3():
 
 
 def test_convert():
-    global dir
-    a = aud.Dir(dir)
+    global mock_dir
+    a = aud.Dir(mock_dir)
 
-    def check_sample_rate(file, rate):
-        info = mediainfo(file)
+    def check_sample_rate(file_path, rate):
+        info = mediainfo(file_path)
         print ("Checking " + str(rate) + " vs " + str(info.get("sample_rate")))
         if str(info.get("sample_rate")) == str(rate):
             print (str(info.get("sample_rate")) + " == " + str(rate))
@@ -228,13 +228,13 @@ def test_convert():
 
 
 def test_export():
-    global dir
-    a = aud.Dir(dir)
+    global mock_dir
+    a = aud.Dir(mock_dir)
 
     a.config_set_extensions(["wav"])
 
     assert a.export_for("amuse", "mock/amuse")
-    assert sorted(listdir(join(dir, "amuse"))) == [
+    assert sorted(listdir(join(mock_dir, "amuse"))) == [
         "bloop.wav",
         "joined.wav",
         "song.wav",

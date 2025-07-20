@@ -114,19 +114,19 @@ class Dir(object):
                 self.filtered_files.append(file)
         return True
 
-    def is_allowlisted(self, str):
+    def is_allowlisted(self, value):
         if self.allowlist_regex:
-            if match(self.allowlist_regex, str):
+            if match(self.allowlist_regex, value):
                 return True
-        if str in self.allowlist:
+        if value in self.allowlist:
             return True
         return False
 
-    def is_denylisted(self, str):
+    def is_denylisted(self, value):
         if self.denylist_regex:
-            if match(self.denylist_regex, str):
+            if match(self.denylist_regex, value):
                 return True
-        if str in self.denylist:
+        if value in self.denylist:
             return True
         return False
 
@@ -189,12 +189,12 @@ class Dir(object):
     def zip(self, file_location):
         verbose_log("Zipping up filtered files")
         try:
-            zip = ZipFile(file_location, "w")
+            archive = ZipFile(file_location, "w")
             [
-                zip.write(join(self.directory_path, item), item)
+                archive.write(join(self.directory_path, item), item)
                 for item in self.filtered_files
             ]
-            zip.close()
+            archive.close()
         except Exception as e:
             raise FileError("zip", e)
         return True
@@ -298,12 +298,12 @@ class Dir(object):
         self.update()
         return True
 
-    def name_prepend(self, str):
-        verbose_log("Changing names to prepend: " + str)
+    def name_prepend(self, prefix):
+        verbose_log("Changing names to prepend: " + prefix)
         try:
             for file in self.filtered_files:
                 name, ext = split_filename(file)
-                new_file = str + name + "." + ext
+                new_file = prefix + name + "." + ext
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
@@ -313,12 +313,12 @@ class Dir(object):
         self.update()
         return True
 
-    def name_append(self, str):
-        verbose_log("Changing names to append: " + str)
+    def name_append(self, suffix):
+        verbose_log("Changing names to append: " + suffix)
         try:
             for file in self.filtered_files:
                 name, ext = split_filename(file)
-                new_file = name + str + "." + ext
+                new_file = name + suffix + "." + ext
                 move(
                     join(self.directory_path, file), join(self.directory_path, new_file)
                 )
@@ -466,7 +466,7 @@ class Dir(object):
                 raise AudioFXError("watermark export", e)
         return True
 
-    def afx_join(self, target_location, format="wav"):
+    def afx_join(self, target_location, file_format="wav"):
         verbose_log("Joining all files into one file")
         try:
             audio = AudioSegment.silent(duration=1)
@@ -474,7 +474,7 @@ class Dir(object):
                 name, ext = split_filename(file)
                 new_audio = AudioSegment.from_file(join(self.directory_path, file), ext)
                 audio = audio + new_audio
-            audio.export(target_location, format=format)
+            audio.export(target_location, format=file_format)
         except Exception as e:
             verbose_log(Fore.RED + "JOINING FAILED: " + target_location + Fore.RESET)
             raise AudioFXError("join", e)
@@ -735,10 +735,15 @@ class Dir(object):
         return True
 
     def convert_to(
-        self, format="wav", sample_rate=None, bit_depth=None, cover=None, tags=None
+        self,
+        file_format="wav",
+        sample_rate=None,
+        bit_depth=None,
+        cover=None,
+        tags=None,
     ):
         verbose_log("Converting files to {}")
-        format = format.replace(".", "")
+        file_format = file_format.replace(".", "")
         for file in self.filtered_files:
             name, ext = split_filename(file)
             try:
@@ -749,44 +754,44 @@ class Dir(object):
                     bit_depth = bit_depth_level(bit_depth)
                     audio.set_sample_width(bit_depth)
                 audio.export(
-                    join(self.directory_path, name + "." + format),
-                    format=format,
+                    join(self.directory_path, name + "." + file_format),
+                    format=file_format,
                     cover=cover,
                     tags=tags,
                 )
             except Exception as e:
                 verbose_log(
                     Fore.RED
-                    + "CONVERTING TO {} FAILED: ".format(format)
+                    + "CONVERTING TO {} FAILED: ".format(file_format)
                     + join(self.directory_path, file)
                     + Fore.RESET
                 )
-                raise ConvertError(format, e)
+                raise ConvertError(file_format, e)
         return True
 
     def export_for(self, target_platform, target_directory):
         platforms = ["amuse", "cd"]
-        dir = abspath(target_directory)
+        target_dir = abspath(target_directory)
 
-        format = None
+        file_format = None
         sample_rate = None
         bit_depth = None
 
         if target_platform.lower() in platforms:
             if target_platform.lower() == "amuse":
-                format = "wav"
+                file_format = "wav"
                 sample_rate = 44100
                 bit_depth = 16
             elif target_platform.lower() == "cd":
-                format = "wav"
+                file_format = "wav"
                 sample_rate = 44100
                 bit_depth = 16
         else:
             raise ExportError(target_platform.lower(), Exception("Unknown platform"))
 
         try:
-            self.copy(dir)
-            self.convert_to(format, sample_rate, bit_depth)
+            self.copy(target_dir)
+            self.convert_to(file_format, sample_rate, bit_depth)
         except Exception as e:
             raise ExportError(target_platform.lower(), e)
         return True
