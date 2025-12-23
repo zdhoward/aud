@@ -1,0 +1,131 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aud"
+version = "1.0.0"
+description = "A tool for batch audio file processing"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10,<3.13"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+keywords = ["audio", "batch", "processing", "ffmpeg", "conversion"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+
+dependencies = [
+    "pydub>=0.25.1",
+    "colorama>=0.4.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=24.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.5.0",
+]
+cli = [
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "questionary>=2.0.0",
+]
+
+[project.scripts]
+aud = "aud.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/zdhoward/aud"
+Documentation = "https://github.com/zdhoward/aud/blob/master/README.md"
+Repository = "https://github.com/zdhoward/aud"
+Issues = "https://github.com/zdhoward/aud/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["aud"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",
+    "B904",
+    "UP038",
+]
+
+[tool.ruff.isort]
+known-first-party = ["aud"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false  # Changed to false
+warn_unused_configs = true
+disallow_untyped_defs = false  # Changed to false
+disallow_incomplete_defs = false  # Changed to false
+check_untyped_defs = false  # Changed to false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = ["pydub.*", "colorama.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["aud.core.plan"]
+ignore_errors = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--verbose",
+    "--cov=aud",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+
+[tool.coverage.run]
+source = ["aud"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]

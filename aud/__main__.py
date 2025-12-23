@@ -1,7 +1,4 @@
-import sys
-import pytest
+from aud.cli import main
 
-if "--test" in sys.argv:
-    sys.exit(pytest.main(["-x", "-v"]))
-elif len(sys.argv) > 1:
-    print("--test is the only valid option")
+if __name__ == "__main__":
+    main()
