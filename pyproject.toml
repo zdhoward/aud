@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "aud"
-version = "1.0.0"
+version = "2.0.0"
 description = "A tool for batch audio file processing"
 readme = "README.md"
 license = {text = "MIT"}
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"},
+    {name = "Zach Howard", email = "3210164+zdhoward@users.noreply.github.com"},
 ]
 keywords = ["audio", "batch", "processing", "ffmpeg", "conversion"]
 classifiers = [

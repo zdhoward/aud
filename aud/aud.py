@@ -19,6 +19,8 @@ from aud.core.operations.audio.convert import (
 
 # audio operations
 from aud.core.operations.audio.effects import (
+    AppendAudio,
+    AudioJoin,
     Fade,
     Gain,
     HighPassFilter,
@@ -26,6 +28,9 @@ from aud.core.operations.audio.effects import (
     LowPassFilter,
     Normalize,
     Pad,
+    PrependAudio,
+    StripSilence,
+    Watermark,
 )
 
 # file operations
@@ -131,6 +136,22 @@ class Dir:
     def get_all(self) -> list[str]:
         return [f.path.name for f in self._files]
 
+    def get_single(self, num: int) -> str:
+        return self._files[num].path.name
+
+    def log(self, message: str) -> bool:
+        import datetime
+
+        if not self._logfile:
+            return False
+        try:
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
+            with open(self._logfile, "a") as file:
+                file.write(f"{timestamp}: {message}\n")
+            return True
+        except Exception:
+            return False
+
     # ------------------------------------------------------------------
     # selection (LEGACY-PARITY)
     # ------------------------------------------------------------------
@@ -193,6 +214,12 @@ class Dir:
     def config_set_log_file(self, filename: str = "main.log") -> bool:
         self._logfile = Path(filename).resolve()
         return True
+
+    def config_get_allowlist(self) -> list[str]:
+        return list(self._allowlist)
+
+    def config_get_denylist(self) -> list[str]:
+        return list(self._denylist)
 
     # ------------------------------------------------------------------
     # internal helpers
@@ -324,6 +351,10 @@ class Dir:
         except Exception as e:
             raise FileError("zip", e)
 
+    def zip(self, target_zip: str | Path) -> bool:
+        """Alias for archive_zip() for backward compatibility."""
+        return self.archive_zip(target_zip)
+
     # ------------------------------------------------------------------
     # audio FX operations
     # ------------------------------------------------------------------
@@ -384,6 +415,74 @@ class Dir:
         except Exception as e:
             raise AudioFXError("invert phase", e)
 
+    def afx_invert_stereo_phase(self, channel: str = "both") -> bool:
+        """Alias for afx_invert_phase() for backward compatibility."""
+        return self.afx_invert_phase(channel)
+
+    def afx_lpf(self, cutoff: int) -> bool:
+        """Alias for afx_low_pass() for backward compatibility."""
+        return self.afx_low_pass(cutoff)
+
+    def afx_hpf(self, cutoff: int) -> bool:
+        """Alias for afx_high_pass() for backward compatibility."""
+        return self.afx_high_pass(cutoff)
+
+    def afx_strip_silence(
+        self, silence_length: int = 1000, silence_threshold: int = -16, padding: int = 100
+    ) -> bool:
+        try:
+            plan = self._plan().add(
+                StripSilence(
+                    silence_length=silence_length,
+                    silence_threshold=silence_threshold,
+                    padding=padding,
+                )
+            )
+            self._execute_audio(plan)
+            return True
+        except Exception as e:
+            raise AudioFXError("strip silence", e)
+
+    def afx_watermark(
+        self, watermark_file: str | Path, frequency_min: float, frequency_max: float
+    ) -> bool:
+        try:
+            plan = self._plan().add(
+                Watermark(
+                    watermark_file=watermark_file,
+                    frequency_min=frequency_min,
+                    frequency_max=frequency_max,
+                )
+            )
+            self._execute_audio(plan)
+            return True
+        except Exception as e:
+            raise AudioFXError("watermark", e)
+
+    def afx_join(self, target_location: str | Path, format: str = "wav") -> bool:
+        try:
+            plan = self._plan().add(AudioJoin(target_location=target_location, file_format=format))
+            self._execute_audio(plan)
+            return True
+        except Exception as e:
+            raise AudioFXError("join", e)
+
+    def afx_prepend(self, file: str | Path) -> bool:
+        try:
+            plan = self._plan().add(PrependAudio(audio_file=file))
+            self._execute_audio(plan)
+            return True
+        except Exception as e:
+            raise AudioFXError("prepend audio", e)
+
+    def afx_append(self, file: str | Path) -> bool:
+        try:
+            plan = self._plan().add(AppendAudio(audio_file=file))
+            self._execute_audio(plan)
+            return True
+        except Exception as e:
+            raise AudioFXError("append audio", e)
+
     # ------------------------------------------------------------------
     # conversion operations
     # ------------------------------------------------------------------
@@ -427,6 +526,56 @@ class Dir:
         except Exception as e:
             raise ConvertError("stereo", e)
 
+    def convert_to_wav(
+        self, sample_rate: int | None = None, bit_depth: int | None = None, cover: str | None = None
+    ) -> bool:
+        """Convenience method for converting to WAV format."""
+        return self.convert_format("wav", sample_rate=sample_rate, bit_depth=bit_depth, cover=cover)
+
+    def convert_to_mp3(
+        self,
+        bit_rate: int | None = None,
+        bit_depth: int | None = None,
+        cover: str | None = None,
+        tags: dict[str, str] | None = None,
+    ) -> bool:
+        """Convenience method for converting to MP3 format."""
+        # Note: bit_rate parameter is kept for compatibility but pydub uses sample_rate
+        return self.convert_format(
+            "mp3", sample_rate=bit_rate, bit_depth=bit_depth, tags=tags, cover=cover
+        )
+
+    def convert_to_flac(
+        self,
+        sample_rate: int | None = None,
+        bit_depth: int | None = None,
+        cover: str | None = None,
+        tags: dict[str, str] | None = None,
+    ) -> bool:
+        """Convenience method for converting to FLAC format."""
+        return self.convert_format(
+            "flac", sample_rate=sample_rate, bit_depth=bit_depth, tags=tags, cover=cover
+        )
+
+    def convert_to_raw(
+        self, sample_rate: int | None = None, bit_depth: int | None = None, cover: str | None = None
+    ) -> bool:
+        """Convenience method for converting to RAW format."""
+        return self.convert_format("raw", sample_rate=sample_rate, bit_depth=bit_depth, cover=cover)
+
+    def convert_to(
+        self,
+        format: str = "wav",
+        sample_rate: int | None = None,
+        bit_depth: int | None = None,
+        cover: str | None = None,
+        tags: dict[str, str] | None = None,
+    ) -> bool:
+        """Alias for convert_format() for backward compatibility."""
+        return self.convert_format(
+            format, sample_rate=sample_rate, bit_depth=bit_depth, tags=tags, cover=cover
+        )
+
     # ------------------------------------------------------------------
     # export helper (legacy API shape)
     # ------------------------------------------------------------------
@@ -443,6 +592,16 @@ class Dir:
             platform = target_platform.strip().lower()
             out_dir = Path(target_directory)
 
+            if platform == "amuse":
+                self.copy(out_dir)
+                self.convert_format("wav", sample_rate=44100, bit_depth=16)
+                return True
+
+            if platform == "cd":
+                self.copy(out_dir)
+                self.convert_format("wav", sample_rate=44100, bit_depth=16)
+                return True
+
             if platform in {"wav"}:
                 self.copy(out_dir)
                 self.convert_format("wav")
@@ -456,3 +615,8 @@ class Dir:
             raise ValueError(f"Unsupported platform: {target_platform}")
         except Exception as e:
             raise ExportError("export_for", e)
+
+
+# Additional backward compatibility note:
+# export_for() now supports "amuse" and "cd" platforms as per v1 behavior
+# Both export to WAV 44.1kHz 16-bit

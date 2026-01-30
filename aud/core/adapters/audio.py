@@ -1,15 +1,20 @@
 from __future__ import annotations
 
+from random import randrange
+
 from pydub import AudioSegment
 from pydub.effects import (
     high_pass_filter,
     invert_phase,
     low_pass_filter,
     normalize,
+    strip_silence,
 )
 
 from aud.core.models import AudioFile
 from aud.core.operations.audio.effects import (
+    AppendAudio,
+    AudioJoin,
     Fade,
     Gain,
     HighPassFilter,
@@ -17,6 +22,9 @@ from aud.core.operations.audio.effects import (
     LowPassFilter,
     Normalize,
     Pad,
+    PrependAudio,
+    StripSilence,
+    Watermark,
 )
 
 
@@ -40,6 +48,16 @@ class AudioAdapter:
             return self._hpf(operation, inputs)
         if isinstance(operation, InvertPhase):
             return self._invert(operation, inputs)
+        if isinstance(operation, StripSilence):
+            return self._strip_silence(operation, inputs)
+        if isinstance(operation, Watermark):
+            return self._watermark(operation, inputs)
+        if isinstance(operation, AudioJoin):
+            return self._audio_join(operation, inputs)
+        if isinstance(operation, PrependAudio):
+            return self._prepend_audio(operation, inputs)
+        if isinstance(operation, AppendAudio):
+            return self._append_audio(operation, inputs)
 
         raise TypeError(f"Unsupported audio operation: {operation}")
 
@@ -108,5 +126,63 @@ class AudioAdapter:
         for file in files:
             audio = self._load(file)
             audio = invert_phase(audio, channels.get(op.channel, (1, 1)))
+            self._export(audio, file)
+        return files
+
+    def _strip_silence(self, op: StripSilence, files):
+        for file in files:
+            audio = self._load(file)
+            audio = strip_silence(audio, op.silence_length, op.silence_threshold, op.padding)
+            self._export(audio, file)
+        return files
+
+    def _watermark(self, op: Watermark, files):
+        # Load watermark file
+        watermark = AudioSegment.from_file(op.watermark_file, op.watermark_file.suffix.lstrip("."))
+        min_ms = int(op.frequency_min * 1000)
+        max_ms = int(op.frequency_max * 1000)
+
+        for file in files:
+            audio = self._load(file)
+            if len(audio) > len(watermark) + max_ms:
+                cur = 0
+                while True:
+                    rng = randrange(min_ms, max_ms) + len(watermark)
+                    cur += rng
+                    if (cur + max_ms + len(watermark)) < len(audio):
+                        audio = audio.overlay(watermark, cur, gain_during_overlay=-2)
+                    else:
+                        break
+            self._export(audio, file)
+        return files
+
+    def _audio_join(self, op: AudioJoin, files):
+        # Join all files into one
+        combined = AudioSegment.silent(duration=1)
+        for file in files:
+            audio = self._load(file)
+            combined = combined + audio
+
+        # Export to target location
+        combined.export(op.target_location, format=op.file_format)
+        return [AudioFile(op.target_location)]
+
+    def _prepend_audio(self, op: PrependAudio, files):
+        # Load the audio to prepend
+        prepend_audio = AudioSegment.from_file(op.audio_file, op.audio_file.suffix.lstrip("."))
+
+        for file in files:
+            audio = self._load(file)
+            audio = prepend_audio + audio
+            self._export(audio, file)
+        return files
+
+    def _append_audio(self, op: AppendAudio, files):
+        # Load the audio to append
+        append_audio = AudioSegment.from_file(op.audio_file, op.audio_file.suffix.lstrip("."))
+
+        for file in files:
+            audio = self._load(file)
+            audio = audio + append_audio
             self._export(audio, file)
         return files
