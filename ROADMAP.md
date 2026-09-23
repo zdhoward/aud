@@ -91,8 +91,6 @@ no-build-step static frontend. Additive; the core package stays dependency-light
 * Single-source the package version — it is declared in both `pyproject.toml`
   and `aud/__init__.py`, which is how the v2.0.1 tag/metadata mismatch
   happened. Use hatch's dynamic version from `aud.__init__`.
-* Add community files: `CONTRIBUTING.md`, `SECURITY.md`, and GitHub
-  PR/issue templates.
 * Sanitize newlines in `Dir.log()` messages (log forging).
 * Resolve `config_set_log_file()` relative to `self.directory` instead of CWD.
 
