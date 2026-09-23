@@ -23,7 +23,7 @@ Key changes:
 * Modern packaging and tooling (`pyproject.toml`, pytest, coverage)
 * A stable foundation for future features
 
-Some ideas present in earlier versions (such as platform-specific export presets) were never fully implemented and are intentionally deferred in v2.
+Platform-specific export presets (`export_for`) are implemented as of v2.0.2, along with a broad set of correctness and validation fixes (see [CHANGELOG.md](CHANGELOG.md)).
 
 ---
 
@@ -154,9 +154,18 @@ Additional helpers include mono and stereo conversion.
 
 ## Export Presets
 
-`export_for()` exists as a placeholder for future platform-specific export presets.
+`export_for()` exports the current selection to a target directory using a platform preset:
 
-This behavior was never fully implemented in earlier versions and is intentionally deferred in v2. The method is retained as a clear extension point for future development.
+```python
+d = Dir("masters", extensions=["wav"])
+d.export_for("cd", "cd_export")     # WAV 44.1 kHz 16-bit
+d.export_for("amuse", "amuse_export")  # WAV 44.1 kHz 16-bit
+d.export_for("mp3", "mp3_export")  # MP3
+d.export_for("wav", "wav_export")  # WAV, source rate/depth preserved
+```
+
+Only converted copies are written to the export directory; the source files and
+the current selection are left untouched. Unknown platforms raise `ExportError`.
 
 ---
 
@@ -210,9 +219,20 @@ aud/
 
 ## Status
 
-aud v2 is stable and fully tested.
+aud v2 is stable and fully tested (74 tests, 92% coverage, 85% CI gate).
 
-The core architecture is complete. Future development will focus on adding new operations and higher-level workflows built on the existing foundation.
+The core architecture is complete. Planned work is tracked in
+[ROADMAP.md](ROADMAP.md) and in the GitHub issue tracker: data-safety
+guards and performance work target v2.1.0, a real CLI targets v2.2.0,
+and an optional web UI is planned as a separate install.
+
+## Documentation
+
+* [API.md](API.md) — API reference
+* [EXAMPLES.md](EXAMPLES.md) — recipes and workflows
+* [CHANGELOG.md](CHANGELOG.md) — release history
+* [ROADMAP.md](ROADMAP.md) — maintenance priorities and planned versions
+* [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — design overview and extension points
 
 ---
 

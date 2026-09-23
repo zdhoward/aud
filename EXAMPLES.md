@@ -18,7 +18,7 @@ d.convert_format("wav", sample_rate=44100, bit_depth=16)
 from aud import Dir
 
 # Add sequential numbers to files with zero-padding
-d = Dir("samples")
+d = Dir("samples", extensions=["wav"])
 d.name_iterate(zerofill=2, separator="-")
 # Result: 01-file.wav, 02-file.wav, 03-file.wav, ...
 ```
@@ -29,11 +29,11 @@ d.name_iterate(zerofill=2, separator="-")
 from aud import Dir
 
 # Force uppercase, replace spaces, add prefix
-d = Dir("audio/project")
+d = Dir("audio/project", extensions=["wav"])
 d.name_upper()
 d.name_replace_spaces("_")
 d.name_prepend("TRACK_")
-# Example: "my song.wav" -> "TRACK_MY_SONG.WAV"
+# Example: "my song.wav" -> "TRACK_MY_SONG.wav"
 ```
 
 ## Audio Processing
@@ -54,7 +54,7 @@ d.afx_normalize(target_level=-0.5, passes=2)
 from aud import Dir
 
 # Add 2 second fade in and 3 second fade out
-d = Dir("audio")
+d = Dir("audio", extensions=["wav"])
 d.afx_fade(in_fade=2.0, out_fade=3.0)
 ```
 
@@ -77,7 +77,7 @@ d.afx_low_pass(cutoff_hz=10000)
 from aud import Dir
 
 # Increase volume by 6dB
-d = Dir("quiet_tracks")
+d = Dir("quiet_tracks", extensions=["wav"])
 d.afx_gain(amount_db=6.0)
 
 # Decrease volume by 3dB
@@ -125,9 +125,9 @@ d.afx_normalize()
 from aud import Dir
 
 # Process all files except temporary ones
-d = Dir("studio")
-d.config_set_denylist(regex=r"^temp_.*")
-d.config_set_denylist(names=["scratch.wav", "test.mp3"])
+# (names and regex can be combined in a single call)
+d = Dir("studio", extensions=["wav"])
+d.config_set_denylist(names=["scratch.wav", "test.mp3"], regex=r"^temp_.*")
 ```
 
 ## Multi-Step Workflows
@@ -152,8 +152,9 @@ d.name_upper()
 d.name_replace("MIX_FINAL_", "")
 d.name_iterate(zerofill=2, separator="_")
 
-# 5. Convert to distribution formats
+# 5. Keep a WAV backup, then convert to distribution formats
 d.backup("masters/wav")
+d.update()  # keep working on the source files, not the backup copies
 d.convert_format("mp3", tags={"artist": "Artist Name", "album": "Album Title"})
 
 # 6. Copy MP3s to distribution folder
@@ -176,8 +177,9 @@ for project in projects:
     d.afx_normalize(target_level=-0.5)
     d.afx_high_pass(cutoff_hz=80)
 
-    # Convert to MP3 and backup
+    # Keep a WAV backup, then convert the sources
     d.backup(f"processed/{project}/wav")
+    d.update()
     d.convert_format("mp3")
     d.copy(f"processed/{project}/mp3")
 ```
@@ -196,7 +198,7 @@ d.name_replace_spaces("_")
 d.name_replace("sample_", "")
 
 # 2. Standardize audio
-d.convert_format("wav", sample_rate=44100, bit_depth=24)
+d.convert_format("wav", sample_rate=44100, bit_depth=16)
 d.afx_normalize(target_level=-1.0)
 
 # 3. Add padding for clean loops
@@ -205,8 +207,9 @@ d.afx_pad(in_pad=0.01, out_pad=0.01)
 # 4. Number sequentially
 d.name_iterate(zerofill=3, separator="_")
 
-# 5. Export to multiple formats
+# 5. Keep a WAV backup, then export to FLAC
 d.backup("sample_pack/wav")
+d.update()
 d.convert_format("flac")
 d.copy("sample_pack/flac")
 ```
@@ -222,7 +225,7 @@ from aud import Dir
 d = Dir("masters/wav", extensions=["wav"])
 
 # Convert to FLAC for lossless distribution
-d.convert_format("flac", sample_rate=48000, bit_depth=24)
+d.convert_format("flac", sample_rate=48000, bit_depth=16)
 d.copy("distribution/flac")
 
 # Convert to MP3 for streaming
@@ -251,7 +254,7 @@ d.convert_format("flac", sample_rate=44100, bit_depth=16)
 from aud import Dir
 from aud.exceptions import AudioFXError, ConvertError, FileError
 
-d = Dir("audio")
+d = Dir("audio", extensions=["wav"])
 
 try:
     d.afx_normalize()
@@ -274,7 +277,7 @@ from aud import Dir
 from datetime import datetime, timedelta
 
 # Get all files
-d = Dir("project")
+d = Dir("project", extensions=["wav"])
 
 # Filter to files modified in last 24 hours using allowlist
 recent_files = [
