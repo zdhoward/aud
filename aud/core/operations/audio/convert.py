@@ -10,12 +10,14 @@ class ConvertFormat(AudioOperation):
         target_format: str,
         sample_rate: int | None = None,
         bit_depth: int | None = None,
+        bit_rate: int | None = None,
         tags: dict | None = None,
         cover: str | None = None,
     ):
         self.target_format = target_format.lstrip(".").lower()
         self.sample_rate = sample_rate
         self.bit_depth = bit_depth
+        self.bit_rate = bit_rate
         self.tags = tags
         self.cover = cover
 

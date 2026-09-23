@@ -29,3 +29,12 @@ def test_filesystem_ops(populated_dir):
 
     with zipfile.ZipFile(zip_path) as z:
         assert sorted(z.namelist()) == ["bloop.wav", "song.wav"]
+
+
+def test_archive_zip_empty_selection_is_noop(populated_dir):
+    d = Dir(populated_dir)
+    d.config_set_extensions(["flac"])  # selects nothing
+
+    zip_path = populated_dir / "empty.zip"
+    assert d.archive_zip(zip_path)
+    assert not zip_path.exists()

@@ -98,7 +98,8 @@ def test_convert_to_wav(populated_dir):
 def test_convert_to_mp3(populated_dir):
     """Test convert_to_mp3 convenience method."""
     d = Dir(populated_dir, extensions=["wav"])
-    assert d.convert_to_mp3(bit_rate=44100, bit_depth=16)
+    # bit_rate is the encoder bitrate in kbps
+    assert d.convert_to_mp3(bit_rate=192, bit_depth=16)
 
     # Verify conversion happened
     d.config_set_extensions(["mp3"])

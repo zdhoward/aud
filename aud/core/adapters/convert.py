@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pydub import AudioSegment
-from pydub.effects import apply_gain_stereo
 
 from aud.core.models import AudioFile
 from aud.core.operations.audio.convert import (
@@ -44,15 +43,20 @@ class ConversionAdapter:
             if op.bit_depth:
                 audio = audio.set_sample_width(self._bit_depth_to_width(op.bit_depth))
 
+            target = file.with_path(file.path.with_suffix(f".{op.target_format}"))
+            export_kwargs = {}
+            if op.bit_rate:
+                export_kwargs["bitrate"] = f"{op.bit_rate}k"
             self._export(
                 audio,
-                file.with_path(file.path.with_suffix(f".{op.target_format}")),
+                target,
                 format=op.target_format,
                 tags=op.tags,
                 cover=op.cover,
+                **export_kwargs,
             )
 
-            outputs.append(file.with_path(file.path.with_suffix(f".{op.target_format}")))
+            outputs.append(target)
 
         return outputs
 
@@ -66,7 +70,7 @@ class ConversionAdapter:
     def _stereo(self, files):
         for file in files:
             audio = self._load(file)
-            audio = apply_gain_stereo(audio, 0, 0)
+            audio = audio.set_channels(2)
             self._export(audio, file)
         return files
 
@@ -76,7 +80,9 @@ class ConversionAdapter:
             return 1
         if bit_depth == 16:
             return 2
-        # pydub converts 24/32 → 32 internally
-        if bit_depth in (24, 32):
+        if bit_depth == 32:
             return 4
-        raise ValueError(f"Unsupported bit depth: {bit_depth}")
+        raise ValueError(
+            f"Unsupported bit depth: {bit_depth} "
+            f"(pydub cannot encode {bit_depth}-bit audio; use 8, 16, or 32)"
+        )

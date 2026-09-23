@@ -109,6 +109,9 @@ class Dir:
     ):
         self.directory = Path(directory).resolve()
 
+        if not self.directory.is_dir():
+            raise FileNotFoundError(f"Not a directory: {self.directory}")
+
         self._extensions = list(extensions or [])
         self._allowlist = list(allowlist or [])
         self._denylist = list(denylist or [])
@@ -137,6 +140,10 @@ class Dir:
         return [f.path.name for f in self._files]
 
     def get_single(self, num: int) -> str:
+        if not -len(self._files) <= num < len(self._files):
+            raise IndexError(
+                f"Index {num} is out of range for a selection of {len(self._files)} files"
+            )
         return self._files[num].path.name
 
     def log(self, message: str) -> bool:
@@ -265,7 +272,7 @@ class Dir:
             self._execute_filesystem(plan)
             return True
         except Exception as e:
-            raise FilenameError("uppercase", e)
+            raise FilenameError("uppercase", e) from e
 
     def name_lower(self) -> bool:
         try:
@@ -273,7 +280,7 @@ class Dir:
             self._execute_filesystem(plan)
             return True
         except Exception as e:
-            raise FilenameError("lowercase", e)
+            raise FilenameError("lowercase", e) from e
 
     def name_append(self, suffix: str) -> bool:
         try:
@@ -281,7 +288,7 @@ class Dir:
             self._execute_filesystem(plan)
             return True
         except Exception as e:
-            raise FilenameError("append", e)
+            raise FilenameError("append", e) from e
 
     def name_prepend(self, prefix: str) -> bool:
         try:
@@ -289,7 +296,7 @@ class Dir:
             self._execute_filesystem(plan)
             return True
         except Exception as e:
-            raise FilenameError("prepend", e)
+            raise FilenameError("prepend", e) from e
 
     def name_replace(self, target: str, replacement: str) -> bool:
         try:
@@ -297,7 +304,7 @@ class Dir:
             self._execute_filesystem(plan)
             return True
         except Exception as e:
-            raise FilenameError("replace", e)
+            raise FilenameError("replace", e) from e
 
     def name_replace_spaces(self, replacement: str = "_") -> bool:
         try:
@@ -305,7 +312,7 @@ class Dir:
             self._execute_filesystem(plan)
             return True
         except Exception as e:
-            raise FilenameError("replace spaces", e)
+            raise FilenameError("replace spaces", e) from e
 
     def name_iterate(self, zerofill: int = 0, separator: str = "_") -> bool:
         try:
@@ -313,7 +320,7 @@ class Dir:
             self._execute_filesystem(plan)
             return True
         except Exception as e:
-            raise FilenameError("iterate", e)
+            raise FilenameError("iterate", e) from e
 
     # ------------------------------------------------------------------
     # file operations
@@ -325,7 +332,7 @@ class Dir:
             self._execute_filesystem(plan)
             return True
         except Exception as e:
-            raise FileError("copy", e)
+            raise FileError("copy", e) from e
 
     def move(self, target_directory: str | Path) -> bool:
         try:
@@ -333,7 +340,7 @@ class Dir:
             self._execute_filesystem(plan)
             return True
         except Exception as e:
-            raise FileError("move", e)
+            raise FileError("move", e) from e
 
     def backup(self, target_directory: str | Path) -> bool:
         try:
@@ -341,7 +348,7 @@ class Dir:
             self._execute_filesystem(plan)
             return True
         except Exception as e:
-            raise FileError("backup", e)
+            raise FileError("backup", e) from e
 
     def archive_zip(self, target_zip: str | Path) -> bool:
         try:
@@ -349,7 +356,7 @@ class Dir:
             self._execute_filesystem(plan)
             return True
         except Exception as e:
-            raise FileError("zip", e)
+            raise FileError("zip", e) from e
 
     def zip(self, target_zip: str | Path) -> bool:
         """Alias for archive_zip() for backward compatibility."""
@@ -365,7 +372,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("normalize", e)
+            raise AudioFXError("normalize", e) from e
 
     def afx_fade(self, in_fade: float = 0, out_fade: float = 0) -> bool:
         try:
@@ -373,7 +380,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("fade", e)
+            raise AudioFXError("fade", e) from e
 
     def afx_pad(self, in_pad: float = 0, out_pad: float = 0) -> bool:
         try:
@@ -381,7 +388,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("pad", e)
+            raise AudioFXError("pad", e) from e
 
     def afx_gain(self, amount_db: float) -> bool:
         try:
@@ -389,7 +396,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("gain", e)
+            raise AudioFXError("gain", e) from e
 
     def afx_low_pass(self, cutoff_hz: int) -> bool:
         try:
@@ -397,7 +404,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("low pass", e)
+            raise AudioFXError("low pass", e) from e
 
     def afx_high_pass(self, cutoff_hz: int) -> bool:
         try:
@@ -405,7 +412,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("high pass", e)
+            raise AudioFXError("high pass", e) from e
 
     def afx_invert_phase(self, channel: str = "both") -> bool:
         try:
@@ -413,7 +420,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("invert phase", e)
+            raise AudioFXError("invert phase", e) from e
 
     def afx_invert_stereo_phase(self, channel: str = "both") -> bool:
         """Alias for afx_invert_phase() for backward compatibility."""
@@ -441,7 +448,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("strip silence", e)
+            raise AudioFXError("strip silence", e) from e
 
     def afx_watermark(
         self, watermark_file: str | Path, frequency_min: float, frequency_max: float
@@ -457,7 +464,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("watermark", e)
+            raise AudioFXError("watermark", e) from e
 
     def afx_join(self, target_location: str | Path, format: str = "wav") -> bool:
         try:
@@ -465,7 +472,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("join", e)
+            raise AudioFXError("join", e) from e
 
     def afx_prepend(self, file: str | Path) -> bool:
         try:
@@ -473,7 +480,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("prepend audio", e)
+            raise AudioFXError("prepend audio", e) from e
 
     def afx_append(self, file: str | Path) -> bool:
         try:
@@ -481,7 +488,7 @@ class Dir:
             self._execute_audio(plan)
             return True
         except Exception as e:
-            raise AudioFXError("append audio", e)
+            raise AudioFXError("append audio", e) from e
 
     # ------------------------------------------------------------------
     # conversion operations
@@ -492,6 +499,7 @@ class Dir:
         target_format: str,
         sample_rate: int | None = None,
         bit_depth: int | None = None,
+        bit_rate: int | None = None,
         tags: dict[str, str] | None = None,
         cover: str | None = None,
     ) -> bool:
@@ -501,6 +509,7 @@ class Dir:
                     target_format=target_format,
                     sample_rate=sample_rate,
                     bit_depth=bit_depth,
+                    bit_rate=bit_rate,
                     tags=tags,
                     cover=cover,
                 )
@@ -508,7 +517,7 @@ class Dir:
             self._execute_convert(plan)
             return True
         except Exception as e:
-            raise ConvertError("format", e)
+            raise ConvertError("format", e) from e
 
     def convert_mono(self) -> bool:
         try:
@@ -516,7 +525,7 @@ class Dir:
             self._execute_convert(plan)
             return True
         except Exception as e:
-            raise ConvertError("mono", e)
+            raise ConvertError("mono", e) from e
 
     def convert_stereo(self) -> bool:
         try:
@@ -524,7 +533,7 @@ class Dir:
             self._execute_convert(plan)
             return True
         except Exception as e:
-            raise ConvertError("stereo", e)
+            raise ConvertError("stereo", e) from e
 
     def convert_to_wav(
         self, sample_rate: int | None = None, bit_depth: int | None = None, cover: str | None = None
@@ -539,10 +548,12 @@ class Dir:
         cover: str | None = None,
         tags: dict[str, str] | None = None,
     ) -> bool:
-        """Convenience method for converting to MP3 format."""
-        # Note: bit_rate parameter is kept for compatibility but pydub uses sample_rate
+        """Convenience method for converting to MP3 format.
+
+        bit_rate is the encoder target bitrate in kbps (e.g. 192).
+        """
         return self.convert_format(
-            "mp3", sample_rate=bit_rate, bit_depth=bit_depth, tags=tags, cover=cover
+            "mp3", bit_rate=bit_rate, bit_depth=bit_depth, tags=tags, cover=cover
         )
 
     def convert_to_flac(
@@ -580,41 +591,48 @@ class Dir:
     # export helper (legacy API shape)
     # ------------------------------------------------------------------
 
+    _EXPORT_PRESETS: dict[str, tuple[str, int | None, int | None]] = {
+        "amuse": ("wav", 44100, 16),
+        "cd": ("wav", 44100, 16),
+        "wav": ("wav", None, None),
+        "mp3": ("mp3", None, None),
+    }
+
     def export_for(self, target_platform: str, target_directory: str | Path = "export") -> bool:
         """
-        Legacy-compatible entrypoint.
+        Export the current selection to target_directory using a platform preset.
 
-        NOTE: This is still a lightweight wrapper and assumes your CLI
-        is deciding formats per platform elsewhere (or you’ll add that here).
+        Only converted copies are written to target_directory; the source
+        files and the current selection are left untouched.
         """
+        original_files = list(self._files)
         try:
-            # placeholder: keep the method for API parity; real mapping can live in CLI later
+            if not original_files:
+                return True
+
             platform = target_platform.strip().lower()
+            if platform not in self._EXPORT_PRESETS:
+                raise ValueError(f"Unsupported platform: {target_platform}")
+
+            target_format, sample_rate, bit_depth = self._EXPORT_PRESETS[platform]
             out_dir = Path(target_directory)
 
-            if platform == "amuse":
-                self.copy(out_dir)
-                self.convert_format("wav", sample_rate=44100, bit_depth=16)
-                return True
+            self.copy(out_dir)
+            self.convert_format(target_format, sample_rate=sample_rate, bit_depth=bit_depth)
 
-            if platform == "cd":
-                self.copy(out_dir)
-                self.convert_format("wav", sample_rate=44100, bit_depth=16)
-                return True
+            # Remove intermediate copies when the target format differs,
+            # so the export directory contains only converted files.
+            for file in original_files:
+                if file.extension != target_format:
+                    leftover = out_dir / file.name
+                    if leftover.exists():
+                        leftover.unlink()
 
-            if platform in {"wav"}:
-                self.copy(out_dir)
-                self.convert_format("wav")
-                return True
-
-            if platform in {"mp3"}:
-                self.copy(out_dir)
-                self.convert_format("mp3")
-                return True
-
-            raise ValueError(f"Unsupported platform: {target_platform}")
+            return True
         except Exception as e:
-            raise ExportError("export_for", e)
+            raise ExportError("export_for", e) from e
+        finally:
+            self._files = original_files
 
 
 # Additional backward compatibility note:

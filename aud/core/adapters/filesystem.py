@@ -35,20 +35,12 @@ class FileSystemAdapter:
         # Naming / rename operations
         if isinstance(
             operation,
-            (
-                Uppercase,
-                Lowercase,
-                Append,
-                Prepend,
-                Replace,
-                ReplaceSpaces,
-                Iterate,
-            ),
+            Uppercase | Lowercase | Append | Prepend | Replace | ReplaceSpaces | Iterate,
         ):
             return self._rename(operation, inputs)
 
         # File movement operations
-        if isinstance(operation, (Copy, Backup)):
+        if isinstance(operation, Copy | Backup):
             return self._copy(operation, inputs)
 
         if isinstance(operation, Move):
@@ -111,6 +103,9 @@ class FileSystemAdapter:
     # ------------------------------------------------------------------
 
     def _zip(self, operation, inputs: list[AudioFile]) -> list[AudioFile]:
+        if not inputs:
+            return []
+
         archive = operation.archive_path
         self.ensure_dir(archive.parent)
 

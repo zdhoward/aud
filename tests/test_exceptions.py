@@ -17,6 +17,15 @@ def test_convert_error_wraps_bad_bit_depth(populated_dir):
         d.convert_to_flac(bit_depth=12)
 
 
+def test_errors_preserve_original_exception(populated_dir):
+    d = Dir(populated_dir, extensions=["wav"])
+
+    with pytest.raises(ConvertError) as excinfo:
+        d.convert_to_flac(bit_depth=12)
+
+    assert isinstance(excinfo.value.__cause__, ValueError)
+
+
 def test_audio_error_wraps_missing_file(populated_dir):
     d = Dir(populated_dir, extensions=["wav"])
     (populated_dir / "song.wav").unlink()

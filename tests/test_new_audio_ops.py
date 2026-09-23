@@ -1,6 +1,10 @@
 """Tests for new audio operations added for backward compatibility."""
 
+import pytest
+from pydub import AudioSegment
+
 from aud.aud import Dir
+from aud.exceptions import AudioFXError
 
 
 def test_afx_strip_silence(populated_dir):
@@ -84,3 +88,34 @@ def test_multiple_audio_operations_chained(populated_dir):
     assert d.afx_fade(in_fade=0.5, out_fade=1.0)
     assert d.afx_strip_silence(silence_threshold=-30)
     assert d.afx_pad(in_pad=0.1, out_pad=0.1)
+
+
+def test_afx_join_duration_is_exact_sum(populated_dir, mock_assets):
+    """Joined output must not gain or lose audio (regression: 1ms silence prefix)."""
+    d = Dir(populated_dir, extensions=["wav"])
+    output_file = populated_dir / "joined.wav"
+    assert d.afx_join(target_location=output_file, format="wav")
+
+    bloop = AudioSegment.from_file(mock_assets / "bloop.wav")
+    song = AudioSegment.from_file(mock_assets / "song.wav")
+    joined = AudioSegment.from_file(output_file)
+    assert len(joined) == len(bloop) + len(song)
+
+
+def test_afx_join_empty_selection_is_noop(populated_dir):
+    d = Dir(populated_dir)
+    d.config_set_extensions(["flac"])  # selects nothing
+
+    output_file = populated_dir / "joined.wav"
+    assert d.afx_join(target_location=output_file, format="wav")
+    assert not output_file.exists()
+
+
+def test_afx_watermark_rejects_invalid_interval(populated_dir, mock_assets):
+    d = Dir(populated_dir, extensions=["wav"])
+
+    with pytest.raises(AudioFXError):
+        d.afx_watermark(mock_assets / "bloop.wav", frequency_min=3.0, frequency_max=1.0)
+
+    with pytest.raises(AudioFXError):
+        d.afx_watermark(mock_assets / "bloop.wav", frequency_min=0, frequency_max=1.0)

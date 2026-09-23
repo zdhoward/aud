@@ -79,6 +79,11 @@ class StripSilence(AudioOperation):
 
 class Watermark(AudioOperation):
     def __init__(self, watermark_file: str | Path, frequency_min: float, frequency_max: float):
+        if frequency_min <= 0 or frequency_min >= frequency_max:
+            raise ValueError(
+                f"Invalid watermark interval: {frequency_min}..{frequency_max} seconds "
+                f"(requires 0 < frequency_min < frequency_max)"
+            )
         self.watermark_file = Path(watermark_file)
         self.frequency_min = frequency_min
         self.frequency_max = frequency_max

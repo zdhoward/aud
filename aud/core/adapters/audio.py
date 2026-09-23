@@ -157,13 +157,13 @@ class AudioAdapter:
         return files
 
     def _audio_join(self, op: AudioJoin, files):
-        # Join all files into one
-        combined = AudioSegment.silent(duration=1)
-        for file in files:
-            audio = self._load(file)
-            combined = combined + audio
+        if not files:
+            return []
 
-        # Export to target location
+        combined = self._load(files[0])
+        for file in files[1:]:
+            combined = combined + self._load(file)
+
         combined.export(op.target_location, format=op.file_format)
         return [AudioFile(op.target_location)]
 
