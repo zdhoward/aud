@@ -101,6 +101,8 @@ migration reworks the same layer once, informed by the registry dispatch.
 
 ## Maintainer settings actions
 
+* Activate PyPI trusted publishing and upload v2.0.2 (#71, includes
+  step-by-step instructions).
 * Enable branch protection on `master` (require CI + CodeQL checks): #69.
 * Enable GitHub private vulnerability reporting (Settings → Code security),
   so the SECURITY.md instructions work.
