@@ -44,6 +44,10 @@ removing unnecessary re-encodes.
   CLI's `--dry-run`) can see renames and targets before executing.
 * **Operation logging.** The configured log file is currently write-only via
   manual `Dir.log()` calls; record executed operations automatically.
+* **Library logging.** The package uses no `logging` at all — long batch runs
+  are silent. Adopt the standard library pattern (package logger with
+  `NullHandler`, debug/info at operation boundaries) so CLIs and front ends
+  can surface progress. This is distinct from the `Dir.log()` audit file.
 
 ## v2.2.0 — CLI
 
@@ -73,6 +77,11 @@ no-build-step static frontend. Additive; the core package stays dependency-light
   tag/release/publish sequence is mechanical.
 * Remove the stale `main.py` dev shim at the repo root (references a `mock/`
   directory; superseded by the test suite).
+* Single-source the package version — it is declared in both `pyproject.toml`
+  and `aud/__init__.py`, which is how the v2.0.1 tag/metadata mismatch
+  happened. Use hatch's dynamic version from `aud.__init__`.
+* Add community files: `CONTRIBUTING.md`, `SECURITY.md`, and GitHub
+  PR/issue templates.
 * Sanitize newlines in `Dir.log()` messages (log forging).
 * Resolve `config_set_log_file()` relative to `self.directory` instead of CWD.
 
