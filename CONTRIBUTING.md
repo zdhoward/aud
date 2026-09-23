@@ -57,6 +57,16 @@ aud is deliberately conservative about history and versions:
 
 ### Labels
 
+Every issue carries exactly one **priority** label:
+
+| Priority label | Meaning |
+|---|---|
+| `high priority` | Data safety, security, or release-blocking. |
+| `medium priority` | Planned core work inside a milestone. |
+| `low priority` | Real but unscheduled; fine to sit. |
+
+Category labels:
+
 | Label | Meaning |
 |---|---|
 | `bug` | Incorrect behavior. Data-loss/safety bugs jump the queue. |
@@ -64,7 +74,6 @@ aud is deliberately conservative about history and versions:
 | `security` | Security-relevant hardening or findings. |
 | `documentation` | Docs work; must not drift from code behavior. |
 | `chore` | Tooling, CI, packaging, refactors with no behavior change. |
-| `low priority` | Real but unscheduled; not in the current milestone. |
 | `good first issue`, `beginner` | Self-contained, documented starting points. |
 | `help wanted` | Wanted contributions from outside. |
 | `dependencies`, `github_actions` | Set automatically by Dependabot. |
