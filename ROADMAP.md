@@ -87,6 +87,11 @@ no-build-step static frontend. Additive; the core package stays dependency-light
 
 ## Backlog (needs design decisions)
 
+* **Migrate off pydub.** pydub is unmaintained (0.25.1, June 2021) and imports
+  `audioop`, which was removed from the stdlib in Python 3.13 — this blocks
+  3.13 support and makes the dependency a growing liability. Options: direct
+  ffmpeg subprocess calls, `ffmpeg-python`, or PyAV. Best combined with the
+  op-batching rework (#44), since both touch the audio execution layer.
 * Video generation from an image + audio (old issue #21, includes a YouTube
   export profile) — decide whether this belongs in aud's scope.
 * Direct ffmpeg filter-chain pipelines for large files (streaming instead of
