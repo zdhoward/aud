@@ -62,8 +62,8 @@ everything else can slide to a later v2.x without harm.
   harness plus property-based tests for the pure cores, recorded before the
   performance work lands (#66).
 * **Release hygiene slotted into this milestone:** pre-commit pin refresh and
-  `eol=lf` (#49), synthetic test assets + PyPI publish workflow + `main.py`
-  removal (#54, with the Python 3.13 item deferred to v3.0.0), and
+  `eol=lf` (#49), synthetic test assets + `main.py` removal (#54, publish
+  workflow already landed, Python 3.13 item deferred to v3.0.0), and
   single-sourcing the package version (#56).
 
 ## v2.2.0: CLI

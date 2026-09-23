@@ -34,8 +34,10 @@ aud is deliberately conservative about history and versions:
   the "why". Never mix unrelated changes into a commit. Version bumps never
   ride along with feature work.
 * **Versions:** numbers change only at planned milestones or hotfixes. The
-  bump lives in the same commit that is tagged. The tag, the GitHub release,
-  and the PyPI publish happen in the same session.
+  bump lives in the same commit that is tagged. Pushing the tag publishes to
+  PyPI automatically via `.github/workflows/publish.yml`, which also verifies
+  that the tag, `pyproject.toml`, `__version__`, and the CHANGELOG section all
+  agree. The GitHub release entry with notes is created in the same session.
 * **Behavior changes:** any change to what an existing call does (not just
   what it accepts) must ship with a `DeprecationWarning` window when feasible,
   a CHANGELOG entry under **Changed**, and regression tests. Example: the
