@@ -48,6 +48,17 @@ removing unnecessary re-encodes.
   are silent. Adopt the standard library pattern (package logger with
   `NullHandler`, debug/info at operation boundaries) so CLIs and front ends
   can surface progress. This is distinct from the `Dir.log()` audit file.
+* **Scene naming.** `name_scene()` (ASCII transliteration, underscores,
+  uppercase, year/source/group affixes, track numbering) and scene-name
+  parsing into tags for release-processing workflows (#63).
+* **Core simplification.** Collapse the 27 duplicated try/except wrappers in
+  `Dir`, unify the three `_execute_*` methods, registry-based adapter
+  dispatch, and a shared pydub adapter base — behavior-neutral, landed with
+  the batching/parallelism work so the execution layer is restructured once
+  (#64).
+* **Test hardening.** Unicode/spaced filename coverage (#65) and a benchmark
+  harness plus property-based tests for the pure cores, recorded before the
+  performance work lands (#66).
 
 ## v2.2.0 — CLI
 
@@ -94,6 +105,10 @@ no-build-step static frontend. Additive; the core package stays dependency-light
   op-batching rework (#44), since both touch the audio execution layer.
 * Video generation from an image + audio (old issue #21, includes a YouTube
   export profile) — decide whether this belongs in aud's scope.
+* Generated API reference (`mkdocstrings` + GitHub Pages) so `API.md` cannot
+  drift (#67).
+* Plugin surface: `aud.operations` entry-points once registry dispatch lands
+  (#68).
 * Direct ffmpeg filter-chain pipelines for large files (streaming instead of
   full in-memory decode).
 * 24-bit output support via ffmpeg codec parameters (today `bit_depth` accepts
