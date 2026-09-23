@@ -39,16 +39,16 @@ aud is deliberately conservative about history and versions:
 * **Behavior changes:** any change to what an existing call does (not just
   what it accepts) must ship with a `DeprecationWarning` window when feasible,
   a CHANGELOG entry under **Changed**, and regression tests. Example: the
-  2.0.2 `bit_rate` semantics change should have carried a runtime warning —
-  it did not, which is the policy's origin.
+  2.0.2 `bit_rate` semantics change should have carried a runtime warning; it
+  did not, which is the policy's origin.
 
 ## Issue guidelines
 
 ### Filing
 
-* **Bug** — the code behaves incorrectly. Include a minimal reproduction,
+* **Bug**: the code behaves incorrectly. Include a minimal reproduction,
   your OS, Python and ffmpeg versions, and the aud version.
-* **Feature request** — a proposal for new or changed capability. State the
+* **Feature request**: a proposal for new or changed capability. State the
   *context that backs the argument*: the concrete use case, what today's
   workaround costs, and why it belongs in aud rather than downstream.
   Subjective proposals are welcome, but the argument has to be written down.
@@ -85,6 +85,13 @@ Category labels:
 * Housekeeping may stay milestone-less until it's slotted.
 * A milestone ships when its issues close; the version bump, tag, release,
   and publish then happen together.
+
+## Writing style
+
+Documentation, issues, commit messages, and release notes are written in
+plain punctuation: no em dashes. Use a comma, a colon, parentheses, or a new
+sentence instead. Keep prose direct; avoid filler and template-sounding
+phrasing. Code comments describe behavior, not reasoning.
 
 ## Pull requests
 

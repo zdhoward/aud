@@ -17,7 +17,7 @@ patch releases under the project's release discipline.
 
 ## Hardening context
 
-Known safety-critical areas are tracked with the `security` label —
+Known safety-critical areas are tracked with the `security` label,
 historically: silent overwrite behavior in rename/copy/move, symlink
 handling in the directory scanner, and unguarded user-supplied regex.
 See the issues tracker for current status.

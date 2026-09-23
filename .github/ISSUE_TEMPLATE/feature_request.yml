@@ -9,7 +9,7 @@ body:
       description: >-
         The argument for adding this. Concrete use case, what the workaround
         costs today, and why it belongs in aud rather than downstream code.
-        Subjective proposals are welcome — the argument just has to be
+        Subjective proposals are welcome, but the argument has to be
         written down.
     validations:
       required: true

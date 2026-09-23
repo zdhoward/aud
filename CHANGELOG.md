@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.2] — 2026-09-22
+## [2.0.2] - 2026-09-22
 
 ### Fixed
 
@@ -40,13 +40,13 @@
 - Local `pytest` runs no longer force coverage; use `pytest --cov=aud` when a
   report is wanted.
 
-## [2.0.1] — 2026-01-30
+## [2.0.1] - 2026-01-30
 
 Backward compatibility: v1 aliases (`zip`, `afx_lpf`, `afx_hpf`,
 `afx_invert_stereo_phase`, `convert_to`), `convert_to_*` convenience methods,
 `log()`/`get_single()` API parity, and allowlist/denylist regex support.
 
-## [2.0.0] — 2025-12-23
+## [2.0.0] - 2025-12-23
 
 Core rewrite: operations (intent) separated from adapters (execution),
 policy-based selection, plans with previews, modern packaging and tooling.
