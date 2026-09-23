@@ -233,6 +233,8 @@ and an optional web UI is planned as a separate install.
 * [CHANGELOG.md](CHANGELOG.md) — release history
 * [ROADMAP.md](ROADMAP.md) — maintenance priorities and planned versions
 * [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — design overview and extension points
+* [CONTRIBUTING.md](CONTRIBUTING.md) — dev setup, commit and release discipline, triage rules
+* [SECURITY.md](SECURITY.md) — vulnerability reporting policy
 
 ---
 

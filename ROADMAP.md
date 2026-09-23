@@ -10,7 +10,9 @@ this file is the overview. See [CHANGELOG.md](CHANGELOG.md) for what shipped.
 ## v2.1.0 — Data safety and performance
 
 The next planned minor release. Focus: making destructive paths explicit and
-removing unnecessary re-encodes.
+removing unnecessary re-encodes. Issue numbers and priorities live in the
+tracker; the cut line if the milestone grows is **#42, #43, #64+#44+#45, #55**
+— everything else can slide to a later v2.x without harm.
 
 * **Overwrite policy for rename/copy/move/backup.** Today renames silently
   overwrite targets on POSIX, and `copy`/`move` overwrite existing destinations
@@ -59,6 +61,10 @@ removing unnecessary re-encodes.
 * **Test hardening.** Unicode/spaced filename coverage (#65) and a benchmark
   harness plus property-based tests for the pure cores, recorded before the
   performance work lands (#66).
+* **Release hygiene slotted into this milestone:** pre-commit pin refresh and
+  `eol=lf` (#49), synthetic test assets + PyPI publish workflow + `main.py`
+  removal (#54, with the Python 3.13 item deferred to v3.0.0), and
+  single-sourcing the package version (#56).
 
 ## v2.2.0 — CLI
 
@@ -74,40 +80,39 @@ web UI over the `Dir` API: directory browsing locked to a chosen root,
 operation preview, batch jobs with progress (SSE), FastAPI backend with a
 no-build-step static frontend. Additive; the core package stays dependency-light.
 
+## v3.0.0 — pydub migration
+
+pydub is unmaintained (0.25.1, June 2021) and imports `audioop`, which was
+removed from the stdlib in Python 3.13 — the dependency is the single
+biggest liability in the stack (#62, high priority). Migrating the audio
+execution layer to direct ffmpeg subprocess calls buys three things at once:
+
+* Python 3.13+ support (currently impossible)
+* 24-bit output via codec parameters (today `bit_depth` accepts 8/16/32 only)
+* Streaming for large files (pydub decodes everything into memory)
+
+Sequencing: after v2.1.0, so the batching rework (#44) lands first and the
+migration reworks the same layer once, informed by the registry dispatch.
+
 ## Housekeeping (no release vehicle)
 
-* Refresh pre-commit hook pins (black 24.1.1 → 26.x, ruff 0.1.15 → 0.14.x,
-  mypy 1.8.0 → 1.19.x) to match tooling used in CI.
-* Set `eol=lf` in `.gitattributes` so Windows checkouts get LF endings, matching
-  the pre-commit `mixed-line-ending --fix=lf` hook.
-* Replace the 27MB `song.wav` test asset with generated short synthetic audio —
-  the audio tests decode/encode it repeatedly and dominate the ~50s suite run
-  (old issue #31, closed unimplemented).
-* Add Python 3.13 to the CI matrix and trove classifiers.
-* Add a PyPI publish workflow triggered on tag push (build + twine), so the
-  tag/release/publish sequence is mechanical.
-* Remove the stale `main.py` dev shim at the repo root (references a `mock/`
-  directory; superseded by the test suite).
-* Single-source the package version — it is declared in both `pyproject.toml`
-  and `aud/__init__.py`, which is how the v2.0.1 tag/metadata mismatch
-  happened. Use hatch's dynamic version from `aud.__init__`.
 * Sanitize newlines in `Dir.log()` messages (log forging).
 * Resolve `config_set_log_file()` relative to `self.directory` instead of CWD.
 
+## Maintainer settings actions
+
+* Enable branch protection on `master` (require CI + CodeQL checks) — #69.
+* Enable GitHub private vulnerability reporting (Settings → Code security),
+  so the SECURITY.md instructions work.
+
 ## Backlog (needs design decisions)
 
-* **Migrate off pydub.** pydub is unmaintained (0.25.1, June 2021) and imports
-  `audioop`, which was removed from the stdlib in Python 3.13 — this blocks
-  3.13 support and makes the dependency a growing liability. Options: direct
-  ffmpeg subprocess calls, `ffmpeg-python`, or PyAV. Best combined with the
-  op-batching rework (#44), since both touch the audio execution layer.
 * Video generation from an image + audio (old issue #21, includes a YouTube
   export profile) — decide whether this belongs in aud's scope.
-* Generated API reference (`mkdocstrings` + GitHub Pages) so `API.md` cannot
-  drift (#67).
-* Plugin surface: `aud.operations` entry-points once registry dispatch lands
-  (#68).
-* Direct ffmpeg filter-chain pipelines for large files (streaming instead of
-  full in-memory decode).
-* 24-bit output support via ffmpeg codec parameters (today `bit_depth` accepts
-  8/16/32 only and raises otherwise).
+
+## Agreed, unscheduled
+
+* Generated API reference + playbooks (#67) — blueprint agreed in the issue;
+  awaiting a slot.
+* Plugin surface: `aud.operations` entry-points (#68) — after registry
+  dispatch (#64).
