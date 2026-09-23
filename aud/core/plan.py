@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, field
 
 from aud.core.models import AudioFile
@@ -24,11 +25,15 @@ class Plan:
     def preview(self) -> list[tuple[AudioFile, AudioFile | list[AudioFile]]]:
         """
         Return a preview of what would happen without executing anything.
+
+        Operations are copied first so that stateful operations
+        (e.g. Iterate's counter) are not consumed by previewing.
         """
+        operations = copy.deepcopy(self.operations)
         preview = []
         for file in self.files:
             result = file
-            for op in self.operations:
+            for op in operations:
                 result = op.apply(result)
             preview.append((file, result))
         return preview

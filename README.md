@@ -176,8 +176,17 @@ Tests cover:
 * filesystem execution
 * audio effects
 * format conversion
+* plan previews
+* adapter dispatch and error handling
+* the CLI entrypoint
 
-Coverage is intentionally focused on core logic rather than CLI entrypoints.
+By default, `pytest` runs without coverage for speed. To generate a coverage report locally:
+
+```
+pytest --cov=aud --cov-report=term-missing
+```
+
+CI enforces a minimum coverage of 85%.
 
 ---
 

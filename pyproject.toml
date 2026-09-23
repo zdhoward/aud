@@ -61,6 +61,8 @@ include = '\.pyi?$'
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+
+[tool.ruff.lint]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -73,10 +75,9 @@ select = [
 ignore = [
     "E501",
     "B904",
-    "UP038",
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["aud"]
 
 [tool.mypy]
@@ -107,11 +108,10 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = [
     "--verbose",
-    "--cov=aud",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
 ]
+
+# Coverage is not part of the default pytest run; use `pytest --cov=aud`
+# (or the CI workflow) when a coverage report is wanted.
 
 [tool.coverage.run]
 source = ["aud"]
@@ -121,6 +121,7 @@ omit = [
 ]
 
 [tool.coverage.report]
+fail_under = 85
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
