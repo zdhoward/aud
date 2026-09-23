@@ -1,0 +1,31 @@
+name: Feature request
+description: Propose an enhancement to aud
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: >-
+        The argument for adding this. Concrete use case, what the workaround
+        costs today, and why it belongs in aud rather than downstream code.
+        Subjective proposals are welcome — the argument just has to be
+        written down.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should exist, and roughly how should it behave?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: design
+    attributes:
+      label: Design questions / open decisions
+      description: Decisions a maintainer needs to make before this can be built.

@@ -1,0 +1,41 @@
+name: Bug report
+description: Report incorrect behavior
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is wrong, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Code or command sequence that triggers the bug.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: aud version
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS
+    validations:
+      required: true
+  - type: input
+    id: ffmpeg
+    attributes:
+      label: ffmpeg version (if the bug involves audio operations)
+      description: "Output of: ffmpeg -version | head -1"
