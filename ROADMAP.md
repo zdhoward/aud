@@ -26,9 +26,24 @@ removing unnecessary re-encodes.
   op). Restructure adapters to decode once, apply all operations, encode once.
 * **Parallel processing.** pydub work is ffmpeg-subprocess bound; a thread
   pool over files gives near-linear speedup with a `max_workers` option.
+* **Selection power-ups.** Regex filtering exists today but uses prefix
+  matching (`re.match`) with no safety guard, and only allow/denylist support
+  patterns. Move to `fullmatch` semantics (with a compatibility note), add
+  glob patterns (`fnmatch`) as the friendly alternative, accept custom
+  predicates and full `SelectionPolicy` objects on `Dir`, and support
+  metadata filters (duration, size, sample rate, channels). Bound regex
+  compile/eval cost before the web UI makes it a ReDoS surface.
 * **Selection and results.** A default common-audio-extensions preset (a bare
   `Dir(path)` currently selects nothing), an optional recursive scan, and a
   per-file results object so one bad file does not abort a batch.
+* **FFmpeg presence check.** pydub failures without ffmpeg installed surface
+  as confusing wrapped tracebacks (old issue #11, closed unimplemented).
+  Check once at operation time with a clear actionable message.
+* **Dir-level dry-run.** `Plan.preview()` exists but is not reachable from
+  the `Dir` facade; expose a preview/dry-run API so users (and the future
+  CLI's `--dry-run`) can see renames and targets before executing.
+* **Operation logging.** The configured log file is currently write-only via
+  manual `Dir.log()` calls; record executed operations automatically.
 
 ## v2.2.0 — CLI
 
@@ -50,6 +65,14 @@ no-build-step static frontend. Additive; the core package stays dependency-light
   mypy 1.8.0 → 1.19.x) to match tooling used in CI.
 * Set `eol=lf` in `.gitattributes` so Windows checkouts get LF endings, matching
   the pre-commit `mixed-line-ending --fix=lf` hook.
+* Replace the 27MB `song.wav` test asset with generated short synthetic audio —
+  the audio tests decode/encode it repeatedly and dominate the ~50s suite run
+  (old issue #31, closed unimplemented).
+* Add Python 3.13 to the CI matrix and trove classifiers.
+* Add a PyPI publish workflow triggered on tag push (build + twine), so the
+  tag/release/publish sequence is mechanical.
+* Remove the stale `main.py` dev shim at the repo root (references a `mock/`
+  directory; superseded by the test suite).
 * Sanitize newlines in `Dir.log()` messages (log forging).
 * Resolve `config_set_log_file()` relative to `self.directory` instead of CWD.
 
