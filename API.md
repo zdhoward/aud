@@ -30,6 +30,10 @@ len(d)  # Returns: int
 # Iterate over selected files
 for file in d:
     print(file)  # AudioFile object
+
+# Get a single file name by index (negative indices allowed)
+d.get_single(0)  # Returns: str
+# Out-of-range indices raise IndexError
 ```
 
 ### File Operations
@@ -153,9 +157,10 @@ d.convert_stereo()
 d.convert_format(
     target_format="mp3",
     sample_rate=44100,      # Optional: target sample rate in Hz
-    bit_depth=16,           # Optional: target bit depth (8, 16, 24, or 32)
+    bit_depth=16,            # Optional: target bit depth (8, 16, or 32; others raise ConvertError)
+    bit_rate=192,            # Optional: encoder bitrate in kbps (lossy formats only)
     tags={"artist": "Name", "album": "Album"},  # Optional: metadata tags
-    cover="cover.jpg"       # Optional: album art file path
+    cover="cover.jpg"        # Optional: album art file path
 )
 
 # Supported formats: wav, mp3, flac, ogg
@@ -167,9 +172,10 @@ d.convert_format(
 # Convert to WAV at 44.1kHz, 16-bit
 d.convert_format("wav", sample_rate=44100, bit_depth=16)
 
-# Convert to MP3 with metadata
+# Convert to MP3 with metadata at 192 kbps
 d.convert_format(
     "mp3",
+    bit_rate=192,
     tags={
         "artist": "Artist Name",
         "album": "Album Title",
@@ -177,19 +183,23 @@ d.convert_format(
     }
 )
 
-# Convert to FLAC with high quality
-d.convert_format("flac", sample_rate=48000, bit_depth=24)
+# Convert to FLAC at 48kHz, 16-bit
+d.convert_format("flac", sample_rate=48000, bit_depth=16)
 ```
 
 ## Export for Platform
 
 ```python
-# Export files for specific platform (basic implementation)
-d.export_for(target_platform="wav", target_directory="export")
-d.export_for(target_platform="mp3", target_directory="export")
+# Export files for a platform preset (converted copies are written to
+# target_directory; source files and the current selection are untouched)
+d.export_for(target_platform="cd", target_directory="export")
 
-# Currently supported platforms: wav, mp3
-# More platforms planned for future releases
+# Supported platforms:
+# - "amuse": WAV 44.1kHz 16-bit
+# - "cd":    WAV 44.1kHz 16-bit
+# - "wav":   WAV (source sample rate/bit depth preserved)
+# - "mp3":   MP3
+# Unsupported platforms raise ExportError.
 ```
 
 ## Selection Behavior
@@ -226,7 +236,7 @@ except AudioFXError as e:
 ## Return Values
 
 Most operations return `bool`:
-- `True`: Operation completed successfully
+- `True`: Operation completed successfully (including no-op on an empty selection)
 - Raises exception on failure
 
 Configuration getters return their respective values:
@@ -238,4 +248,5 @@ Configuration getters return their respective values:
 - All operations are applied to the currently selected files
 - File selection can be modified at any time using `config_set_*` methods
 - Operations modify files in-place unless using `copy()`, `move()`, or `backup()`
+- `Dir()` raises `FileNotFoundError` if the given path is not an existing directory
 - The `update()` method is called automatically after configuration changes
