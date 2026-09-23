@@ -88,6 +88,15 @@ Category labels:
 * A milestone ships when its issues close; the version bump, tag, release,
   and publish then happen together.
 
+## Automation
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `ci.yml` | push/PR to master | lint (black, ruff, mypy); test matrix Linux + macOS, Python 3.10-3.12; coverage gate at 85% with artifact upload |
+| `codeql.yml` | push/PR, weekly | Python security scanning |
+| `publish.yml` | `v*` tag push | verifies tag/pyproject/`__version__`/CHANGELOG agreement, builds, `twine check`, publishes to PyPI via trusted publishing |
+| Dependabot | weekly | pip and github-actions updates, PRs with full CI |
+
 ## Writing style
 
 Documentation, issues, commit messages, and release notes are written in
