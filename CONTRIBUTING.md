@@ -12,8 +12,8 @@ pip install -e .[dev]
 ffmpeg must be on `PATH` for audio operations and the test suite.
 
 ```
-pytest                      # fast run
-pytest --cov=aud            # with coverage (85% gate)
+pytest tests/test_names.py   # example: targeted development check
+pytest --cov=aud            # full suite and coverage before a release
 black --check . && ruff check . && mypy aud   # lint gates (same as CI)
 ```
 
@@ -22,6 +22,13 @@ Pre-commit hooks (formatting, line endings, lint) run on every commit:
 ```
 pre-commit install
 ```
+
+During development, test the behavior changed since the last passing check.
+Include affected callers or integrations when shared code changes, and broaden
+the scope only when failures or unresolved concerns justify it. Do not repeatedly
+run the full suite or coverage after every edit. Run the complete suite and release
+checks before a new release. CI may continue to run its configured full matrix.
+Apply the same scope discipline to local formatting and lint checks.
 
 Line endings are LF everywhere (`.gitattributes` normalizes; the pre-commit
 `mixed-line-ending --fix=lf` hook enforces).
@@ -106,6 +113,7 @@ phrasing. Code comments describe behavior, not reasoning.
 
 ## Pull requests
 
-* Tests for changed behavior; `pytest` and the lint gates pass locally.
+* Tests for changed behavior; affected tests and relevant lint checks pass locally.
+  A full local suite is required before a release, not for every development change.
 * CHANGELOG entry for anything user-facing.
 * Don't bump versions in a PR unless the PR *is* the release.

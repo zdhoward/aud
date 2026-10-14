@@ -1,5 +1,12 @@
 # Project log
 
+## 2026-10-14: Scope development validation
+
+- Per maintainer direction, local checks cover changes since the last passing
+  run and affected integrations. Broaden only for failures or unresolved concerns;
+  reserve full local suites/coverage for releases. Recorded in CONTRIBUTING.md.
+- This documentation-only change requires no product test rerun.
+
 ## 2026-10-14: Initial security audit and implementation follow-up
 
 - Completed a quick source audit of `98a9a7c` and a separate independent source
