@@ -7,6 +7,20 @@ is tagged, and the tag, GitHub release, and PyPI publish happen together.
 Tracked work lives in the GitHub issue tracker under version milestones;
 this file is the overview. See [CHANGELOG.md](CHANGELOG.md) for what shipped.
 
+## Product readiness review (2026-10-14)
+
+The [product readiness plan](reports/Audio%20product%20readiness.md) reviews
+the current code, open issues, and common audio preparation conventions.
+It proposes safe batch execution, verified audio and metadata handling,
+configurable naming profiles, and a usable CLI as the requirements before
+an experimental port. The proposed sequence brings the audio backend
+contract forward to avoid rebuilding the execution layer twice.
+
+The milestones below remain the existing tracker allocation. The review
+is a proposal for implementation triage, not a claim that features shipped
+or that tracker milestones have been changed. Planning alone does not bump
+the package version or create a release tag.
+
 ## v2.1.0: Data safety and performance
 
 The next planned minor release. Focus: making destructive paths explicit and
@@ -50,9 +64,12 @@ everything else can slide to a later v2.x without harm.
   are silent. Adopt the standard library pattern (package logger with
   `NullHandler`, debug/info at operation boundaries) so CLIs and front ends
   can surface progress. This is distinct from the `Dir.log()` audit file.
-* **Scene naming.** `name_scene()` (ASCII transliteration, underscores,
-  uppercase, year/source/group affixes, track numbering) and scene-name
-  parsing into tags for release-processing workflows (#63).
+* **Naming profiles.** Configurable templates over track and release metadata,
+  optional ASCII transliteration, underscores, uppercase, year/source/custom
+  affixes, and disc/track numbering (#63). Use neutral profile names rather
+  than a convention-specific API. Parse existing names only with an explicit
+  grammar and review inferred metadata before writing tags. The readiness
+  plan expands the design and the required collision and portability checks.
 * **Core simplification.** Collapse the 27 duplicated try/except wrappers in
   `Dir`, unify the three `_execute_*` methods, registry-based adapter
   dispatch, and a shared pydub adapter base. Behavior-neutral, landed with
@@ -87,7 +104,8 @@ removed from the stdlib in Python 3.13. The dependency is the single
 biggest liability in the stack (#62, high priority). Migrating the audio
 execution layer to direct ffmpeg subprocess calls buys three things at once:
 
-* Python 3.13+ support (currently impossible)
+* Python 3.13+ support without an audioop compatibility dependency (the
+  current declared dependencies do not support it)
 * 24-bit output via codec parameters (today `bit_depth` accepts 8/16/32 only)
 * Streaming for large files (pydub decodes everything into memory)
 
