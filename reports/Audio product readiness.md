@@ -4,6 +4,14 @@ aud has a useful architecture and a substantial test baseline, but it needs a sa
 
 ## Passing checks leave important behavior unprotected
 
+Implementation update, 2026-10-14: the first safety slice now adds staged writes,
+collision policies, link skipping, narrowing globs, and public plan/preview/results
+APIs. Ordinary tags and nominal MP3 bitrate are retained during effects. The local
+suite passes 111 tests with 92.23% coverage, and package build/import checks pass.
+The initial source audit and focused implementation review are recorded in the
+[security review](/S:/ZX/Programming/aud/docs/SECURITY_REVIEW.md). The paragraphs below
+describe the original review baseline; remaining work and release gates still apply.
+
 The checkout declares **2.0.2**, while the reviewed PyPI listing showed **2.0.1**. The current Windows run on Python 3.10.11 passed all **74 tests in 68.34 seconds**, with **92.43% coverage**; Black, Ruff, and mypy also passed. These results establish a working baseline, not complete product correctness. Some audio tests check only a truthy return value, and mypy does not check untyped function bodies and suppresses errors in the plan module. CI covers Linux and macOS on Python 3.10–3.12, leaving Windows behavior outside its matrix. The README's “stable and fully tested” language should become a precise statement of supported behavior and tested environments. ([Package configuration](/S:/ZX/Programming/aud/pyproject.toml), [Audio tests](/S:/ZX/Programming/aud/tests/test_audio_fx.py), [CI configuration](/S:/ZX/Programming/aud/.github/workflows/ci.yml), [Published package](https://pypi.org/project/aud/), [README](/S:/ZX/Programming/aud/README.md))
 
 The behavioral probes expose practical gaps. A bare `Dir(path)` selects no files; an allowlist combined with WAV extensions still admits a nonmatching WAV. Applying gain to a newly tagged MP3 drops artist/title metadata and exports with default encoding behavior. Exporting into the exact source location fails with `SameFileError`; this probe does **not** demonstrate source deletion. Separate source inspection finds direct writes to audio paths and export intermediates whose naming and cleanup need collision protection. These are different kinds of evidence: confirmed selection and metadata failures, a confirmed same-file exception, and inspected write-path risks. ([Selection implementation](/S:/ZX/Programming/aud/aud/core/selection/composite.py), [Directory facade](/S:/ZX/Programming/aud/aud/aud.py), [Audio adapter](/S:/ZX/Programming/aud/aud/core/adapters/audio.py), [Conversion adapter](/S:/ZX/Programming/aud/aud/core/adapters/convert.py))

@@ -31,20 +31,36 @@ the package version or create a release tag.
 
 ## v2.1.0: Data safety and performance
 
+### Implemented in the working branch, not released
+
+The first safety slice implements overwrite policies, default link skipping,
+staged/validated writes, direct final-output exports, narrowing glob selection,
+and public plan/preview/per-file results with cancellation between files.
+Synthetic test audio and refreshed tooling are in place; Windows is added to
+the configured CI matrix. Existing allowlist/default-selection semantics remain
+compatible. See [the processing contract](docs/SAFE_PROCESSING.md) and
+[initial security review](docs/SECURITY_REVIEW.md) for guarantees and limits.
+
+Batch decoding, bounded codec execution, comprehensive metadata/artwork handling,
+parallelism, recursive scanning, and the remaining milestone work are pending.
+The tracker allocation below is preserved; this progress note does not close
+issues, tag a release, or change the package version.
+
 The next planned minor release. Focus: making destructive paths explicit and
 removing unnecessary re-encodes. Issue numbers and priorities live in the
 tracker; the cut line if the milestone grows is **#42, #43, #64+#44+#45, #55**;
 everything else can slide to a later v2.x without harm.
 
-* **Overwrite policy for rename/copy/move/backup.** Today renames silently
+* **Overwrite policy for rename/copy/move/backup (implemented, unreleased).** In
+  released v2.0.2, renames silently
   overwrite targets on POSIX, and `copy`/`move` overwrite existing destinations
   anywhere, including previous backups. A policy (`error` | `skip` |
   `overwrite` | `auto-rename`, default `error`) removes the silent data-loss
   class of bugs. Also covers same-name collisions when converting across
   formats in one directory.
-* **Symlink handling in the scanner.** `DirectoryScanner` currently follows
-  symlinks, so files outside the working tree can be copied, zipped, or
-  processed. Default should skip or opt in explicitly.
+* **Symlink handling in the scanner (implemented, unreleased).** Released
+  v2.0.2 followed symlinks. The working branch skips symlinks/reparse points
+  by default and resolves selected links only on explicit opt-in.
 * **Batch audio operations.** Chained operations currently decode and
   re-encode once per operation per file (generation loss, 2 ffmpeg spawns per
   op). Restructure adapters to decode once, apply all operations, encode once.
@@ -57,15 +73,17 @@ everything else can slide to a later v2.x without harm.
   predicates and full `SelectionPolicy` objects on `Dir`, and support
   metadata filters (duration, size, sample rate, channels). Bound regex
   compile/eval cost before the web UI makes it a ReDoS surface.
-* **Selection and results.** A default common-audio-extensions preset (a bare
+* **Selection and results (partly implemented).** A default common-audio-extensions preset (a bare
   `Dir(path)` currently selects nothing), an optional recursive scan, and a
-  per-file results object so one bad file does not abort a batch.
-* **FFmpeg presence check.** pydub failures without ffmpeg installed surface
-  as confusing wrapped tracebacks (old issue #11, closed unimplemented).
-  Check once at operation time with a clear actionable message.
-* **Dir-level dry-run.** `Plan.preview()` exists but is not reachable from
-  the `Dir` facade; expose a preview/dry-run API so users (and the future
-  CLI's `--dry-run`) can see renames and targets before executing.
+  per-file results object so one bad file does not abort a batch. Results
+  and explicit continuation are now implemented; audio defaults and recursive
+  scanning remain pending.
+* **FFmpeg presence check (implemented, unreleased).** Audio loading checks for
+  ffmpeg and ffprobe and reports actionable missing-tool errors. Bounded tool
+  execution remains part of the engine contract.
+* **Dir-level dry-run (implemented, unreleased).** `Dir.plan()` and validated
+  `Dir.preview()` expose destination and grouped-operation inspection, while
+  preserving the existing pure `Plan.preview()` API.
 * **Operation logging.** The configured log file is currently write-only via
   manual `Dir.log()` calls; record executed operations automatically.
 * **Library logging.** The package uses no `logging` at all; long batch runs

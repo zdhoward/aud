@@ -1,5 +1,17 @@
 # Project log
 
+## 2026-10-14: Initial security audit and implementation follow-up
+
+- Completed a quick source audit of `98a9a7c` and a separate independent source
+  recheck of the new processing implementation. No confirmed cross-principal
+  vulnerabilities; the conditional input-trust/link lead still needs validation.
+- Recorded scope, verified environment refresh, fixes, and remaining limits in
+  [the security review](docs/SECURITY_REVIEW.md). Detailed evidence stays outside
+  the repository; the final follow-up snapshot records source file hashes.
+- No fully verified adversarial audit runner was established. Sandbox-dependent
+  native checks, global FFmpeg patching and later engine/interface review remain
+  work; source review and ordinary regression tests do not certify those areas.
+
 ## 2026-10-14: Safe processing implementation
 
 - Added collision policies, link-safe selection and a narrowing glob. Shared
