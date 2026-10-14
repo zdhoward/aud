@@ -1,8 +1,9 @@
 # Roadmap
 
 aud moves in planned milestones. Version numbers change only when a milestone
-ships (or a hotfix demands it); the version bump lands in the same commit that
-is tagged, and the tag, GitHub release, and PyPI publish happen together.
+ships (or a hotfix demands it); a reviewed release commit aligns the version,
+annotated tag, changelog, and GitHub release notes. PyPI publication is a separate
+maintainer-controlled action at significant release points, not a tag-push trigger.
 
 Tracked work lives in the GitHub issue tracker under version milestones;
 this file is the overview. See [CHANGELOG.md](CHANGELOG.md) for what shipped.
@@ -145,8 +146,9 @@ migration reworks the same layer once, informed by the registry dispatch.
 
 ## Maintainer settings actions
 
-* Activate PyPI trusted publishing and upload v2.0.2 (#71, includes
-  step-by-step instructions).
+* Review PyPI trusted publishing configuration (#71). Publication is manually
+  initiated by the maintainer when a significant release is ready; do not infer
+  that every tagged release should be uploaded.
 * Enable branch protection on `master` (require CI + CodeQL checks): #69.
 * Enable GitHub private vulnerability reporting (Settings → Code security),
   so the SECURITY.md instructions work.

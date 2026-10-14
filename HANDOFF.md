@@ -8,10 +8,13 @@ This repo runs under Zach's universal agent system. Canonical resync/reinit/migr
 
 - Session start: run /sync. Session end ("wrap up"): run /finish.
 - Docs drifted or re-onboarding: run /init — migration-aware, never overwrites existing state.
-- Push policy here: private repo Zach owns — push to main when the work is ready.
+- Public project policy: work on feature/fix/docs branches and use PRs against
+  `master`. Do not push development changes directly to the default branch.
+  Release tags follow reviewed milestones; PyPI publication is maintainer-controlled.
 
 Migration notes (this repo):
 - Remote: `zdhoward/aud`. Python package — environment specifics live in the code; consult the README before assuming a toolchain.
 
 ## Current state
-Quiet since registration in the knowledgebase (2026-09-23 sweeps); tree clean. See README for what the package does.
+Safe-processing work is preserved on `feat/safe-processing`; local `master` tracks
+the published default branch. See ROADMAP.md and PROJECT_LOG.md for current progress.

@@ -42,7 +42,6 @@ and release/provider settings verification. Hostile concurrent directory/source
 replacement is outside the implemented filesystem guarantees. The future web UI
 requires its own exposure review before shipping.
 
-Detailed evidence is retained outside the repository at
-`C:/Users/ZECHS/security-audit-skill/aud/run-1/`: `REPORT.md`, `FOLLOWUP.md`,
-`DEPENDENCY-REVIEW.md`, the coverage ledger, and findings/validation records.
-Raw environment inventories and audit scratch data are not committed here.
+Detailed reports, the coverage ledger, and findings/validation records are retained
+in the maintainer's local audit archive. Raw environment inventories, machine-specific
+locations, and audit scratch data are not committed in this public repository.

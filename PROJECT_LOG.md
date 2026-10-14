@@ -1,5 +1,15 @@
 # Project log
 
+## 2026-10-14: Public contribution and release policy
+
+- Corrected stale private-project/direct-push guidance. Preserved all seven local
+  commits on `feat/safe-processing` and returned local `master` to `origin/master`;
+  no remote history was rewritten and no work was discarded.
+- Document changes accompany implementation and use portable public links.
+  Release tags mark reviewed milestones; PyPI publication is a separate maintainer
+  decision. Changed the proposed publisher to manual dispatch with validated tag
+  input, so merging the policy will decouple tags from package uploads.
+
 ## 2026-10-14: Scope development validation
 
 - Per maintainer direction, local checks cover changes since the last passing
