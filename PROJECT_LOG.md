@@ -1,5 +1,15 @@
 # Project log
 
+## 2026-10-14: Add the security audit gate
+
+- Added work package S to the readiness plan: source-first review now in the
+  implementation sequence, targeted rechecks after engine/naming/CLI changes,
+  and independently verified findings before the port readiness gate.
+- Defined scope around actual trust boundaries, safe local validation,
+  dependency/release checks, remediation, and explicit coverage gaps. Future
+  web exposure requires its own review. The audit is planned, not completed;
+  no runtime or release changes were made.
+
 ## 2026-10-14: Product readiness review
 
 - Reviewed the Python core, public API, tests, documentation, automation,

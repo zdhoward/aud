@@ -12,9 +12,17 @@ this file is the overview. See [CHANGELOG.md](CHANGELOG.md) for what shipped.
 The [product readiness plan](reports/Audio%20product%20readiness.md) reviews
 the current code, open issues, and common audio preparation conventions.
 It proposes safe batch execution, verified audio and metadata handling,
-configurable naming profiles, and a usable CLI as the requirements before
-an experimental port. The proposed sequence brings the audio backend
+configurable naming profiles, a usable CLI, and a security audit as the
+requirements before an experimental port. The proposed sequence brings the audio backend
 contract forward to avoid rebuilding the execution layer twice.
+
+The security pass starts with the current source and is repeated for the
+changed engine, naming/sidecar processing, CLI, and release candidate. It
+covers filesystem boundaries, external tool invocation, untrusted inputs,
+resource limits, dependencies, and release automation. Confirmed high/critical
+findings must be fixed and independently rechecked before the port readiness
+gate; remaining findings and validation gaps require explicit triage. The
+optional web UI gets a separate exposure review before shipping.
 
 The milestones below remain the existing tracker allocation. The review
 is a proposal for implementation triage, not a claim that features shipped
