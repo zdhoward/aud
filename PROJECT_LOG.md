@@ -1,5 +1,15 @@
 # Project log
 
+## 2026-10-14: Verification tooling refresh
+
+- Updated development tool floors and pre-commit pins to the verified current
+  versions, enforced LF through Git, and added Windows to the CI configuration
+  with unique per-platform coverage artifact names.
+- Refreshed the repo-local development/build environment after advisory matches.
+  Independent exact-version OSV rechecking found zero matches across 60 Python
+  dependencies; `pip check` passed. The global FFmpeg binary remains separate
+  maintenance work. The configured CI matrix has not yet run remotely.
+
 ## 2026-10-14: Add the security audit gate
 
 - Added work package S to the readiness plan: source-first review now in the
