@@ -4,7 +4,7 @@ from aud.aud import Dir
 
 
 def test_filesystem_ops(populated_dir):
-    d = Dir(populated_dir)
+    d = Dir(populated_dir, overwrite="overwrite")
     d.config_set_extensions(["wav"])
 
     backup = populated_dir / "backup"

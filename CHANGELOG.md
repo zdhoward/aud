@@ -1,5 +1,29 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Overwrite policies (`error`, `skip`, `overwrite`, `auto-rename`), link-safe
+  scanning, and a narrowing filename `pattern` glob on `Dir`.
+- Public `plan()`, validated `preview()`, and `execute()` APIs with per-file
+  results, fail-fast/continue behavior, and cancellation between files.
+
+### Changed
+
+- File and audio outputs are staged before publication. Collisions now raise
+  by default; scripts relying on replacement must explicitly opt into
+  `overwrite="overwrite"`. This data-loss guard takes effect immediately
+  rather than continuing unsafe writes through a deprecation window.
+- Symlinks and Windows reparse points are skipped unless explicitly enabled.
+  Explicit in-place effects and same-format conversion remain supported.
+- Export writes final outputs directly and never deletes unrelated existing
+  intermediate-name files. Exports into the source directory are rejected.
+- Effects retain ordinary source tags and nominal MP3 bitrate; output decoding
+  validates audio before publication. Artwork/VBR identity remain future work.
+- Tests generate synthetic audio; Windows joins the CI matrix; development
+  tool floors and pre-commit pins are refreshed and Git enforces LF endings.
+
 ## [2.0.2] - 2026-09-22
 
 ### Fixed

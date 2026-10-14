@@ -11,6 +11,7 @@ from pydub.effects import (
     strip_silence,
 )
 
+from aud.core.adapters.audio_io import AudioIO
 from aud.core.models import AudioFile
 from aud.core.operations.audio.effects import (
     AppendAudio,
@@ -26,14 +27,60 @@ from aud.core.operations.audio.effects import (
     StripSilence,
     Watermark,
 )
+from aud.core.safety import destinations
 
 
-class AudioAdapter:
+class AudioAdapter(AudioIO):
     """
     Executes audio operations using pydub.
     """
 
+    supported_effects = (
+        Normalize,
+        Fade,
+        Pad,
+        Gain,
+        LowPassFilter,
+        HighPassFilter,
+        InvertPhase,
+        StripSilence,
+        Watermark,
+        PrependAudio,
+        AppendAudio,
+    )
+
     def execute(self, operation, inputs: list[AudioFile]) -> list[AudioFile]:
+        if isinstance(operation, AudioJoin):
+            if not inputs:
+                return []
+            entries = destinations(
+                [(None, operation.target_location)],
+                self.overwrite,
+                protected=[f.path for f in inputs],
+            )
+            return self.execute_resolved(operation, inputs, entries)
+        # Validate dispatch before planning or loading files.
+        if not isinstance(operation, self.supported_effects):
+            raise TypeError(f"Unsupported audio operation: {operation}")
+        entries = destinations(
+            [(f.path, f.path) for f in inputs],
+            self.overwrite,
+            protected=[f.path for f in inputs],
+            in_place=True,
+        )
+        return self.execute_resolved(operation, inputs, entries)
+
+    def execute_resolved(self, operation, inputs, entries):
+        def process(entry):
+            self.destination = entry
+            if isinstance(operation, AudioJoin):
+                self._audio_join(operation, inputs)
+            else:
+                self._execute_effect(operation, [AudioFile(entry.source)])
+
+        return self.perform(operation, entries, process)
+
+    def _execute_effect(self, operation, inputs):
         if isinstance(operation, Normalize):
             return self._normalize(operation, inputs)
         if isinstance(operation, Fade):
@@ -60,12 +107,6 @@ class AudioAdapter:
             return self._append_audio(operation, inputs)
 
         raise TypeError(f"Unsupported audio operation: {operation}")
-
-    def _load(self, file: AudioFile) -> AudioSegment:
-        return AudioSegment.from_file(file.path, file.extension)
-
-    def _export(self, audio: AudioSegment, file: AudioFile) -> None:
-        audio.export(file.path, format=file.extension)
 
     def _normalize(self, op: Normalize, files):
         for file in files:
@@ -164,7 +205,7 @@ class AudioAdapter:
         for file in files[1:]:
             combined = combined + self._load(file)
 
-        combined.export(op.target_location, format=op.file_format)
+        self._export(combined, AudioFile(op.target_location), format=op.file_format)
         return [AudioFile(op.target_location)]
 
     def _prepend_audio(self, op: PrependAudio, files):

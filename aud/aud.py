@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass
+from fnmatch import fnmatchcase
 from pathlib import Path
 
-from aud.core.adapters.audio import AudioAdapter
 from aud.core.adapters.convert import ConversionAdapter
-from aud.core.adapters.filesystem import FileSystemAdapter
+from aud.core.execution import execute_steps, preview, resolve
 from aud.core.models import AudioFile
 from aud.core.operations.archive import Zip
 
@@ -32,6 +32,7 @@ from aud.core.operations.audio.effects import (
     StripSilence,
     Watermark,
 )
+from aud.core.operations.base import Operation
 
 # file operations
 from aud.core.operations.files import Backup, Copy, Move
@@ -47,6 +48,8 @@ from aud.core.operations.names import (
     Uppercase,
 )
 from aud.core.plan import Plan
+from aud.core.results import BatchResult
+from aud.core.safety import path_key, validate_policy
 from aud.core.selection.composite import CompositePolicy
 
 # selection
@@ -106,8 +109,16 @@ class Dir:
         extensions: Iterable[str] | None = None,
         allowlist: Iterable[str] | None = None,
         denylist: Iterable[str] | None = None,
+        *,
+        overwrite: str = "error",
+        follow_symlinks: bool = False,
+        pattern: str | None = None,
     ):
         self.directory = Path(directory).resolve()
+        self.overwrite = validate_policy(overwrite)
+        self.follow_symlinks = follow_symlinks
+        self.pattern = pattern
+        self.last_result = BatchResult()
 
         if not self.directory.is_dir():
             raise FileNotFoundError(f"Not a directory: {self.directory}")
@@ -187,8 +198,12 @@ class Dir:
         return base
 
     def update(self) -> None:
-        scanner = DirectoryScanner(self.directory, self._build_policy())
+        scanner = DirectoryScanner(
+            self.directory, self._build_policy(), follow_symlinks=self.follow_symlinks
+        )
         self._files = scanner.scan()
+        if self.pattern is not None:
+            self._files = [f for f in self._files if fnmatchcase(f.name, self.pattern)]
 
     # ------------------------------------------------------------------
     # config (compat layer)
@@ -233,34 +248,75 @@ class Dir:
     # ------------------------------------------------------------------
 
     def _execute_filesystem(self, plan: Plan) -> None:
-        adapter = FileSystemAdapter()
-        files = plan.files
-
-        for op in plan.operations:
-            files = adapter.execute(op, files)
-
-        self._files = files
+        self.execute(plan)
 
     def _execute_audio(self, plan: Plan) -> None:
-        adapter = AudioAdapter()
-        files = plan.files
-
-        for op in plan.operations:
-            files = adapter.execute(op, files)
-
-        self._files = files
+        self.execute(plan)
 
     def _execute_convert(self, plan: Plan) -> None:
-        adapter = ConversionAdapter()
-        files = plan.files
-
-        for op in plan.operations:
-            files = adapter.execute(op, files)
-
-        self._files = files
+        self.execute(plan)
 
     def _plan(self) -> Plan:
         return Plan(list(self._files))
+
+    def plan(self) -> Plan:
+        """Snapshot the selection without executing any operations."""
+        return self._plan()
+
+    def preview(self, operation_or_plan):
+        plan = (
+            self._plan().add(operation_or_plan)
+            if isinstance(operation_or_plan, Operation)
+            else operation_or_plan
+        )
+        if not isinstance(plan, Plan):
+            raise TypeError("Expected an Operation or Plan")
+        return preview(resolve(plan, self.overwrite))
+
+    def execute(
+        self,
+        plan: Plan,
+        *,
+        continue_on_error: bool = False,
+        cancel: Callable[[], bool] | None = None,
+    ) -> BatchResult:
+        """Execute a snapshot, recording partial success even when an error is raised."""
+        if not isinstance(plan, Plan):
+            raise TypeError("Expected a Plan")
+        self.last_result = BatchResult()
+        try:
+            steps = resolve(plan, self.overwrite)
+        except Exception as error:
+            from aud.core.results import FileResult
+
+            self.last_result.items = [
+                FileResult(str(f.path), str(f.path), "preflight", "failed", str(error))
+                for f in plan.files
+            ]
+            raise
+        try:
+            execute_steps(
+                steps, self.last_result, continue_on_error=continue_on_error, cancel=cancel
+            )
+        finally:
+            if steps:
+                self._selection_after_results(plan)
+        return self.last_result
+
+    def _selection_after_results(self, plan: Plan) -> None:
+        paths = [file.path for file in plan.files]
+        for item in self.last_result.items:
+            if item.status != "success":
+                continue
+            sources = item.sources or ((item.source,) if item.source else ())
+            keys = {path_key(Path(source)) for source in sources}
+            affected = [index for index, path in enumerate(paths) if path_key(path) in keys]
+            position = min(affected) if affected else len(paths)
+            paths = [path for path in paths if path_key(path) not in keys]
+            target = Path(item.target)
+            if path_key(target) not in {path_key(path) for path in paths}:
+                paths.insert(position, target)
+        self._files = [AudioFile(path) for path in paths if path.exists()]
 
     # ------------------------------------------------------------------
     # name operations
@@ -615,18 +671,18 @@ class Dir:
                 raise ValueError(f"Unsupported platform: {target_platform}")
 
             target_format, sample_rate, bit_depth = self._EXPORT_PRESETS[platform]
-            out_dir = Path(target_directory)
-
-            self.copy(out_dir)
-            self.convert_format(target_format, sample_rate=sample_rate, bit_depth=bit_depth)
-
-            # Remove intermediate copies when the target format differs,
-            # so the export directory contains only converted files.
-            for file in original_files:
-                if file.extension != target_format:
-                    leftover = out_dir / file.name
-                    if leftover.exists():
-                        leftover.unlink()
+            out_dir = Path(target_directory).absolute()
+            if any(file.path.parent == out_dir for file in original_files):
+                raise ValueError("Export directory must differ from the source directory")
+            adapter = ConversionAdapter(overwrite=self.overwrite)
+            try:
+                adapter.export_to(
+                    ConvertFormat(target_format, sample_rate=sample_rate, bit_depth=bit_depth),
+                    original_files,
+                    out_dir,
+                )
+            finally:
+                self.last_result = adapter.result
 
             return True
         except Exception as e:

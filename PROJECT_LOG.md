@@ -1,5 +1,21 @@
 # Project log
 
+## 2026-10-14: Safe processing implementation
+
+- Added collision policies, link-safe selection and a narrowing glob. Shared
+  destination resolution drives public previews and execution; staged writes
+  protect sources on encoder/copy failure and refuse late new-file collisions.
+- Added per-file/group results, continuation and cancellation between files.
+  Selection follows successful transitions and retains failed inputs. Exports
+  write final outputs directly; ordinary tags and nominal MP3 bitrate survive
+  effects. Artwork/VBR preservation and bounded codec execution remain pending.
+- Independent source review caught alias moves and grouped-output propagation;
+  regression tests cover the fixes. Final checks: 111 tests passed, 92.23%
+  coverage; Black/Ruff/mypy and focused checked function bodies passed; wheel/sdist
+  build, metadata checks and isolated installed-wheel import passed.
+- Changes are recorded under Unreleased. Version 2.0.2 is unchanged; the broader
+  milestone is incomplete, so no release tag or publication is appropriate.
+
 ## 2026-10-14: Reproducible audio fixtures
 
 - Replaced recorded mock audio in tests with session-scoped generated PCM tone,

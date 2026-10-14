@@ -235,6 +235,39 @@ except AudioFXError as e:
 
 ## Return Values
 
+### Safe execution and inspection
+
+`Dir(..., overwrite="error", follow_symlinks=False, pattern=None)` adds
+keyword-only safety options. Overwrite policies are `error`, `skip`, `overwrite`,
+and `auto-rename`. `pattern` is a filename glob intersected with the existing
+selection. Allowlists retain their documented override behavior.
+
+```python
+from aud import Dir
+from aud.core.operations.files import Copy
+
+d = Dir("masters", extensions=["wav"], pattern="final_*.wav")
+plan = d.plan().add(Copy("exports"))
+print(d.preview(plan).to_dict())
+result = d.execute(plan, continue_on_error=True)
+print(result.to_dict())
+```
+
+Preview resolves collisions without writes and raises if the plan is unsafe.
+Execution recomputes the preview snapshot, then uses those resolved destinations
+without selecting files again. `last_result` records `success`, `skipped`,
+`failed`, `not_run`, or `cancelled` outcomes, including partial completion before
+a legacy method raises. New `execute` calls raise underlying errors by default;
+`continue_on_error=True` continues independent files and returns a false-valued
+result if any file failed. Cancellation accepts `cancel=event.is_set` and stops
+between files. Batches are not atomic transactions.
+
+Sources remain unchanged if export/validation fails before publication. Ordinary
+MP3/FLAC tags and nominal MP3 bitrates are retained by in-place processing; full
+artwork and VBR preset preservation are still pending. See
+[the safe processing contract](docs/SAFE_PROCESSING.md) for filesystem and
+concurrency limits.
+
 Most operations return `bool`:
 - `True`: Operation completed successfully (including no-op on an empty selection)
 - Raises exception on failure
