@@ -1,5 +1,14 @@
 # Project log
 
+## 2026-10-14: Reproducible audio fixtures
+
+- Replaced recorded mock audio in tests with session-scoped generated PCM tone,
+  silence, and watermark-duration fixtures. The corpus is reproducible without
+  recorded media and suitable for later conformance work.
+- The unchanged 74-test baseline passed with the new fixtures in 5.43 seconds,
+  compared with the earlier 68.34-second run. This fixture change preserves
+  existing product behavior.
+
 ## 2026-10-14: Verification tooling refresh
 
 - Updated development tool floors and pre-commit pins to the verified current
