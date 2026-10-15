@@ -20,6 +20,12 @@
   resolved dependencies. Triaged four low-severity Bandit items: replaced an
   archive assertion and documented three exact-site exclusions with recheck rules.
   No blanket scanner suppression or native-security certification.
+- Run `38752076905` on `49251f1` passed both evidence jobs: zero remaining Bandit
+  findings/errors with exactly three reviewed exclusions, other scanner passes,
+  100/100 installed tests passing for each artifact, and successful import checks.
+  An independent source-only reviewer confirmed the three site dispositions and
+  archive guard. Retained detailed evidence outside version control; final release
+  approval, native isolation and reproducibility gates remain open.
 
 ## 2026-10-15: Documentation review and integration authorization
 

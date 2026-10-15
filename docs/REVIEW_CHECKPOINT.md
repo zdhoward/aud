@@ -19,6 +19,13 @@ POSIX venv interpreter symlinks to the base Python. The workflow follow-up enabl
 hidden files only for explicit evidence paths and preserves the venv executable
 path. Scanner and installed-regression gates remain pending a successful rerun.
 
+Follow-up [run `38752076905`](https://github.com/zdhoward/aud/actions/runs/38752076905)
+passed on `49251f1`: all four scanner steps and distribution checks succeeded,
+with 100 installed tests passing for each artifact and successful import
+observations. The [security record](SECURITY_REVIEW.md) documents the three narrow
+Bandit exclusions and their independent source recheck. These dated development
+results do not complete the full release checklist or approve publication.
+
 | Order | PR | Scope |
 | --- | --- | --- |
 | 1 | [#74](https://github.com/zdhoward/aud/pull/74) | Selection, safe writes, plans/results, publishing policy |

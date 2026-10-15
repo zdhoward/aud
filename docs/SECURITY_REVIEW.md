@@ -148,3 +148,13 @@ Review owner: project maintainer. Recheck each site on the next candidate and on
 the triggers above; these dispositions expire at the next release review. Scanner
 exclusion does not accept a demonstrated vulnerability or close native isolation
 gaps. Archive assertion remediation and excluded-site scanning require a fresh run.
+
+An independent source-only reviewer rechecked these sites and all repository runner
+callers, confirming the dispositions without target execution. Follow-up run
+[`38752076905`](https://github.com/zdhoward/aud/actions/runs/38752076905) on `49251f1`
+passed both evidence jobs: Bandit had zero remaining findings/errors with exactly
+three excluded tests, the other scanners passed, and each installed wheel/sdist
+selection passed all 100 tests with no skips. Both fresh import observations passed.
+This closes the initial workflow defects and scanner triage for that development
+commit; native isolation, build reproducibility and final release approval remain
+open. Artifact evidence is retained locally outside version control and on the run.
