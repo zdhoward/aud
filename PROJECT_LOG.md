@@ -1,5 +1,25 @@
 # Project log
 
+## 2026-10-15: Explicit filename candidate metadata
+
+- Added `feat/filename-parsing` above media conformance. `FilenamePattern` uses
+  unique canonical fields, literal separators, bounded input, and optional exact
+  numeric widths; `Dir.parse_filenames()` snapshots selected basenames without I/O.
+- Chose deterministic first-separator matching rather than heuristic confidence
+  scores or backtracking. Preserve text exactly and reject mismatches; candidates
+  require deliberate use. No implicit tag merging or tag writes. CLI rename/album
+  config selects either filename patterns or explicit metadata.
+- All 57 focused filename/CLI checks passed, including portable extraction cases,
+  invalid grammar, untouched sources, naming copies, and album manifest metadata.
+  Lint/types pass. Full local release tests remain deferred. Independent security
+  follow-up and PR-stack review remain open. No merge, release, tag, version bump,
+  or PyPI publication.
+
+- Cross-platform CI exposed a subprocess cleanup race on macOS: group signalling
+  can fail after the child exits, masking the original limit error. Recheck child
+  completion before suppressing that permission error; a live-child denial still
+  raises. Deterministic tests cover both branches, alongside focused runner checks.
+
 ## 2026-10-15: Media and recovery conformance corpus
 
 - Added `test/media-conformance` above JSON contracts. Data-only media fixtures

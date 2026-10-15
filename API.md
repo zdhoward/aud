@@ -328,6 +328,12 @@ Configuration getters return their respective values:
 
 ## Notes
 
+`FilenamePattern(template).parse(basename)` returns candidate `AudioMetadata`.
+`Dir.parse_filenames(pattern)` parses the full current selection into a path-keyed
+metadata mapping for naming/album plans, without probes, merging, or writes.
+Any mismatch raises. See [filename parsing](docs/FILENAME_PARSING.md) for bounded
+grammar, numeric widths, first-separator matching, and CLI integration.
+
 `json_document(kind, payload, version=1)` snapshots a versioned interchange
 envelope; `json_schema(version=1)` reads its bundled schema without network I/O.
 Existing `to_dict()` outputs stay unchanged. See [JSON contracts](docs/JSON_CONTRACTS.md)

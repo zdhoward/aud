@@ -249,6 +249,9 @@ and an optional web UI is planned as a separate install.
 
 ## Documentation
 
+Unreleased [explicit filename parsing](docs/FILENAME_PARSING.md) can provide
+candidate metadata to naming and album preparation through caller-defined patterns.
+
 Unreleased [versioned JSON contracts](docs/JSON_CONTRACTS.md) and a portable
 conformance corpus provide a starting reference for integrations and future ports.
 

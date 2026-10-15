@@ -31,7 +31,11 @@ list/inspect, conversion, naming, native effects, exports, and album preparation
 with bounded JSON config, previews/results, exit codes, and cancellation.
 File-level progress now has shared callbacks and opt-in CLI stderr output;
 opt-in [v1 JSON contracts](../docs/JSON_CONTRACTS.md) and an initial portable corpus
-now cover core outputs. Filename parsing, finer media-time progress, and broader
+now cover core outputs. Explicit [filename parsing](../docs/FILENAME_PARSING.md)
+now supplies candidate metadata using fixed left-to-right separators, without
+heuristic confidence or automatic tag application. This deliberately narrows the
+earlier proposal to a small deterministic grammar; callers review ambiguous
+conventions or supply metadata. Finer media-time progress and broader
 media/operation conformance remain pending.
 
 The portable media corpus now adds representative exact PCM round trips,

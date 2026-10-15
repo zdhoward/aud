@@ -53,8 +53,10 @@ snapshots, with disc numbering, explicit defaults, transformations, and portable
 tree/collision checks. See [the naming contract](docs/NAMING_PROFILES.md).
 Album ZIP preparation now includes opaque sidecars, checksums, metadata, and
 versioned profiles for eight distributors. See [album packaging](docs/ALBUM_PACKAGING.md)
-for supported subsets and manual review requirements. Filename parsing and the
-CLI polish remain pending; distributor account integration remains outside scope.
+for supported subsets and manual review requirements. Explicit
+[filename parsing](docs/FILENAME_PARSING.md) now supplies candidate metadata to
+naming and album preparation without guessing or tag writes. CLI polish and
+distributor account integration remain outside this completed slice.
 The first [CLI slice](docs/CLI.md) now exposes read/preview/execution commands,
 bounded JSON configuration, structured results, and cancellation over these APIs.
 Effects migration/batching, comprehensive metadata mapping, hard OS resource
