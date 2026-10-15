@@ -135,6 +135,9 @@ this document does not mark them complete.
 `publish.yml` stays manual. Its build job has read-only permissions; only the
 artifact-download/PyPI job receives `id-token: write`. Publishing actions are
 pinned to reviewed commit SHAs. The workflow validates tag/version/changelog and
+passes the build's immutable artifact ID to the upload job. Artifact names include
+the build attempt, avoiding collisions on whole-workflow retries. Retrying only
+publication can reuse its successful build output. The workflow checks distribution
 metadata, but does not automatically enforce every checklist item. It rebuilds
 at dispatch: compare/revalidate those outputs and their resolution against the
 candidate evidence before using this flow; do not assume byte identity.

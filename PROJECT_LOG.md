@@ -10,6 +10,8 @@
 - Split manual publishing into read-only build/metadata/artifact storage and a
   minimal download/PyPI job with OIDC. Pinned all publishing-workflow actions to
   upstream commit SHAs resolved on this date. No live provider settings changed.
+- Bound publication to the build's immutable artifact ID and included attempt
+  numbers in upload names, avoiding artifact collisions on workflow retries.
 - Documented open reviewed-artifact handoff and attestation gates. The workflow
   still rebuilds at dispatch, so the process does not claim that an unchecked
   rebuild is a reviewed candidate artifact. Evidence output is ignored by Git.
