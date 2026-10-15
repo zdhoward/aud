@@ -16,5 +16,8 @@ Migration notes (this repo):
 - Remote: `zdhoward/aud`. Python package — environment specifics live in the code; consult the README before assuming a toolchain.
 
 ## Current state
-Safe-processing work is preserved on `feat/safe-processing`; local `master` tracks
-the published default branch. See ROADMAP.md and PROJECT_LOG.md for current progress.
+The product-readiness stack #74-90 and hosted-validation follow-up #91 are merged
+into `master`. The package remains 2.0.2 with unreleased changes; integration did
+not create a release or publish to PyPI. See [the roadmap](ROADMAP.md),
+[project log](PROJECT_LOG.md), and [review checkpoint](docs/REVIEW_CHECKPOINT.md)
+for implemented behavior, validation evidence, and open release/port gates.
