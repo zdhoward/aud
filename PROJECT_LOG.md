@@ -20,6 +20,8 @@
 - Scoped checks cover new engine behavior and affected conversion/export/result
   integrations; full release validation is deferred. Effects still use pydub;
   limits are application controls and external FFmpeg patching remains required.
+- Linux CI exposed a Windows-only subprocess constant in type analysis. Use an
+  explicit platform guard and check the runner with Linux and Windows type targets.
 - No version bump, release tag, merge, or PyPI upload; the broader milestone remains
   incomplete. Public docs describe the new contract and remaining limitations.
 
