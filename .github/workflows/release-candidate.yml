@@ -1,0 +1,147 @@
+name: Release candidate evidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.12'
+      - name: Prepare scanner environments
+        run: |
+          mkdir -p .release-evidence
+          git rev-parse HEAD > .release-evidence/commit.txt
+          python -m venv "$RUNNER_TEMP/security-tools"
+          "$RUNNER_TEMP/security-tools/bin/pip" install bandit==1.9.4 pip-audit==2.10.1
+          python -m venv "$RUNNER_TEMP/semgrep"
+          "$RUNNER_TEMP/semgrep/bin/pip" install semgrep==1.181.0
+          "$RUNNER_TEMP/security-tools/bin/pip" freeze > .release-evidence/security-tools.txt
+          "$RUNNER_TEMP/semgrep/bin/pip" freeze > .release-evidence/semgrep-tools.txt
+      - name: Bandit
+        if: ${{ !cancelled() }}
+        run: '"$RUNNER_TEMP/security-tools/bin/bandit" -r aud -f json -o .release-evidence/bandit.json'
+      - name: Semgrep
+        if: ${{ !cancelled() }}
+        run: '"$RUNNER_TEMP/semgrep/bin/semgrep" scan --config p/python --error --metrics=off --json --output .release-evidence/semgrep.json aud'
+      - name: Gitleaks history and working tree
+        if: ${{ !cancelled() }}
+        run: |
+          curl --fail --location --retry 3 --output "$RUNNER_TEMP/gitleaks.tar.gz" \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $RUNNER_TEMP/gitleaks.tar.gz" | sha256sum --check
+          mkdir "$RUNNER_TEMP/gitleaks"
+          tar -xzf "$RUNNER_TEMP/gitleaks.tar.gz" -C "$RUNNER_TEMP/gitleaks" gitleaks
+          "$RUNNER_TEMP/gitleaks/gitleaks" version > .release-evidence/gitleaks-version.txt
+          status=0
+          "$RUNNER_TEMP/gitleaks/gitleaks" git --redact --report-format json --report-path .release-evidence/gitleaks-history.json . || status=1
+          "$RUNNER_TEMP/gitleaks/gitleaks" dir --redact --report-format json --report-path .release-evidence/gitleaks-tree.json . || status=1
+          exit "$status"
+      - name: Audit development and runtime dependency resolution
+        if: ${{ !cancelled() }}
+        run: |
+          python -m venv "$RUNNER_TEMP/dependencies"
+          "$RUNNER_TEMP/dependencies/bin/pip" install '.[dev,cli]'
+          "$RUNNER_TEMP/dependencies/bin/pip" freeze --exclude aud > .release-evidence/dependencies.txt
+          "$RUNNER_TEMP/security-tools/bin/python" -m pip_audit --disable-pip --no-deps \
+            -r .release-evidence/dependencies.txt --format json --output .release-evidence/pip-audit.json
+      - name: Retain scanner evidence, including failed checks
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: candidate-security-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .release-evidence/
+          if-no-files-found: error
+          retention-days: 14
+
+  distribution-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.12'
+      - name: Build and check metadata
+        run: |
+          mkdir -p .release-evidence
+          git rev-parse HEAD > .release-evidence/commit.txt
+          python -m pip install build==1.6.1 twine==7.0.0
+          python -m pip freeze > .release-evidence/build-tools.txt
+          python -m build
+          python -m twine check dist/*
+          sha256sum dist/* > .release-evidence/distribution-sha256.txt
+      - name: Record archive inventories and check member paths
+        run: |
+          python - <<'PY'
+          import json
+          import tarfile
+          import zipfile
+          from pathlib import Path, PurePosixPath
+
+          inventories = {}
+          archives = sorted(Path("dist").iterdir())
+          assert len(archives) == 2 and sum(p.suffix == ".whl" for p in archives) == 1
+          for archive in archives:
+              if archive.suffix == ".whl":
+                  with zipfile.ZipFile(archive) as package:
+                      names = package.namelist()
+                      assert all((i.external_attr >> 16) & 0o170000 != 0o120000 for i in package.infolist()), "wheel contains symlink"
+              else:
+                  assert archive.name.endswith(".tar.gz"), "unexpected distribution"
+                  with tarfile.open(archive) as package:
+                      members = package.getmembers()
+                      assert all(m.isfile() or m.isdir() for m in members), "sdist contains links or special files"
+                      names = [m.name for m in members]
+              assert len(names) == len(set(names)), "duplicate archive paths"
+              for name in names:
+                  path = PurePosixPath(name)
+                  assert not path.is_absolute() and ".." not in path.parts and "\\" not in name and ":" not in name, "unsafe archive path"
+                  assert not any(p in {".env", ".git", ".release-evidence"} for p in path.parts), "private build data in distribution"
+              inventories[archive.name] = names
+          Path(".release-evidence/archive-members.json").write_text(json.dumps(inventories, indent=2))
+          PY
+      - name: Install wheel and sdist outside checkout
+        run: |
+          for kind in wheel source; do
+            python -m venv "$RUNNER_TEMP/install-$kind"
+            if [ "$kind" = wheel ]; then package=("$GITHUB_WORKSPACE"/dist/*.whl); else package=("$GITHUB_WORKSPACE"/dist/*.tar.gz); fi
+            "$RUNNER_TEMP/install-$kind/bin/pip" install "${package[0]}"
+            mkdir "$RUNNER_TEMP/smoke-$kind"
+            (
+              cd "$RUNNER_TEMP/smoke-$kind"
+              "$RUNNER_TEMP/install-$kind/bin/python" -I - <<'PY'
+          import importlib.metadata
+          import sys
+          from pathlib import Path
+          import aud
+          assert Path(aud.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
+          assert aud.__version__ == importlib.metadata.version("aud")
+          assert isinstance(aud.json_schema(), dict)
+          print(f"Installed aud {aud.__version__}: {aud.__file__}")
+          PY
+            )
+            "$RUNNER_TEMP/install-$kind/bin/pip" check
+          done
+      - name: Retain distribution evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: candidate-distributions-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            dist/
+            .release-evidence/
+          if-no-files-found: error
+          retention-days: 14

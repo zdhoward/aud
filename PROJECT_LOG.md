@@ -1,5 +1,17 @@
 # Project log
 
+## 2026-10-15: Manual candidate evidence automation
+
+- Added a read-only manual workflow for Bandit, Semgrep, Gitleaks, and pip-audit,
+  retaining reports even when findings fail a step. Pinned direct tool versions
+  and the Gitleaks binary hash; recorded resolved dependencies, not a lock claim.
+- Added separate wheel/sdist metadata, member-path, and clean-install smoke checks.
+  No publishing credentials, automatic development trigger, or native adversarial
+  execution. Documented mutable rules, public evidence, and remaining manual gates.
+- Prior PR #86 CI/CodeQL passed. Local validation is limited to workflow structure,
+  embedded code syntax, and synthetic archive cases. No candidate dispatch or full
+  local runtime suite was run; no version/tag/release or provider settings changed.
+
 ## 2026-10-15: Review the built artifact before publication
 
 - Added distribution hashes and immutable artifact identity to the build summary.

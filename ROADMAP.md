@@ -177,9 +177,10 @@ backend contract and Python compatibility checks are ready.
 ## Maintainer settings actions
 
 * Apply the [release security gate](docs/RELEASE_SECURITY.md) to the final candidate,
-  including scanners, clean artifact testing, and recorded decisions. The manual
-  publishing workflow separates its read-only build and OIDC upload jobs; finish
-  configure/verify the `pypi` review environment and publisher binding, then review
+  using the manual candidate-evidence workflow for initial scans and packaging
+  smoke checks, then complete the remaining artifact tests and recorded decisions.
+  The manual publishing workflow separates its read-only build and OIDC upload
+  jobs. Configure/verify the `pypi` review environment and publisher binding, then review
   the recorded artifact before approving upload. Attestation verification remains
   open before production publication.
 

@@ -123,6 +123,7 @@ Category labels:
 | `ci.yml` | main/master push, all PR bases | lint (black, ruff, mypy); test matrix Linux + macOS + Windows, Python 3.10-3.12; coverage gate at 85% with artifact upload |
 | `codeql.yml` | main/master push, all PR bases, weekly | Python security scanning, including stacked PRs |
 | `publish.yml` | maintainer manual dispatch | validates a release tag, builds/checks distributions, records artifact hashes, then uploads the same artifact through the `pypi` environment via trusted publishing |
+| `release-candidate.yml` | maintainer manual dispatch | source/secret/dependency scanning and distribution build/install smoke evidence; no publishing or ordinary development trigger |
 | Dependabot | weekly | pip and github-actions updates, PRs with full CI |
 
 ## Writing style
