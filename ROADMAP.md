@@ -179,8 +179,10 @@ backend contract and Python compatibility checks are ready.
 * Apply the [release security gate](docs/RELEASE_SECURITY.md) to the final candidate,
   using the manual candidate-evidence workflow for initial scans and packaging
   smoke checks, then complete the remaining artifact tests and recorded decisions.
-  Candidate and publishing builds share distribution integrity checks; installed
-  regression/content review still applies to the actual publication artifacts.
+  Candidate and publishing builds share distribution integrity checks. Candidate
+  automation also runs focused installed regressions; full regression/content
+  review still applies to the actual publication artifacts. Integrate the manual
+  workflow into the default branch before attempting its first dispatch.
   The manual publishing workflow separates its read-only build and OIDC upload
   jobs. Configure/verify the `pypi` review environment and publisher binding, then review
   the recorded artifact before approving upload. Attestation verification remains

@@ -14,8 +14,10 @@ expiry/recheck trigger. No blanket scanner suppression or automatic dependency f
 
 ## Manual evidence workflow
 
-Dispatch `release-candidate.yml` only from a reviewed trusted workflow ref. It checks
-out that dispatch commit, not an arbitrary candidate input. Record the full SHA
+The `release-candidate.yml` workflow must first be integrated into the default
+branch before GitHub accepts manual dispatches; selecting a feature ref does not
+register a new workflow. Once present, dispatch from the reviewed ref. The workflow
+checks out that dispatch commit, not an arbitrary candidate input. Record the full SHA
 and run URL. The workflow is manual-only, read-only, and cannot publish. It runs
 Bandit, Semgrep, full-history/working-tree Gitleaks, and pip-audit against the
 resolved development/CLI/runtime dependencies. Findings fail their steps; later
@@ -26,7 +28,14 @@ The independent distribution job builds wheel/sdist, checks metadata, inventorie
 members, rejects unsafe paths/links/private build directories, and installs each
 artifact into a fresh environment outside the checkout. It checks import location,
 version, bundled schema, and dependency consistency. This is a packaging smoke
-check, not the installed regression suite or an import-side-effect sandbox.
+check, not an import-side-effect sandbox. After smoke checks, the workflow copies
+selected naming, filename parsing, and JSON-contract regressions plus synthetic
+fixtures/conformance data outside the checkout. It runs them against each clean
+wheel/sdist installation with isolated Python, importlib-mode pytest, no automatic
+third-party plugins, and guards checking every loaded `aud` module's location at
+session start/end. JUnit reports and installed dependency/native-tool versions are
+retained. These focused installed regressions do not replace the full release
+suite or verify native adversarial isolation.
 
 Both candidate and publishing builds run `tools/check_distributions.py` before
 installation or artifact review. This aud-specific validator checks expected

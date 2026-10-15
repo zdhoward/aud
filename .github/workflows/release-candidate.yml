@@ -107,6 +107,24 @@ jobs:
             )
             "$RUNNER_TEMP/install-$kind/bin/pip" check
           done
+      - name: Prepare installed regression dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          ffmpeg -version > .release-evidence/ffmpeg-version.txt
+          for kind in wheel source; do
+            "$RUNNER_TEMP/install-$kind/bin/pip" install pytest==9.1.1 jsonschema==4.26.0
+            "$RUNNER_TEMP/install-$kind/bin/pip" freeze > ".release-evidence/installed-$kind.txt"
+          done
+      - name: Run installed wheel regressions
+        run: |
+          python tools/check_installed.py --python "$RUNNER_TEMP/install-wheel/bin/python" \
+            --scratch "$RUNNER_TEMP/regressions-wheel" --report .release-evidence/installed-wheel.xml
+      - name: Run installed sdist regressions
+        if: ${{ !cancelled() }}
+        run: |
+          python tools/check_installed.py --python "$RUNNER_TEMP/install-source/bin/python" \
+            --scratch "$RUNNER_TEMP/regressions-source" --report .release-evidence/installed-source.xml
       - name: Retain distribution evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
