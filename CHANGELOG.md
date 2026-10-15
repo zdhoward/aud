@@ -4,6 +4,14 @@
 
 ### Added
 
+- Reusable `NamingProfile` directory/filename templates over canonical metadata,
+  with disc-aware numbering, explicit defaults, case/spacing/ASCII options, and
+  missing-field error/skip policies. `plan_naming()` snapshots metadata for safe
+  previews; `name_profile()` provides a boolean copy/move helper without reencoding.
+- Naming preflight checks portable components, directory spelling aliases, and
+  file/directory prefix conflicts. Same-key in-place paths now require matching
+  parent identity, preventing false-success operations across directory aliases.
+
 - Explicit `AudioChain` batches gain, fade, pad, low/high-pass filtering, and phase
   inversion with an optional conversion in one final encode. Preview/result JSON,
   safe publication, artwork retention, and active cancellation use the shared engine.

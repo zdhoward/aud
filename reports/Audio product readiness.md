@@ -17,8 +17,13 @@ profiles, bounded/cancellable processes, and explicit native effect chains with 
 final encode. Canonical metadata views retain original tags and report ambiguities.
 These slices use focused local checks and cross-platform CI; the 111-test full run
 above records the earlier safety checkpoint. See the [conversion](../docs/FFMPEG_CONVERSION.md)
-and [chain contracts](../docs/AUDIO_CHAINS.md) for implemented scope. Naming profiles,
-remaining effects, complete Python compatibility, and port conformance remain work.
+and [chain contracts](../docs/AUDIO_CHAINS.md) for implemented scope. Remaining
+effects, complete Python compatibility, and port conformance remain work.
+
+Reusable naming profiles are now implemented in the next working branch: metadata
+snapshots feed neutral directory/filename templates, explicit missing-field rules,
+and portable tree preflight before copy/move. The [naming contract](../docs/NAMING_PROFILES.md)
+records scope. Filename parsing, sidecar packaging, and the CLI are still pending.
 
 The checkout declares **2.0.2**, while the reviewed PyPI listing showed **2.0.1**. The current Windows run on Python 3.10.11 passed all **74 tests in 68.34 seconds**, with **92.43% coverage**; Black, Ruff, and mypy also passed. These results establish a working baseline, not complete product correctness. Some audio tests check only a truthy return value, and mypy does not check untyped function bodies and suppresses errors in the plan module. CI covers Linux and macOS on Python 3.10–3.12, leaving Windows behavior outside its matrix. The README's “stable and fully tested” language should become a precise statement of supported behavior and tested environments. ([Package configuration](../pyproject.toml), [Audio tests](../tests/test_audio_fx.py), [CI configuration](../.github/workflows/ci.yml), [Published package](https://pypi.org/project/aud/), [README](../README.md))
 

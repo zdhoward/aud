@@ -1,5 +1,26 @@
 # aud Examples
 
+## Organize tagged albums with a naming profile (unreleased)
+
+```python
+from aud import Dir, NamingProfile
+
+d = Dir("album", extensions=["flac"])
+profile = NamingProfile(
+    directory="{album_artist} - {album} ({year})/Disc {disc_number:02}",
+    filename="{track_number:02} - {title}",
+    defaults={"disc_number": 1},  # Explicitly appropriate for this album
+)
+plan = d.plan_naming(profile, "organized", copy=True)
+print(d.preview(plan).to_dict())
+result = d.execute(plan, continue_on_error=True)
+```
+
+This copies audio bytes without reencoding. Required tags must be present; use
+explicit metadata or defaults when correcting known missing fields. See the
+[naming contract](docs/NAMING_PROFILES.md) for ASCII/uppercase/spacing options,
+missing-field behavior, portable path checks, and multidisc examples.
+
 ## Basic Usage
 
 ### Converting Audio Files to a Specific Format

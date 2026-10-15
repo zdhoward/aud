@@ -48,6 +48,10 @@ settings in results. See [the conversion contract](docs/FFMPEG_CONVERSION.md).
 An explicit native `AudioChain` now batches supported effects with a final
 conversion and reports canonical metadata fields for future naming profiles.
 See [the chain contract](docs/AUDIO_CHAINS.md) for supported effects and boundaries.
+Reusable naming profiles now render directory/filename templates over metadata
+snapshots, with disc numbering, explicit defaults, transformations, and portable
+tree/collision checks. See [the naming contract](docs/NAMING_PROFILES.md).
+Filename parsing, album sidecar packaging, and the real CLI remain pending.
 Effects migration/batching, comprehensive metadata mapping, hard OS resource
 limits, parallelism, recursive scanning, and remaining milestone work are pending.
 The tracker allocation below is preserved; this progress note does not close

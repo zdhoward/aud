@@ -10,6 +10,10 @@ suffix). Preflight resolves all destinations before any file is changed. It
 rejects writes over another selected input, including mixed-format conversions.
 Unicode-normalized, case-folded names are considered collisions on every OS.
 Explicit in-place effects and same-format conversions remain supported.
+Same-key in-place destinations must have the same actual parent directory;
+case/Unicode equality across distinct directory aliases is rejected.
+Metadata-based [naming profiles](NAMING_PROFILES.md) additionally validate their
+portable output tree before writes.
 
 Writes use uniquely owned staging files beside their destinations. Failed writes
 remove only staging files. New destinations are published with Windows' exclusive

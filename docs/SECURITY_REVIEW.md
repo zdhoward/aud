@@ -49,6 +49,13 @@ Timing-sensitive lossy fade-out measures decoded duration through the same bound
 runner. Ordinary regressions cover these corrections; source review does not
 substitute for sandboxed adversarial decoder validation.
 
+The naming follow-up reviewed metadata-controlled paths, restricted format fields,
+portable components, tree conflicts, and results. It found a false-success alias
+case across distinct directories. In-place planning now verifies parent identity;
+naming also rejects distinct root aliases. Case/Unicode regressions cover the fix.
+No further concrete blocker was found in this source scope. No adversarial target
+execution was performed for this follow-up.
+
 Remaining work includes sandboxed native validation, OS-enforced decoder memory
 limits, effects process limits/cancellation, stronger metadata/sidecar validation,
 and release/provider settings verification. Hostile concurrent directory/source

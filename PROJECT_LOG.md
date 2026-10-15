@@ -1,5 +1,21 @@
 # Project log
 
+## 2026-10-14: Metadata naming profiles
+
+- Added reusable profiles on `feat/naming-profiles`, stacked on audio chains.
+  Directory/filename templates, explicit context/defaults, disc numbers, and
+  transformations cover common preparation conventions through neutral APIs.
+- Metadata preparation snapshots supplied/probed tags; rendering stays pure.
+  Missing fields error or skip explicitly. Copies/moves retain exact audio bytes
+  and use the shared destination, staging, results, and cancellation contracts.
+- Added portable component/tree checks and bounded template formats. Source review
+  found a false-success directory-alias path; in-place planning now checks actual
+  parent identity and naming rejects distinct root aliases. Regression cases cover
+  case-sensitive and Unicode-sensitive filesystems.
+- Focused naming, execution, and safety checks pass. Full local release validation
+  remains deferred; no merge, tag, release, or PyPI upload. Sidecar packaging,
+  explicit filename parsing, and CLI work remain pending.
+
 ## 2026-10-14: Explicit audio chains and canonical metadata
 
 - Added `AudioChain` on `feat/audio-chains`, stacked on direct conversions. Explicit

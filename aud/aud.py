@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator, Mapping
 from dataclasses import dataclass
 from fnmatch import fnmatchcase
 from pathlib import Path
 
 from aud.core.adapters.convert import ConversionAdapter
 from aud.core.execution import execute_steps, preview, resolve
-from aud.core.ffmpeg import MediaLimits
+from aud.core.ffmpeg import FFmpegEngine, MediaLimits
+from aud.core.metadata import AudioMetadata
 from aud.core.models import AudioFile
+from aud.core.naming import NamingProfile
 from aud.core.operations.archive import Zip
 from aud.core.operations.audio.base import AudioOperation
 from aud.core.operations.audio.chain import AudioChain
@@ -50,6 +52,7 @@ from aud.core.operations.names import (
     ReplaceSpaces,
     Uppercase,
 )
+from aud.core.operations.naming import NameWithProfile
 from aud.core.plan import Plan
 from aud.core.results import BatchResult
 from aud.core.safety import path_key, validate_policy
@@ -267,6 +270,42 @@ class Dir:
     def plan(self) -> Plan:
         """Snapshot the selection without executing any operations."""
         return self._plan()
+
+    def plan_naming(
+        self,
+        profile: NamingProfile,
+        output_directory: str | Path,
+        *,
+        metadata: Mapping[str | Path, AudioMetadata] | None = None,
+        copy: bool = False,
+    ) -> Plan:
+        """Snapshot supplied or probed metadata, then prepare a pure naming operation."""
+        if not isinstance(profile, NamingProfile):
+            raise TypeError("Expected a NamingProfile")
+        profile.validate()
+        prepared: dict[str | Path, AudioMetadata]
+        if metadata is None:
+            engine = FFmpegEngine(self.media_limits)
+            prepared = {file.path: engine.probe(file.path).metadata for file in self._files}
+        else:
+            prepared = {self.directory / Path(path): value for path, value in metadata.items()}
+        return self.plan().add(NameWithProfile(profile, output_directory, prepared, copy=copy))
+
+    def name_profile(
+        self,
+        profile: NamingProfile,
+        output_directory: str | Path,
+        *,
+        metadata: Mapping[str | Path, AudioMetadata] | None = None,
+        copy: bool = False,
+    ) -> bool:
+        try:
+            result = self.execute(
+                self.plan_naming(profile, output_directory, metadata=metadata, copy=copy)
+            )
+            return bool(result)
+        except Exception as error:
+            raise FilenameError("profile", error) from error
 
     def preview(self, operation_or_plan):
         plan = (
