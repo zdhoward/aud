@@ -6,6 +6,26 @@ their latest CI heads through `ebed525`. The maintainer authorized merging after
 documentation review. Integration is not a release approval; recheck the final
 default-branch head and run candidate evidence collection after integration.
 
+PRs #74-90 were merged in dependency order with merge commits. After every merge,
+the resulting default-branch tree matched the corresponding reviewed feature head.
+The final integration commit is `683286e`. Integrated CI/CodeQL and the first
+[manual evidence run](https://github.com/zdhoward/aud/actions/runs/38750990602)
+were started on that exact commit. Their results must be reviewed separately from
+the pre-integration checks; this checkpoint does not declare a release candidate.
+
+The first evidence run failed: Bandit findings require triage, scanner-report
+upload excluded the hidden evidence directory, and the installed runner resolved
+POSIX venv interpreter symlinks to the base Python. The workflow follow-up enables
+hidden files only for explicit evidence paths and preserves the venv executable
+path. Scanner and installed-regression gates remain pending a successful rerun.
+
+Follow-up [run `38752076905`](https://github.com/zdhoward/aud/actions/runs/38752076905)
+passed on `49251f1`: all four scanner steps and distribution checks succeeded,
+with 100 installed tests passing for each artifact and successful import
+observations. The [security record](SECURITY_REVIEW.md) documents the three narrow
+Bandit exclusions and their independent source recheck. These dated development
+results do not complete the full release checklist or approve publication.
+
 | Order | PR | Scope |
 | --- | --- | --- |
 | 1 | [#74](https://github.com/zdhoward/aud/pull/74) | Selection, safe writes, plans/results, publishing policy |

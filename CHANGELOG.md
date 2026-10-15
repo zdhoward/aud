@@ -66,6 +66,11 @@
 
 ### Changed
 
+- Corrected candidate evidence uploads for hidden report directories and preserved
+  POSIX virtual-environment interpreter paths in installed regression checks.
+  Archive-open validation now remains active under optimized Python; intentional
+  audio timing/native execution scanner sites have documented, narrow dispositions.
+
 - Candidate evidence now retains the Semgrep rules actually scanned and their
   hash, dependency installation sources/hashes, and fresh-process installed import
   observations for unexpected Python-level side effects.

@@ -188,7 +188,8 @@ class AudioAdapter(AudioIO):
             if len(audio) > len(watermark) + max_ms:
                 cur = 0
                 while True:
-                    rng = randrange(min_ms, max_ms) + len(watermark)
+                    # Randomness controls audio placement only, never credentials or access.
+                    rng = randrange(min_ms, max_ms) + len(watermark)  # nosec B311
                     cur += rng
                     if (cur + max_ms + len(watermark)) < len(audio):
                         audio = audio.overlay(watermark, cur, gain_during_overlay=-2)

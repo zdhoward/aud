@@ -1,5 +1,32 @@
 # Project log
 
+## 2026-10-15: Ordered stack integration
+
+- Merged #74-90 into `master` in dependency order, preserving feature commits and
+  merge boundaries. Verified each merged tree against its reviewed feature head;
+  final integration commit `683286e` matches the complete reviewed stack.
+- The final SHA guard on #90 caught stale pre-documentation metadata. Confirmed
+  the intended documentation-only commit `a05118c` before merging it.
+- Started integrated CI/CodeQL and manual evidence run `38750990602` on that head.
+  This validates unreleased development; no version bump, tag, release, publication,
+  or live GitHub/PyPI settings change was made.
+- First evidence run exposed hidden-report upload exclusion and POSIX interpreter
+  symlink dereferencing in the installed runner. Enabled hidden files only for the
+  explicit evidence paths and preserved the venv interpreter path; one focused
+  regression passed. Bandit findings need retained-report triage; other scanners,
+  archive checks, clean installs, and import observations completed successfully.
+- Follow-up run `38751474633` retained reports and passed both installed artifact
+  jobs. Semgrep/Gitleaks found no findings; pip-audit found no advisories for 42
+  resolved dependencies. Triaged four low-severity Bandit items: replaced an
+  archive assertion and documented three exact-site exclusions with recheck rules.
+  No blanket scanner suppression or native-security certification.
+- Run `38752076905` on `49251f1` passed both evidence jobs: zero remaining Bandit
+  findings/errors with exactly three reviewed exclusions, other scanner passes,
+  100/100 installed tests passing for each artifact, and successful import checks.
+  An independent source-only reviewer confirmed the three site dispositions and
+  archive guard. Retained detailed evidence outside version control; final release
+  approval, native isolation and reproducibility gates remain open.
+
 ## 2026-10-15: Documentation review and integration authorization
 
 - Reviewed feature/release guides, CLI references, changelog, roadmap, and evidence

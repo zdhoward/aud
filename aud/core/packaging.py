@@ -410,7 +410,8 @@ class AlbumPackage:
                             )
                         )
                         digest, size = hashlib.sha256(), 0
-                        assert archive.fp is not None
+                        if archive.fp is None:
+                            raise RuntimeError("Package archive is closed")
                         with (
                             path.open("rb") as source,
                             archive.open(member, "w", force_zip64=True) as target,
