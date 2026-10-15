@@ -180,8 +180,9 @@ backend contract and Python compatibility checks are ready.
   using the manual candidate-evidence workflow for initial scans and packaging
   smoke checks, then complete the remaining artifact tests and recorded decisions.
   Candidate and publishing builds share distribution integrity checks. Candidate
-  automation also runs focused installed regressions; full regression/content
-  review still applies to the actual publication artifacts. Integrate the manual
+  automation also retains rule snapshots and runs focused installed regressions
+  and Python-level import observations. Full regression/content review still
+  applies to the actual publication artifacts. Integrate the manual
   workflow into the default branch before attempting its first dispatch.
   The manual publishing workflow separates its read-only build and OIDC upload
   jobs. Configure/verify the `pypi` review environment and publisher binding, then review

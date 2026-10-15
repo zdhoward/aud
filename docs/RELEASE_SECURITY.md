@@ -28,7 +28,15 @@ The independent distribution job builds wheel/sdist, checks metadata, inventorie
 members, rejects unsafe paths/links/private build directories, and installs each
 artifact into a fresh environment outside the checkout. It checks import location,
 version, bundled schema, and dependency consistency. This is a packaging smoke
-check, not an import-side-effect sandbox. After smoke checks, the workflow copies
+check. A separate fresh-process import observer checks aud and its CLI for Python
+audit events involving network/socket activity, process creation, filesystem writes,
+and selected environment/filesystem mutations. It disables bytecode writes and
+fails even if imported code catches the observer's exception. Only event names and
+error types are retained, not argument values. A timeout or missing report is an
+incomplete check. Python audit hooks can be bypassed by malicious/native code and
+are not a sandbox; this is a trusted-code regression observation, not proof of
+absence of all side effects. See [Python's audit-hook limits](https://docs.python.org/3/library/sys.html#sys.addaudithook).
+After smoke checks, the workflow copies
 selected naming, filename parsing, and JSON-contract regressions plus synthetic
 fixtures/conformance data outside the checkout. It runs them against each clean
 wheel/sdist installation with isolated Python, importlib-mode pytest, no automatic
@@ -51,9 +59,13 @@ Manual content/secret review and installed regression checks are still required.
 
 Tool versions are pinned and their resolved Python dependencies are recorded;
 Gitleaks binaries are checked against a pinned upstream SHA-256. Transitive tool
-and candidate/build dependencies are not locked. Semgrep's `p/python` registry is
-mutable: rule snapshot/replay evidence still needs review before approving a
-candidate. These initial automation checks do not complete all 22 gates, scan
+and candidate/build dependencies are not locked. The workflow downloads the mutable
+Semgrep `p/python` registry configuration once, hashes and retains it, then scans
+with that local file. Review that snapshot and its hash; replay with the retained
+file and recorded tool resolution rather than fetching the registry again. A fresh
+run can receive different rules. Dependency installation reports retain resolved
+archive sources/hashes alongside the installed version inventory. These initial
+automation checks do not complete all 22 gates, scan
 unpacked artifact contents for secrets, test native adversarial inputs, or replace
 the supported-platform CI/full final-candidate suite.
 
