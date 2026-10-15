@@ -15,6 +15,11 @@
   follow-up and PR-stack review remain open. No merge, release, tag, version bump,
   or PyPI publication.
 
+- Cross-platform CI exposed a subprocess cleanup race on macOS: group signalling
+  can fail after the child exits, masking the original limit error. Recheck child
+  completion before suppressing that permission error; a live-child denial still
+  raises. Deterministic tests cover both branches, alongside focused runner checks.
+
 ## 2026-10-15: Media and recovery conformance corpus
 
 - Added `test/media-conformance` above JSON contracts. Data-only media fixtures

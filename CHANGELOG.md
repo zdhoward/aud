@@ -66,6 +66,10 @@
 
 ### Changed
 
+- Process cleanup rechecks an exited child after a process-group permission error,
+  preserving the original limit/cancellation outcome in that race. Permission
+  failures for a still-running child remain visible.
+
 - Case-only renames handle case-insensitive POSIX volumes, including default macOS
   filesystems. CI also runs for stacked PRs targeting feature branches.
 

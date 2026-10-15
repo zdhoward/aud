@@ -131,11 +131,18 @@ def test_timeout_reaps_owned_process():
 def test_active_cancellation_stops_owned_process():
     from aud.core.ffmpeg import MediaLimits, ProcessRunner
 
-    before = time.monotonic()
-    runner = ProcessRunner(MediaLimits(timeout=5), cancel=lambda: time.monotonic() - before > 0.2)
+    started = None
+
+    def cancel():
+        nonlocal started
+        if started is None:
+            started = time.monotonic()
+        return time.monotonic() - started > 0.2
+
+    runner = ProcessRunner(MediaLimits(timeout=5), cancel=cancel)
     with pytest.raises(InterruptedError):
         runner.run([sys.executable, "-I", "-c", "import time; time.sleep(10)"])
-    assert time.monotonic() - before < 3
+    assert started is not None and time.monotonic() - started < 3
 
 
 def test_diagnostic_output_is_bounded():
@@ -144,6 +151,48 @@ def test_diagnostic_output_is_bounded():
     runner = ProcessRunner(MediaLimits(stdout_bytes=32))
     with pytest.raises(ValueError, match="output limit"):
         runner.run([sys.executable, "-I", "-c", "print('x' * 4096)"])
+
+
+@pytest.mark.parametrize("exited", [True, False])
+def test_group_cleanup_permission_race_only_ignores_exited_child(monkeypatch, exited):
+    from types import SimpleNamespace
+
+    import aud.core.ffmpeg as media
+    from aud.core.results import OperationCancelled
+
+    finished = False
+    waited = False
+
+    class Process:
+        pid = 12345
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def poll(self):
+            return 0 if finished else None
+
+        def wait(self):
+            nonlocal waited
+            waited = True
+
+    def denied(group, signum):
+        nonlocal finished
+        assert group == 12345
+        finished = exited
+        raise PermissionError("group signal denied")
+
+    monkeypatch.setattr(media, "sys", SimpleNamespace(platform="darwin"))
+    monkeypatch.setattr(media, "signal", SimpleNamespace(SIGKILL=9))
+    monkeypatch.setattr(media.subprocess, "Popen", lambda *args, **kwargs: Process())
+    monkeypatch.setattr(media.os, "killpg", denied, raising=False)
+    runner = media.ProcessRunner(media.MediaLimits(), cancel=lambda: True)
+    with pytest.raises(OperationCancelled if exited else PermissionError):
+        runner.run(["unused"])
+    assert waited is exited
 
 
 @pytest.mark.parametrize("completion", ["output", "cancel", "timeout"])

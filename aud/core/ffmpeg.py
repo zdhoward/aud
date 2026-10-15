@@ -111,6 +111,12 @@ class ProcessRunner:
                             os.killpg(process.pid, signal.SIGKILL)
                         except ProcessLookupError:
                             pass
+                        except PermissionError:
+                            # A child may exit between poll() and killpg(); Darwin
+                            # can report EPERM for a group whose leader is a zombie.
+                            # Suppress it only after confirming our child exited.
+                            if process.poll() is None:
+                                raise
                 process.wait()
 
 
