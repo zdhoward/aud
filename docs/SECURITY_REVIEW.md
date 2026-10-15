@@ -66,6 +66,14 @@ decoder. Checksums establish file integrity, not provenance or trust. This was
 a maintainer-agent source review; independent packaging review and sandboxed
 adversarial native execution remain outstanding.
 
+The CLI source follow-up reviewed config-to-operation dispatch, output escaping,
+path semantics, cancellation, and error/results handling. Config uses bounded
+JSON reads, rejects duplicate/non-finite values, and selects fixed operation
+constructors; it accepts no shell commands, dynamic imports, or raw filters.
+CLI paths are trusted local caller choices, not a containment boundary. Terminal
+path/tag/error strings are escaped. This focused source review does not provide
+independent security verification or adversarial native-execution evidence.
+
 Remaining work includes sandboxed native validation, OS-enforced decoder memory
 limits, effects process limits/cancellation, stronger metadata/sidecar validation,
 and release/provider settings verification. Hostile concurrent directory/source

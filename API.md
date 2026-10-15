@@ -328,6 +328,9 @@ Configuration getters return their respective values:
 
 ## Notes
 
+The unreleased console interface wraps these APIs; see [CLI usage](docs/CLI.md)
+for command selection, JSON configuration, dry runs, and exit codes.
+
 Unreleased album preparation uses `plan_album(target, *, service="generic",
 release, metadata=None, track_order=None, **options) -> AlbumPackage`,
 `preview(package) -> AlbumPreview`, and `execute(package) -> BatchResult`.

@@ -22,6 +22,11 @@ FileSystemAdapter | AudioAdapter | ConversionAdapter
 
 ### Dir
 
+The optional user-facing entry point `aud/cli.py` uses standard-library argparse
+and bounded JSON config to construct the same facade plans. It owns terminal
+formatting, process exit codes, and a restored Ctrl+C handler; it does not add
+another media engine or interpolate shell/filter commands. See [CLI.md](CLI.md).
+
 `Dir` is the public facade. It owns a working directory and a current file
 selection, builds selection policies from configuration (extensions,
 allowlist, denylist, each optionally regex), and turns method calls into

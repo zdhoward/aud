@@ -1,5 +1,19 @@
 # Project log
 
+## 2026-10-15: CLI preparation and execution
+
+- Added `feat/cli` above album packaging: list/inspect, conversion, naming,
+  ordered native effects, export copies, and album commands reuse core APIs.
+  Standard-library argparse keeps the base installation sufficient; retain
+  optional CLI extras and legacy count-only invocation for compatibility.
+- Added explicit selection, dry runs, overwrite policies, bounded JSON config,
+  structured results/errors, partial-failure exit codes, and Ctrl+C cancellation.
+  Output escapes terminal controls; source review checked fixed dispatch and
+  config boundaries. Independent/adversarial validation remains outstanding.
+- All 25 focused CLI checks and touched-source lint/type checks pass. Full local
+  release testing remains deferred. Live progress, schema versioning, and other
+  readiness items remain open. No version bump, merge, tag, or publication.
+
 ## 2026-10-15: Album packaging and distributor preparation
 
 - Added grouped album plans on `feat/album-packaging`, stacked on naming profiles.

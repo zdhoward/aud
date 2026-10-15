@@ -249,6 +249,10 @@ and an optional web UI is planned as a separate install.
 
 ## Documentation
 
+The unreleased [command line interface](docs/CLI.md) supports list/inspect,
+conversion, naming, effects, export copies, and album packages with dry runs
+and JSON output. For example: `aud list audio --extensions wav flac --json`.
+
 * [API.md](API.md): API reference
 * [EXAMPLES.md](EXAMPLES.md): recipes and workflows
 * [CHANGELOG.md](CHANGELOG.md): release history
