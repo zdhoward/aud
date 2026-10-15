@@ -1,8 +1,10 @@
 # Review checkpoint, 2026-10-15
 
 The Python readiness work is still unreleased. Package version remains 2.0.2.
-The stack was inspected at `918ce49`; all ten existing PRs were mergeable, draft,
-and green on their latest CI heads. This snapshot is not a release approval.
+Before integration, all seventeen PRs #74-90 were mergeable, draft, and green on
+their latest CI heads through `ebed525`. The maintainer authorized merging after
+documentation review. Integration is not a release approval; recheck the final
+default-branch head and run candidate evidence collection after integration.
 
 | Order | PR | Scope |
 | --- | --- | --- |
@@ -16,8 +18,15 @@ and green on their latest CI heads. This snapshot is not a release approval.
 | 8 | [#81](https://github.com/zdhoward/aud/pull/81) | Versioned JSON contracts |
 | 9 | [#82](https://github.com/zdhoward/aud/pull/82) | Portable media/recovery corpus |
 | 10 | [#83](https://github.com/zdhoward/aud/pull/83) | Filename parsing and process cleanup race fix |
+| 11 | [#84](https://github.com/zdhoward/aud/pull/84) | Codec consent, CLI/config validation, independent review follow-up |
+| 12 | [#85](https://github.com/zdhoward/aud/pull/85) | Release security checklist and minimal OIDC publishing job |
+| 13 | [#86](https://github.com/zdhoward/aud/pull/86) | Artifact identity/hashes and publication environment handoff |
+| 14 | [#87](https://github.com/zdhoward/aud/pull/87) | Manual scanner and packaging evidence workflow |
+| 15 | [#88](https://github.com/zdhoward/aud/pull/88) | Shared wheel/sdist integrity validation |
+| 16 | [#89](https://github.com/zdhoward/aud/pull/89) | Installed-artifact regressions outside the checkout |
+| 17 | [#90](https://github.com/zdhoward/aud/pull/90) | Retained rule snapshots and installed import observations |
 
-`fix/review-follow-up` is layered above these PRs. It corrects codec consent and
+`fix/review-follow-up` corrects codec consent and
 CLI option presence, rejects non-finite JSON overflow, and enables CodeQL for
 all PR bases. Independent source reviewers checked the changes; the
 [security record](SECURITY_REVIEW.md) describes evidence and limits.
@@ -26,6 +35,12 @@ Keep the dependency order during eventual review/integration. Do not treat each
 layer as a release, tag intermediate heads, or publish the unreleased package.
 If history or base branches change, recheck the actual final integrated head;
 green checks on prior heads do not certify a later combination.
+
+Feature guides, CLI/config references, versioned JSON schema and conformance
+fixtures, changelog, roadmap, and project log describe the unreleased behavior.
+Release security/evidence documentation distinguishes implemented automation from
+pending candidate scans, native isolation, reproducibility, and live provider gates.
+No version bump, release tag, or PyPI upload is authorized by this integration.
 
 ## Gates still open
 

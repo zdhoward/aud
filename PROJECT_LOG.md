@@ -1,5 +1,14 @@
 # Project log
 
+## 2026-10-15: Documentation review and integration authorization
+
+- Reviewed feature/release guides, CLI references, changelog, roadmap, and evidence
+  requirements; updated the review checkpoint to cover all seventeen PRs #74-90.
+  All pre-integration heads through `ebed525` were green and mergeable.
+- The maintainer authorized merging after documentation review. Preserve feature
+  commits with ordered merge commits, then recheck the integrated head and run the
+  now-registered manual evidence workflow. No release, tag, or PyPI publication.
+
 ## 2026-10-15: Reproducible rule evidence and import observation
 
 - Candidate scanning now uses a retained, hashed local snapshot of the Semgrep
