@@ -41,6 +41,16 @@ available, including its empty default selection; use `list` for useful output.
 | `album` | A generic or service-specific local ZIP preparation plan. |
 
 Human output is indented structured JSON with escaped path/tag strings.
+
+Use `--progress` to print live file-level start/finish lines on stderr while
+keeping stdout unchanged, including with `--json`. It is off by default. Counts
+cover terminal decisions within the current adapter operation, including skipped,
+failed, cancelled, and unattempted entries; they are not elapsed-time estimates.
+Inspection reports each probe. Album payload events say `staged`; only the final
+`AlbumPackage ... success` event indicates archive publication. Dry runs produce
+no execution events. Preparation itself and progress within a long encode/copy
+are not measured. Use the final result for authoritative outcomes.
+
 `--json` emits one compact JSON document on stdout; human error diagnostics use
 stderr. JSON errors include `succeeded: false`, `error`, `exit_code`, and `result`
 (partial batch results when available). Successful execution uses the core
@@ -139,8 +149,8 @@ before sharing it.
 
 ## Remaining interface work
 
-This first CLI slice has no interactive menus, live progress display, saved job
-replay, or arbitrary multi-operation configuration. Streaming progress and stable
+This CLI has no interactive menus, saved job
+replay, or arbitrary multi-operation configuration. Finer media-time progress and stable
 versioned cross-language JSON schemas remain part of the readiness work. Optional
 `[cli]` dependencies remain available for compatibility but are not imported.
 The implementation uses Python 3.10-compatible

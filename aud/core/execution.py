@@ -177,10 +177,11 @@ def execute_steps(
     continue_on_error=False,
     cancel=None,
     media_limits=None,
+    progress=None,
 ) -> None:
     failed_sources: set[str] = set()
     for step_index, step in enumerate(steps):
-        options = {"continue_on_error": continue_on_error, "cancel": cancel}
+        options = {"continue_on_error": continue_on_error, "cancel": cancel, "progress": progress}
         if step.adapter_type is ConversionAdapter:
             options["media_limits"] = media_limits
         adapter = step.adapter_type(**options)

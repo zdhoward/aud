@@ -21,6 +21,7 @@ from aud.core.metadata import AudioMetadata
 from aud.core.models import AudioFile
 from aud.core.naming import DEVICES, NamingProfile
 from aud.core.operations.audio.convert import ConvertFormat
+from aud.core.progress import ProgressEvent, ProgressReporter
 from aud.core.results import BatchResult, FileResult, OperationCancelled
 from aud.core.safety import Destination, check_path, destinations, staged_write
 
@@ -349,15 +350,28 @@ class AlbumPackage:
         *,
         cancel: Callable[[], bool] | None = None,
         continue_on_error: bool = False,
+        progress=None,
     ) -> BatchResult:
         sources = tuple(str(path) for path, stamp in self.stamps)
         destination = self.destination
+        progress = ProgressReporter.wrap(progress)
         try:
+            progress(ProgressEvent("start", "AlbumPackage", 0, 1, target=str(destination.target)))
             self._validate()
             if destination.status == "skipped":
                 result.items.append(
                     FileResult(
                         None, str(destination.target), "AlbumPackage", "skipped", sources=sources
+                    )
+                )
+                progress(
+                    ProgressEvent(
+                        "finish",
+                        "AlbumPackage",
+                        1,
+                        1,
+                        target=str(destination.target),
+                        status="skipped",
                     )
                 )
                 return result
@@ -382,10 +396,19 @@ class AlbumPackage:
                 staged_write(destination) as temporary,
                 tempfile.TemporaryDirectory(prefix="aud-package-", dir=temporary.parent) as scratch,
             ):
-                files = []
+                files: list[dict] = []
                 with ZipFile(temporary, "w", compression=ZIP_STORED) as archive:
 
                     def add(path: Path, member: str, maximum: int):
+                        progress(
+                            ProgressEvent(
+                                "start",
+                                "AlbumPayload",
+                                len(files),
+                                len(self.tracks) + len(self.assets),
+                                target=member,
+                            )
+                        )
                         digest, size = hashlib.sha256(), 0
                         assert archive.fp is not None
                         with (
@@ -403,6 +426,16 @@ class AlbumPackage:
                                 target.write(chunk)
                                 digest.update(chunk)
                         files.append({"path": member, "bytes": size, "sha256": digest.hexdigest()})
+                        progress(
+                            ProgressEvent(
+                                "finish",
+                                "AlbumPayload",
+                                len(files),
+                                len(self.tracks) + len(self.assets),
+                                target=member,
+                                status="staged",
+                            )
+                        )
 
                     for index, track in enumerate(self.tracks):
                         cancelled()
@@ -470,6 +503,11 @@ class AlbumPackage:
                     },
                 )
             )
+            progress(
+                ProgressEvent(
+                    "finish", "AlbumPackage", 1, 1, target=str(destination.target), status="success"
+                )
+            )
         except Exception as error:
             result.items.append(
                 FileResult(
@@ -479,6 +517,16 @@ class AlbumPackage:
                     "cancelled" if isinstance(error, OperationCancelled) else "failed",
                     str(error),
                     sources,
+                )
+            )
+            progress(
+                ProgressEvent(
+                    "finish",
+                    "AlbumPackage",
+                    1,
+                    1,
+                    target=str(destination.target),
+                    status="cancelled" if isinstance(error, OperationCancelled) else "failed",
                 )
             )
             if not isinstance(error, OperationCancelled) and not continue_on_error:
