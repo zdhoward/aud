@@ -4,6 +4,11 @@
 
 ### Added
 
+- Expanded the portable conformance corpus with signed 16/24-bit PCM, retained
+  tags/artwork, explicit MP3 settings, staged-error recovery, collisions, album
+  order/sidecars/checksums, and eight local delivery-profile expectations. Cases
+  describe observable properties without encoder-version-dependent byte goldens.
+
 - Opt-in v1 JSON envelopes, a bundled Draft 2020-12 schema, and portable
   copy/naming/result conformance fixtures. CLI `--json-version 1` preserves plain
   `--json` compatibility; Python helpers add no runtime dependencies. Full port

@@ -133,8 +133,11 @@ previews/results, bounded JSON configuration, and cancellation. Standard-library
 argparse keeps the base install sufficient; existing `[cli]` extras stay optional.
 File-level progress callbacks and opt-in CLI stderr reporting are implemented.
 Opt-in [v1 JSON contracts](docs/JSON_CONTRACTS.md) and initial portable conformance
-fixtures now cover core outputs. Remaining work includes finer media-time
-progress, interface polish, and broader media/operation conformance coverage.
+fixtures now cover core outputs. The [media corpus](conformance/v1/README.md)
+adds representative PCM fidelity, tags/artwork, lossy settings, staged-error
+recovery, album sidecars/checksums, and local delivery-policy boundaries.
+Remaining work includes finer media-time progress, interface polish, and broader
+media/operation conformance coverage.
 See [the CLI contract](docs/CLI.md).
 
 ## v2.3.0: Optional web UI

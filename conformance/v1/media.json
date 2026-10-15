@@ -1,0 +1,51 @@
+{
+  "corpus_version": 1,
+  "pcm": [
+    {"id": "pcm16-stereo", "bits": 16, "channels": 2, "sample_rate": 44100, "repeat": 64, "samples": [-32768, -12345, -1, 0, 1, 23456, 32767]},
+    {"id": "pcm24-mono", "bits": 24, "channels": 1, "sample_rate": 44100, "repeat": 64, "samples": [-8388608, -1234567, -1, 0, 1, 7654321, 8388607]},
+    {"id": "pcm24-stereo-hires", "bits": 24, "channels": 2, "sample_rate": 96000, "repeat": 64, "samples": [-8388608, -1234567, -1, 0, 1, 7654321, 8388607]}
+  ],
+  "metadata": {"artist": "Example Artist", "album": "Example Album", "title": "Café", "track": "2/3", "disc": "1/2"},
+  "artwork": {"width": 1, "height": 1, "rgba": [16, 128, 240, 255]},
+  "lossy": [
+    {"profile": "mp3-v0", "mode": "vbr", "encoder": "libmp3lame"},
+    {"profile": "mp3-320", "mode": "cbr", "encoder": "libmp3lame", "bit_rate": 320000}
+  ],
+  "recovery": [
+    {"id": "fail-fast", "injected": "failed", "continue_on_error": false, "statuses": ["failed", "not_run"], "published": []},
+    {"id": "continue", "injected": "failed", "continue_on_error": true, "statuses": ["failed", "success"], "published": ["b.flac"]},
+    {"id": "cancel", "injected": "cancelled", "continue_on_error": false, "statuses": ["cancelled", "cancelled"], "published": []}
+  ],
+  "collisions": [
+    {"policy": "error", "raises": true, "status": "failed", "new_name": null},
+    {"policy": "skip", "raises": false, "status": "skipped", "new_name": null},
+    {"policy": "auto-rename", "raises": false, "status": "success", "new_name": "a (1).flac"}
+  ],
+  "album": {
+    "release": {"title": "Conformance Album", "artist": "Example Artist"},
+    "order": ["b.wav", "a.wav"],
+    "sidecar_name": "album.cue",
+    "sidecar_text": "FILE \"external.wav\" WAVE\n",
+    "generated": ["manifest.json", "checksums.sha256"],
+    "submission_status": "not_submitted"
+  },
+  "delivery_profiles": [
+    {"service": "amuse", "format": "wav", "input_rate": 96000, "output_rate": 96000, "output_bits": 24, "needs_consent": false, "max_tracks": 1000},
+    {"service": "distrokid", "format": "wav", "input_rate": 96000, "output_rate": 96000, "output_bits": 24, "needs_consent": false, "max_tracks": 1000},
+    {"service": "tunecore", "format": "wav", "input_rate": 192000, "output_rate": 192000, "output_bits": 24, "needs_consent": false, "max_tracks": 1000},
+    {"service": "cdbaby", "format": "wav", "input_rate": 96000, "output_rate": 44100, "output_bits": 16, "needs_consent": true, "max_tracks": 1000},
+    {"service": "routenote", "format": "flac", "input_rate": 96000, "output_rate": 44100, "output_bits": 16, "needs_consent": true, "max_tracks": 1000},
+    {"service": "ditto", "format": "wav", "input_rate": 96000, "output_rate": 96000, "output_bits": 24, "needs_consent": false, "max_tracks": 1000},
+    {"service": "landr", "format": "wav", "input_rate": 96000, "output_rate": 96000, "output_bits": 24, "needs_consent": false, "max_tracks": 30},
+    {"service": "unitedmasters", "format": "flac", "input_rate": 96000, "output_rate": 96000, "output_bits": 24, "needs_consent": false, "max_tracks": 1000}
+  ],
+  "duration_boundaries": [
+    {"service": "distrokid", "durations": [60], "accepted": true},
+    {"service": "distrokid", "durations": [59.999], "accepted": false},
+    {"service": "distrokid", "durations": [17999.999], "accepted": true},
+    {"service": "distrokid", "durations": [18000], "accepted": false},
+    {"service": "landr", "durations": [3600, 3600], "accepted": true},
+    {"service": "landr", "durations": [3600.001], "accepted": false},
+    {"service": "landr", "durations": [3600, 3600, 0.001], "accepted": false}
+  ]
+}

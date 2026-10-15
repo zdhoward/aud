@@ -33,6 +33,12 @@ File-level progress now has shared callbacks and opt-in CLI stderr output;
 opt-in [v1 JSON contracts](../docs/JSON_CONTRACTS.md) and an initial portable corpus
 now cover core outputs. Filename parsing, finer media-time progress, and broader
 media/operation conformance remain pending.
+
+The portable media corpus now adds representative exact PCM round trips,
+metadata/artwork retention, lossy settings, staged failure/cancellation recovery,
+collision handling, album order/sidecar/checksum behavior, and local provider
+policy boundaries. These reference cases supplement the wider test suite;
+they do not yet establish complete port equivalence or security validation.
 Account integration is still outside scope.
 
 The checkout declares **2.0.2**, while the reviewed PyPI listing showed **2.0.1**. The current Windows run on Python 3.10.11 passed all **74 tests in 68.34 seconds**, with **92.43% coverage**; Black, Ruff, and mypy also passed. These results establish a working baseline, not complete product correctness. Some audio tests check only a truthy return value, and mypy does not check untyped function bodies and suppresses errors in the plan module. CI covers Linux and macOS on Python 3.10–3.12, leaving Windows behavior outside its matrix. The README's “stable and fully tested” language should become a precise statement of supported behavior and tested environments. ([Package configuration](../pyproject.toml), [Audio tests](../tests/test_audio_fx.py), [CI configuration](../.github/workflows/ci.yml), [Published package](https://pypi.org/project/aud/), [README](../README.md))
