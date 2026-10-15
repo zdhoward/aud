@@ -1,5 +1,13 @@
 # Project log
 
+## 2026-10-15: Integrated handoff
+
+- Updated the handoff and roadmap to describe the merged `master` state instead
+  of the former feature-branch location. Package 2.0.2 remains unreleased work;
+  integration is not a PyPI release or completion of the release security gate.
+- PR #91 merged as `5d200c4` with its reviewed tree verified. Started fresh CI,
+  CodeQL, and evidence run `38752533150` on that exact integrated code head.
+
 ## 2026-10-15: Ordered stack integration
 
 - Merged #74-90 into `master` in dependency order, preserving feature commits and

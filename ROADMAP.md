@@ -36,7 +36,7 @@ The [2026-10-15 review checkpoint](docs/REVIEW_CHECKPOINT.md) records independen
 source follow-up, corrected consent/CLI defects, stack state, and open release/
 port gates. It does not declare a release candidate or authorize publication.
 
-### Implemented in the working branch, not released
+### Implemented on master, not released
 
 The first safety slice implements overwrite policies, default link skipping,
 staged/validated writes, direct final-output exports, narrowing glob selection,
