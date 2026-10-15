@@ -69,7 +69,7 @@ def main() -> None:
     env["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
     subprocess.run(
         [
-            str(args.python.resolve()),
+            str(args.python.absolute()),
             "-I",
             "-m",
             "pytest",

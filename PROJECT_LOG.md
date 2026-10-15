@@ -1,5 +1,21 @@
 # Project log
 
+## 2026-10-15: Ordered stack integration
+
+- Merged #74-90 into `master` in dependency order, preserving feature commits and
+  merge boundaries. Verified each merged tree against its reviewed feature head;
+  final integration commit `683286e` matches the complete reviewed stack.
+- The final SHA guard on #90 caught stale pre-documentation metadata. Confirmed
+  the intended documentation-only commit `a05118c` before merging it.
+- Started integrated CI/CodeQL and manual evidence run `38750990602` on that head.
+  This validates unreleased development; no version bump, tag, release, publication,
+  or live GitHub/PyPI settings change was made.
+- First evidence run exposed hidden-report upload exclusion and POSIX interpreter
+  symlink dereferencing in the installed runner. Enabled hidden files only for the
+  explicit evidence paths and preserved the venv interpreter path; one focused
+  regression passed. Bandit findings need retained-report triage; other scanners,
+  archive checks, clean installs, and import observations completed successfully.
+
 ## 2026-10-15: Documentation review and integration authorization
 
 - Reviewed feature/release guides, CLI references, changelog, roadmap, and evidence
