@@ -50,11 +50,11 @@ class ProcessRunner:
             if key in os.environ
         }
         environment["LANG"] = "C.UTF-8"
-        options: dict[str, Any] = (
-            {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
-            if sys.platform == "win32"
-            else {"start_new_session": True}
-        )
+        options: dict[str, Any]
+        if sys.platform == "win32":
+            options = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
+        else:
+            options = {"start_new_session": True}
         with tempfile.TemporaryFile() as stdout, tempfile.TemporaryFile() as stderr:
             process = subprocess.Popen(
                 arguments,
