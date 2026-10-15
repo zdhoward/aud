@@ -116,6 +116,12 @@ Metadata must cover every selected file when supplied. Omit `metadata` to probe
 canonical tags. See [naming profiles](NAMING_PROFILES.md) for template fields,
 defaults, transformations, and missing-field behavior.
 
+For `rename` or `album`, `filename_pattern` can replace `metadata` with an explicit
+basename grammar such as `"{track_number:02} - {title}"`. They are mutually
+exclusive; when neither is supplied, existing tag probing applies.
+See [filename parsing](FILENAME_PARSING.md)
+for exact matching and delimiter rules. Parsing never writes tags or guesses fields.
+
 `effects.json`:
 
 ```json

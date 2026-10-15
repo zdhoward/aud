@@ -4,6 +4,11 @@
 
 ### Added
 
+- Explicit `FilenamePattern` and `Dir.parse_filenames()` produce candidate metadata
+  from bounded basename grammars without probing, guessing, merging, or tag writes.
+  CLI naming/album config accepts `filename_pattern` instead of explicit metadata;
+  portable cases document exact delimiter, width, and mismatch behavior.
+
 - Expanded the portable conformance corpus with signed 16/24-bit PCM, retained
   tags/artwork, explicit MP3 settings, staged-error recovery, collisions, album
   order/sidecars/checksums, and eight local delivery-profile expectations. Cases

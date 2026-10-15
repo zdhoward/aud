@@ -1,0 +1,20 @@
+{
+  "corpus_version": 1,
+  "valid": [
+    {"template": "{track_number:02} - {title}", "filename": "03 - Café.flac", "fields": {"track_number": 3, "title": "Café"}},
+    {"template": "{disc_number:02}-{track_number:02} - {artist} - {title}", "filename": "02-03 - Artist - First - Live.wav", "fields": {"disc_number": 2, "track_number": 3, "artist": "Artist", "title": "First - Live"}},
+    {"template": "{artist} - {title}", "filename": "A - B - C.mp3", "fields": {"artist": "A", "title": "B - C"}},
+    {"template": "{title} {{Live}}", "filename": "Part.One {Live}.WAV", "fields": {"title": "Part.One"}},
+    {"template": "{track_number} of {track_total} - {title}", "filename": "2 of 12 -  Title .wav", "fields": {"track_number": 2, "track_total": 12, "title": " Title "}}
+  ],
+  "invalid": [
+    {"template": "{track_number:02} - {title}", "filename": "1 - Title.wav"},
+    {"template": "{track_number} - {title}", "filename": "00 - Title.wav"},
+    {"template": "{track_number} - {title}", "filename": "١ - Title.wav"},
+    {"template": "{track_number} of {track_total} - {title}", "filename": "3 of 2 - Title.wav"},
+    {"template": "{title} [Live]", "filename": "Title [Live] extra.wav"},
+    {"template": "{title}", "filename": "dir/Title.wav"},
+    {"template": "{title}", "filename": "Title"},
+    {"template": "{title}", "filename": "Title\nHidden.wav"}
+  ]
+}

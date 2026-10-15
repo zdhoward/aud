@@ -7,6 +7,7 @@ from aud.aud import Dir
 from aud.contracts import json_document, json_schema
 from aud.core.delivery import DELIVERY_PROFILES, DeliveryProfile, delivery_profile
 from aud.core.ffmpeg import MediaLimits
+from aud.core.filename import FilenamePattern
 from aud.core.metadata import AudioMetadata
 from aud.core.naming import NamingProfile
 from aud.core.operations.audio.chain import AudioChain
@@ -21,6 +22,7 @@ __all__ = [
     "AudioChain",
     "AudioMetadata",
     "NamingProfile",
+    "FilenamePattern",
     "AlbumPackage",
     "ProgressEvent",
     "DELIVERY_PROFILES",

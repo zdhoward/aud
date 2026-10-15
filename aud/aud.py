@@ -8,6 +8,7 @@ from pathlib import Path
 from aud.core.adapters.convert import ConversionAdapter
 from aud.core.execution import execute_steps, preview, resolve
 from aud.core.ffmpeg import FFmpegEngine, MediaLimits
+from aud.core.filename import FilenamePattern
 from aud.core.metadata import AudioMetadata
 from aud.core.models import AudioFile
 from aud.core.naming import NamingProfile
@@ -339,6 +340,18 @@ class Dir:
     def plan(self) -> Plan:
         """Snapshot the selection without executing any operations."""
         return self._plan()
+
+    def parse_filenames(self, pattern: FilenamePattern) -> dict[Path, AudioMetadata]:
+        """Parse every selected basename explicitly; no probing, writes, or tag merging."""
+        if not isinstance(pattern, FilenamePattern):
+            raise TypeError("Expected a FilenamePattern")
+        rows = {}
+        for file in self._files:
+            try:
+                rows[file.path] = pattern.parse(file.path.name)
+            except ValueError as error:
+                raise ValueError(f"Cannot parse filename {file.path.name!r}: {error}") from error
+        return rows
 
     def plan_naming(
         self,

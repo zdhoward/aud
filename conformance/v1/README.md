@@ -6,6 +6,10 @@ Run `pytest tests/test_contracts.py -q`.
 `media.json` adds the media/recovery corpus, run with
 `pytest tests/test_media_conformance.py -q` (FFmpeg/ffprobe required).
 
+`filename.json` records explicit filename grammar extraction/mismatch cases;
+`pytest tests/test_filename_parsing.py -q` also checks grammar rejection and API/CLI
+integration. Preserve exact captured text and first-separator behavior.
+
 - PCM cases specify signed integer samples, bit depth, rate, channels, and repeat
   count. Repeat the sample array `repeat * channels` times, encode each integer
   as signed little-endian PCM, and write interleaved frames to WAV. Convert to

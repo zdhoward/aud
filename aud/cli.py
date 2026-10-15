@@ -12,6 +12,7 @@ from pathlib import Path
 from aud import AudioChain, AudioMetadata, Dir, MediaLimits, NamingProfile, __version__
 from aud.contracts import json_document
 from aud.core.ffmpeg import FORMATS, PROFILES, FFmpegEngine
+from aud.core.filename import FilenamePattern
 from aud.core.operations.audio.convert import ConvertFormat
 from aud.core.operations.audio.effects import (
     Fade,
@@ -181,11 +182,12 @@ def _plan(directory, args, cancel):
         return directory.plan().add(_conversion(args))
     config = _load(args.config)
     if args.command == "rename":
-        _keys(config, {"profile", "metadata"}, "rename configuration")
+        _keys(config, {"profile", "metadata", "filename_pattern"}, "rename configuration")
+        parsed = _filename_metadata(directory, config)
         return directory.plan_naming(
             NamingProfile(**_object(config["profile"], "Naming profile")),
             args.output_directory,
-            metadata=_metadata(config["metadata"]) if "metadata" in config else None,
+            metadata=parsed,
             copy=args.copy,
         )
     if args.command == "effects":
@@ -228,14 +230,25 @@ def _plan(directory, args, cancel):
             "allow_audio_changes",
             "allow_lossy",
             "naming",
+            "filename_pattern",
         },
         "album configuration",
     )
-    if "metadata" in config:
-        config["metadata"] = _metadata(config["metadata"])
+    parsed = _filename_metadata(directory, config)
+    config.pop("filename_pattern", None)
+    if parsed is not None:
+        config["metadata"] = parsed
     if "naming" in config:
         config["naming"] = NamingProfile(**_object(config["naming"], "Naming profile"))
     return directory.plan_album(args.target, service=args.service, cancel=cancel, **config)
+
+
+def _filename_metadata(directory, config):
+    if "filename_pattern" in config:
+        if "metadata" in config:
+            raise ValueError("Choose filename_pattern or metadata; implicit merging is unsupported")
+        return directory.parse_filenames(FilenamePattern(config["filename_pattern"]))
+    return _metadata(config["metadata"]) if "metadata" in config else None
 
 
 def _emit(data, machine, *, version=None, kind=None):

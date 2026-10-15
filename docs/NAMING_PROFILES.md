@@ -103,6 +103,10 @@ cancellation apply. Completed outputs remain after later failures. Concurrent
 source/ancestor replacement, crash rollback, and atomic whole-album moves are
 outside the [safe processing guarantees](SAFE_PROCESSING.md).
 
+For filename-derived candidate metadata, use the explicit
+[filename parsing API](FILENAME_PARSING.md). Parsed values are not merged with
+tags automatically and do not rewrite source metadata.
+
 For custom multi-step plans, `NameWithProfile` is available from
 `aud.core.operations.naming`. Its metadata keys must match the paths reaching that
 step, including earlier copies/conversions. It does not infer tag changes from
