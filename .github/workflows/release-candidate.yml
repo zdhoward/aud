@@ -33,7 +33,12 @@ jobs:
         run: '"$RUNNER_TEMP/security-tools/bin/bandit" -r aud -f json -o .release-evidence/bandit.json'
       - name: Semgrep
         if: ${{ !cancelled() }}
-        run: '"$RUNNER_TEMP/semgrep/bin/semgrep" scan --config p/python --error --metrics=off --json --output .release-evidence/semgrep.json aud'
+        run: |
+          curl --fail --location --retry 3 --max-time 60 --max-filesize 2097152 \
+            --user-agent 'Semgrep/1.181.0' --output .release-evidence/python-rules.yml https://semgrep.dev/c/p/python
+          sha256sum .release-evidence/python-rules.yml > .release-evidence/python-rules-sha256.txt
+          "$RUNNER_TEMP/semgrep/bin/semgrep" scan --config .release-evidence/python-rules.yml \
+            --error --metrics=off --json --output .release-evidence/semgrep.json aud
       - name: Gitleaks history and working tree
         if: ${{ !cancelled() }}
         run: |
@@ -51,7 +56,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           python -m venv "$RUNNER_TEMP/dependencies"
-          "$RUNNER_TEMP/dependencies/bin/pip" install '.[dev,cli]'
+          "$RUNNER_TEMP/dependencies/bin/pip" install --report .release-evidence/dependency-install.json '.[dev,cli]'
           "$RUNNER_TEMP/dependencies/bin/pip" freeze --exclude aud > .release-evidence/dependencies.txt
           "$RUNNER_TEMP/security-tools/bin/python" -m pip_audit --disable-pip --no-deps \
             -r .release-evidence/dependencies.txt --format json --output .release-evidence/pip-audit.json
@@ -116,6 +121,17 @@ jobs:
             "$RUNNER_TEMP/install-$kind/bin/pip" install pytest==9.1.1 jsonschema==4.26.0
             "$RUNNER_TEMP/install-$kind/bin/pip" freeze > ".release-evidence/installed-$kind.txt"
           done
+      - name: Observe installed wheel and sdist imports
+        run: |
+          status=0
+          for kind in wheel source; do
+            (
+              cd "$RUNNER_TEMP/smoke-$kind"
+              timeout 30 "$RUNNER_TEMP/install-$kind/bin/python" -I "$GITHUB_WORKSPACE/tools/check_import.py" \
+                --report "$GITHUB_WORKSPACE/.release-evidence/import-$kind.json"
+            ) || status=1
+          done
+          exit "$status"
       - name: Run installed wheel regressions
         run: |
           python tools/check_installed.py --python "$RUNNER_TEMP/install-wheel/bin/python" \

@@ -66,6 +66,10 @@
 
 ### Changed
 
+- Candidate evidence now retains the Semgrep rules actually scanned and their
+  hash, dependency installation sources/hashes, and fresh-process installed import
+  observations for unexpected Python-level side effects.
+
 - Manual candidate validation now runs selected naming and JSON-contract
   regressions against clean wheel/sdist installations outside the checkout, with
   module-location guards and retained test reports.

@@ -1,5 +1,28 @@
 # Project log
 
+## 2026-10-15: Documentation review and integration authorization
+
+- Reviewed feature/release guides, CLI references, changelog, roadmap, and evidence
+  requirements; updated the review checkpoint to cover all seventeen PRs #74-90.
+  All pre-integration heads through `ebed525` were green and mergeable.
+- The maintainer authorized merging after documentation review. Preserve feature
+  commits with ordered merge commits, then recheck the integrated head and run the
+  now-registered manual evidence workflow. No release, tag, or PyPI publication.
+
+## 2026-10-15: Reproducible rule evidence and import observation
+
+- Candidate scanning now uses a retained, hashed local snapshot of the Semgrep
+  registry rules. Dependency installation reports retain resolution sources/hashes;
+  neither is a claim that transitive dependencies are locked or reviewed.
+- Added fresh-process observations of installed aud/CLI imports for unexpected
+  process/network/write/mutation audit events, including caught attempts. Reports
+  omit event arguments. This trusted-code regression check is not a sandbox.
+- Validation uses focused event tests and clean wheel/sdist imports, plus the
+  previously unrun selected sdist-installed regressions: 12 event tests passed,
+  both import observations passed, and 98 installed sdist tests passed with 2
+  filesystem-case skips. Prior #89 CI/CodeQL passed. Full local suite, scanners,
+  native adversarial execution, releases, and live provider changes remain excluded.
+
 ## 2026-10-15: Installed artifact regression checks
 
 - Added copied naming/parser/JSON-contract regressions for both candidate wheel
