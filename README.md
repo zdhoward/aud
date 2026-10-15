@@ -232,6 +232,8 @@ scripts. Replacing an existing destination now requires explicit opt-in.
 Unreleased conversions use FFmpeg directly with verified 24-bit PCM, neutral
 encoding profiles, tag/artwork handling, process limits, and active cancellation.
 See the [conversion contract](docs/FFMPEG_CONVERSION.md) and [API examples](API.md).
+Explicit [audio chains](docs/AUDIO_CHAINS.md) apply supported native effects with
+one final encode and expose canonical metadata for future naming profiles.
 
 Remaining backend, naming profile, and product work is tracked in
 [ROADMAP.md](ROADMAP.md) and in the GitHub issue tracker: data-safety

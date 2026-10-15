@@ -10,6 +10,8 @@ from aud.core.execution import execute_steps, preview, resolve
 from aud.core.ffmpeg import MediaLimits
 from aud.core.models import AudioFile
 from aud.core.operations.archive import Zip
+from aud.core.operations.audio.base import AudioOperation
+from aud.core.operations.audio.chain import AudioChain
 
 # conversion
 from aud.core.operations.audio.convert import (
@@ -428,6 +430,16 @@ class Dir:
     # ------------------------------------------------------------------
     # audio FX operations
     # ------------------------------------------------------------------
+
+    def afx_chain(
+        self, effects: Iterable[AudioOperation], *, output: ConvertFormat | None = None
+    ) -> bool:
+        """Apply supported effects in order with one final encode per file."""
+        try:
+            self.execute(self.plan().add(AudioChain(effects, output=output)))
+            return bool(self.last_result)
+        except Exception as error:
+            raise AudioFXError("chain", error) from error
 
     def afx_normalize(self, target_level: float = 0.1, passes: int = 1) -> bool:
         try:

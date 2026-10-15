@@ -1,5 +1,25 @@
 # Project log
 
+## 2026-10-14: Explicit audio chains and canonical metadata
+
+- Added `AudioChain` on `feat/audio-chains`, stacked on direct conversions. Explicit
+  chains perform supported native effects and optional conversion with one final
+  encode; separate legacy calls retain their current behavior. This avoids repeated
+  lossy encoding without silently changing legacy effect rounding/filter behavior.
+- Added canonical metadata as a read-only view of retained tags. Invalid/conflicting
+  positions, aliases, and dates report issues; missing values remain null, giving
+  future naming profiles deterministic inputs without guessing from filenames.
+- Focused checks cover encode count, 24-bit PCM, padding, filter/channel behavior,
+  previews/results, metadata, artwork, cancellation, and failure dependencies.
+  Existing conversion checks pass. Full local release validation remains deferred.
+- Focused source review found missing-field preflight and lossy fade timing gaps.
+  Validate required fields explicitly; measure decoded duration for timing-sensitive
+  lossy chains using the bounded runner. Regression checks cover both corrections.
+- Linux CI exposed version-dependent progress timestamps. Timing analysis now
+  counts bounded temporary PCM frames so fade endpoints follow decoded samples.
+- Remaining effects and pydub removal are incomplete. No release, tag, merge, or
+  PyPI publication; version remains 2.0.2.
+
 ## 2026-10-14: Cross-platform CI follow-up
 
 - The first remote matrix passed on Linux and Windows; macOS exposed case-only

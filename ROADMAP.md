@@ -45,6 +45,9 @@ compatible. See [the processing contract](docs/SAFE_PROCESSING.md) and
 The next slice implements direct FFmpeg conversions, 24-bit PCM, encoding profiles,
 tag/artwork handling, process/output limits, active cancellation, and effective
 settings in results. See [the conversion contract](docs/FFMPEG_CONVERSION.md).
+An explicit native `AudioChain` now batches supported effects with a final
+conversion and reports canonical metadata fields for future naming profiles.
+See [the chain contract](docs/AUDIO_CHAINS.md) for supported effects and boundaries.
 Effects migration/batching, comprehensive metadata mapping, hard OS resource
 limits, parallelism, recursive scanning, and remaining milestone work are pending.
 The tracker allocation below is preserved; this progress note does not close

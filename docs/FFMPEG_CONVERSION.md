@@ -29,6 +29,9 @@ explicit; this is a codec check, not certification of original source provenance
 The preservation profile rejects requested sample-property changes. Generic
 conversion retains its compatibility behavior and permits deliberate lossy inputs.
 VBR quality is explicit and is never inferred from average source bitrate.
+The explicit [AudioChain](AUDIO_CHAINS.md) operation adds supported ordered native
+effects before the final encode; ordinary conversions have no effect filters.
+Results also expose canonical source/output metadata with parsing issues.
 
 `MediaLimits` configures per-process timeout, diagnostic/probe output limits, and
 encoded output size. Tools receive argument arrays, no shell or inherited stdin,

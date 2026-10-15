@@ -7,10 +7,12 @@ from pathlib import Path
 from aud.core.adapters.audio import AudioAdapter
 from aud.core.adapters.convert import ConversionAdapter
 from aud.core.adapters.filesystem import FileSystemAdapter
+from aud.core.effect_chain import validate_effects
 from aud.core.ffmpeg import validate_conversion
 from aud.core.models import AudioFile
 from aud.core.operations.archive import Zip
 from aud.core.operations.audio.base import AudioOperation
+from aud.core.operations.audio.chain import AudioChain
 from aud.core.operations.audio.convert import ConvertFormat, ConvertToMono, ConvertToStereo
 from aud.core.operations.audio.effects import AudioJoin
 from aud.core.operations.files import Backup, Copy, Move
@@ -81,9 +83,15 @@ def resolve(plan: Plan, overwrite: str) -> list[Step]:
             pairs = [(f.path, operation.apply(f).path) for f in files]
             adapter = FileSystemAdapter
             in_place = False
-        elif isinstance(operation, (ConvertFormat, ConvertToMono, ConvertToStereo)):
+        elif isinstance(operation, (ConvertFormat, ConvertToMono, ConvertToStereo, AudioChain)):
             if isinstance(operation, ConvertFormat):
                 validate_conversion(operation)
+            elif isinstance(operation, AudioChain):
+                validate_effects(operation.effects)
+                if operation.output is not None:
+                    if not isinstance(operation.output, ConvertFormat):
+                        raise TypeError("AudioChain output must be a ConvertFormat")
+                    validate_conversion(operation.output)
             pairs = [(f.path, operation.apply(f).path) for f in files]
             adapter = ConversionAdapter
             in_place = True
@@ -113,6 +121,10 @@ def preview(steps: list[Step]) -> PlanPreview:
             return str(item)
         if isinstance(item, dict):
             return {str(k): value(v) for k, v in item.items()}
+        if isinstance(item, (tuple, list)):
+            return [value(v) for v in item]
+        if isinstance(item, AudioOperation):
+            return {"operation": type(item).__name__, "settings": value(vars(item))}
         return item
 
     return PlanPreview(

@@ -5,5 +5,7 @@ __version__ = "2.0.2"
 # Import the Dir class from the aud module
 from aud.aud import Dir
 from aud.core.ffmpeg import MediaLimits
+from aud.core.metadata import AudioMetadata
+from aud.core.operations.audio.chain import AudioChain
 
-__all__ = ["Dir", "MediaLimits", "__version__"]
+__all__ = ["Dir", "MediaLimits", "AudioChain", "AudioMetadata", "__version__"]

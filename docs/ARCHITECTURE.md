@@ -52,6 +52,9 @@ raise `TypeError`. Effects use pydub; conversions use `FFmpegEngine` with explic
 argument arrays, probe/encode/decode verification, process limits, and cancellation.
 Both require FFmpeg on PATH. The shared executor preflights all steps and records
 per-file results; only successful transitions change the selection.
+`AudioChain` is routed through the conversion adapter and compiles supported
+effect intents into numeric FFmpeg filters, retaining one staged output per file.
+It does not automatically fuse existing separate plan steps or legacy calls.
 
 Operations on an empty selection are no-ops (since v2.0.2: no empty archives,
 no placeholder audio files).
