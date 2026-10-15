@@ -112,7 +112,7 @@ def _settings(info, profile, allow_audio_changes, allow_lossy):
         changes.append("triangular_dither")
     changes.append("strip_embedded_metadata_and_artwork")
     if not info.lossless:
-        changes.append("lossy_source_derivative")
+        changes.append("lossy_source_derivative" if info.lossy else "unverified_source_derivative")
     return rate, depth, tuple(changes), dither
 
 

@@ -32,6 +32,10 @@ the package version or create a release tag.
 
 ## v2.1.0: Data safety and performance
 
+The [2026-10-15 review checkpoint](docs/REVIEW_CHECKPOINT.md) records independent
+source follow-up, corrected consent/CLI defects, stack state, and open release/
+port gates. It does not declare a release candidate or authorize publication.
+
 ### Implemented in the working branch, not released
 
 The first safety slice implements overwrite policies, default link skipping,

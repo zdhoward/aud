@@ -6,9 +6,6 @@ on:
       - main
       - master
   pull_request:
-    branches:
-      - main
-      - master
   schedule:
     - cron: "0 6 * * 1"
 

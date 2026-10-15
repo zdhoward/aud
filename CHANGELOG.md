@@ -66,6 +66,13 @@
 
 ### Changed
 
+- Lossless-input consent now uses an explicit codec allowlist. Companded PCM
+  requires opt-in, as do ambiguous/unknown codecs such as WavPack. Package manifests
+  distinguish known lossy derivatives from unverified source derivatives.
+- Effects CLI rejects supplied output options without `--format`, including zero
+  values. JSON config rejects floating-point overflow during parsing.
+- CodeQL now checks stacked PRs targeting feature branches.
+
 - Process cleanup rechecks an exited child after a process-group permission error,
   preserving the original limit/cancellation outcome in that race. Permission
   failures for a still-running child remain visible.

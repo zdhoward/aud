@@ -218,6 +218,28 @@ def test_main_restores_signal_handler(populated_dir, monkeypatch, capsys):
     assert json.loads(capsys.readouterr().out) == {"files": []}
 
 
+@pytest.mark.parametrize("option", ["--sample-rate", "--bit-depth", "--bit-rate", "--channels"])
+def test_explicit_zero_effect_output_option_rejected_before_execution(
+    populated_dir, capsys, monkeypatch, option
+):
+    path = config(populated_dir, {"effects": [{"type": "gain", "amount_db": -3}]})
+    monkeypatch.setattr(
+        cli.Dir, "execute", lambda *args, **kwargs: pytest.fail("Unexpected execution")
+    )
+    code, data = invoke(
+        capsys, "effects", populated_dir, "--extensions", "wav", "--config", path, option, "0"
+    )
+    assert code == 2 and "require --format" in data["error"]
+
+
+@pytest.mark.parametrize("number", ["1e999", "-1e999"])
+def test_config_rejects_floating_point_overflow(populated_dir, capsys, number):
+    path = populated_dir / "overflow.json"
+    path.write_text('{"effects":[{"type":"gain","amount_db":' + number + "}]}")
+    code, data = invoke(capsys, "effects", populated_dir, "--extensions", "wav", "--config", path)
+    assert code == 2 and "Non-finite JSON number" in data["error"]
+
+
 def test_execution_failure_keeps_partial_result(populated_dir, monkeypatch, capsys):
     def fail(directory, plan, **options):
         directory.last_result = BatchResult(

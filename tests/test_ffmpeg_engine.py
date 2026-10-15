@@ -13,6 +13,47 @@ from aud.core.operations.audio.convert import ConvertFormat
 from aud.exceptions import ConvertError
 
 
+@pytest.mark.parametrize(
+    "codec,lossless,lossy",
+    [
+        ("pcm_s16le", True, False),
+        ("pcm_f32le", True, False),
+        ("pcm_s24le_planar", True, False),
+        ("flac", True, False),
+        ("pcm_alaw", False, True),
+        ("pcm_mulaw", False, True),
+        ("pcm_vidc", False, True),
+        ("wavpack", False, False),
+        ("pcm_unknown", False, False),
+        ("mp3", False, True),
+    ],
+)
+def test_codec_evidence_is_conservative(codec, lossless, lossy):
+    from aud.core.ffmpeg import AudioInfo
+
+    info = AudioInfo(codec, 44100, 2, 16, 1.0, None)
+    assert info.lossless is lossless and info.lossy is lossy
+
+
+@pytest.mark.parametrize(
+    "codec,marker",
+    [
+        ("pcm_alaw", "lossy_source_derivative"),
+        ("pcm_mulaw", "lossy_source_derivative"),
+        ("wavpack", "unverified_source_derivative"),
+    ],
+)
+def test_delivery_requires_consent_for_lossy_or_unverified_codec(codec, marker):
+    from aud import delivery_profile
+    from aud.core.ffmpeg import AudioInfo
+    from aud.core.packaging import _settings
+
+    info = AudioInfo(codec, 44100, 2, 16, 1.0, None)
+    with pytest.raises(ValueError, match="allow_lossy"):
+        _settings(info, delivery_profile("amuse"), False, False)
+    assert marker in _settings(info, delivery_profile("amuse"), False, True)[2]
+
+
 def test_24bit_pcm_round_trip_preserves_samples(tmp_path):
     source = tmp_path / "original.wav"
     values = [-8388608, -1234567, -1, 0, 1, 7654321, 8388607] * 128
