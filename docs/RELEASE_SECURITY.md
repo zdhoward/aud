@@ -142,12 +142,28 @@ metadata, but does not automatically enforce every checklist item. It rebuilds
 at dispatch: compare/revalidate those outputs and their resolution against the
 candidate evidence before using this flow; do not assume byte identity.
 
-Before enabling a production release, finish the artifact-review/approval handoff
-or reviewed-artifact reuse design so that unchecked rebuilds cannot be published.
-This is an open automation gate, not something a checklist alone solves. Keep
-ordinary CI/scanners/builds free of publishing tokens. Verify live PyPI publisher
-bindings, branch/tag/workflow protections, and any dedicated release environment
-separately; repository YAML cannot prove those settings. Attestations are currently
+The build summary records each distribution's SHA-256, the immutable artifact ID,
+download URL, and artifact archive digest. The publication job targets the `pypi`
+environment. Before production use, configure that environment with required
+reviewers, prevent self-review where practical, restrict deployment refs to the
+reviewed publishing workflow refs, and bind the PyPI Trusted Publisher to the exact
+repository, `publish.yml`, and `pypi` environment. An environment name in YAML can
+create an unprotected environment; it does not configure these protections.
+
+For each dispatch, download the artifact identified in the successful build
+summary. Match its distribution hashes, complete the candidate evidence against
+those files, and record the run URL, attempt, artifact ID, and reviewer decision.
+Approve the waiting `pypi` deployment only after that review. The upload job
+downloads that same artifact ID without rebuilding. A whole-workflow retry creates
+a new artifact and requires fresh review; a publish-only retry reuses the prior
+successful build. Expired/deleted artifacts require a new build and review.
+The artifact archive digest and individual distribution hashes describe different
+bytes and must not be compared with each other.
+
+This handoff depends on live environment protections, which remain an open
+production gate until verified separately. Keep ordinary CI/scanners/builds free
+of publishing tokens. Verify branch/tag/workflow protections too; repository YAML
+cannot prove those settings. Attestations are currently
 disabled pending provider verification, so record that gap rather than marking
 provenance complete. See [PyPI's security model](https://docs.pypi.org/trusted-publishers/security-model/).
 

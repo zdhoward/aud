@@ -1,5 +1,17 @@
 # Project log
 
+## 2026-10-15: Review the built artifact before publication
+
+- Added distribution hashes and immutable artifact identity to the build summary.
+  Publication targets the `pypi` environment and downloads the same artifact,
+  allowing candidate validation after building and before approval without a rebuild.
+- Documented required live reviewer/ref protections and exact PyPI environment
+  binding. YAML does not create approval rules; no provider settings were changed.
+  Attestation verification remains open. Prior PR #85 CI and CodeQL passed.
+- Validation is scoped to workflow structure and summary generation with synthetic
+  distribution bytes. No aud runtime suite, scanner, workflow dispatch, release,
+  version/tag change, or publication is part of this work.
+
 ## 2026-10-15: Aud-specific pre-publication security process
 
 - Adapted the supplied general checklist into 22 aud release-candidate gates,

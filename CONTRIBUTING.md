@@ -63,7 +63,9 @@ aud is deliberately conservative about history and versions:
   Complete the [release security gate](docs/RELEASE_SECURITY.md) and retain
   candidate-specific [evidence](docs/RELEASE_EVIDENCE_TEMPLATE.md) first. The
   workflow's build job is read-only; only its artifact-upload-to-PyPI job has OIDC.
-  Resolve the documented reviewed-artifact handoff gap before production use.
+  Configure and verify the documented `pypi` environment protection and publisher
+  binding before production use. Review the build artifact and hashes before
+  approving publication; do not approve an unchecked dispatch-time rebuild.
 * **Behavior changes:** any change to what an existing call does (not just
   what it accepts) must ship with a `DeprecationWarning` window when feasible,
   a CHANGELOG entry under **Changed**, and regression tests. Example: the
@@ -120,7 +122,7 @@ Category labels:
 |---|---|---|
 | `ci.yml` | main/master push, all PR bases | lint (black, ruff, mypy); test matrix Linux + macOS + Windows, Python 3.10-3.12; coverage gate at 85% with artifact upload |
 | `codeql.yml` | main/master push, all PR bases, weekly | Python security scanning, including stacked PRs |
-| `publish.yml` | maintainer manual dispatch | validates an existing release tag/version/changelog, builds, `twine check`, and publishes to PyPI via trusted publishing |
+| `publish.yml` | maintainer manual dispatch | validates a release tag, builds/checks distributions, records artifact hashes, then uploads the same artifact through the `pypi` environment via trusted publishing |
 | Dependabot | weekly | pip and github-actions updates, PRs with full CI |
 
 ## Writing style
