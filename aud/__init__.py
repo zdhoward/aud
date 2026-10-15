@@ -4,5 +4,6 @@ __version__ = "2.0.2"
 
 # Import the Dir class from the aud module
 from aud.aud import Dir
+from aud.core.ffmpeg import MediaLimits
 
-__all__ = ["Dir", "__version__"]
+__all__ = ["Dir", "MediaLimits", "__version__"]

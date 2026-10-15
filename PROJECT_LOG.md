@@ -9,6 +9,24 @@
 - Added focused branch coverage and enabled CI for all PR bases so stacked feature
   branches receive checks. This fixes observed failures without broad local retesting.
 
+## 2026-10-14: Direct FFmpeg conversion slice
+
+- Implemented direct conversion on `feat/ffmpeg-conversion`, stacked on the safety
+  branch. Profiles, output directories, 24-bit PCM, tags/artwork, and effective
+  result settings make encoding behavior explicit without convention-specific APIs.
+- Added per-process deadlines/output limits and active cancellation. Source review
+  caught a process-completion limit race and missing audio-stream metadata; fixed
+  both with focused regressions. Lossless WAV/FLAC output also checks duration.
+- Scoped checks cover new engine behavior and affected conversion/export/result
+  integrations; full release validation is deferred. Effects still use pydub;
+  limits are application controls and external FFmpeg patching remains required.
+- Linux CI exposed a Windows-only subprocess constant in type analysis. Use an
+  explicit platform guard and check the runner with Linux and Windows type targets.
+- The Ogg regression exposed missing libvorbis in the standard macOS FFmpeg build.
+  Select Homebrew's full build in CI and document codec requirements for users.
+- No version bump, release tag, merge, or PyPI upload; the broader milestone remains
+  incomplete. Public docs describe the new contract and remaining limitations.
+
 ## 2026-10-14: Public contribution and release policy
 
 - Corrected stale private-project/direct-push guidance. Preserved all seven local

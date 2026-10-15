@@ -7,6 +7,7 @@ from pathlib import Path
 
 from aud.core.adapters.convert import ConversionAdapter
 from aud.core.execution import execute_steps, preview, resolve
+from aud.core.ffmpeg import MediaLimits
 from aud.core.models import AudioFile
 from aud.core.operations.archive import Zip
 
@@ -113,12 +114,14 @@ class Dir:
         overwrite: str = "error",
         follow_symlinks: bool = False,
         pattern: str | None = None,
+        media_limits: MediaLimits | None = None,
     ):
         self.directory = Path(directory).resolve()
         self.overwrite = validate_policy(overwrite)
         self.follow_symlinks = follow_symlinks
         self.pattern = pattern
         self.last_result = BatchResult()
+        self.media_limits = media_limits or MediaLimits()
 
         if not self.directory.is_dir():
             raise FileNotFoundError(f"Not a directory: {self.directory}")
@@ -296,7 +299,11 @@ class Dir:
             raise
         try:
             execute_steps(
-                steps, self.last_result, continue_on_error=continue_on_error, cancel=cancel
+                steps,
+                self.last_result,
+                continue_on_error=continue_on_error,
+                cancel=cancel,
+                media_limits=self.media_limits,
             )
         finally:
             if steps:
@@ -558,6 +565,12 @@ class Dir:
         bit_rate: int | None = None,
         tags: dict[str, str] | None = None,
         cover: str | None = None,
+        *,
+        output_directory: str | Path | None = None,
+        profile: str | None = None,
+        allow_lossy: bool = False,
+        drop_artwork: bool = False,
+        channels: int | None = None,
     ) -> bool:
         try:
             plan = self._plan().add(
@@ -568,6 +581,11 @@ class Dir:
                     bit_rate=bit_rate,
                     tags=tags,
                     cover=cover,
+                    output_directory=output_directory,
+                    profile=profile,
+                    allow_lossy=allow_lossy,
+                    drop_artwork=drop_artwork,
+                    channels=channels,
                 )
             )
             self._execute_convert(plan)
@@ -674,7 +692,7 @@ class Dir:
             out_dir = Path(target_directory).absolute()
             if any(file.path.parent == out_dir for file in original_files):
                 raise ValueError("Export directory must differ from the source directory")
-            adapter = ConversionAdapter(overwrite=self.overwrite)
+            adapter = ConversionAdapter(overwrite=self.overwrite, media_limits=self.media_limits)
             try:
                 adapter.export_to(
                     ConvertFormat(target_format, sample_rate=sample_rate, bit_depth=bit_depth),

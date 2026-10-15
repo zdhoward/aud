@@ -36,8 +36,14 @@ the official exported validators passed over trusted parent-owned in-memory data
 Ordinary development regression tests and package smoke checks were separate from
 the adversarial audit.
 
-Remaining work includes sandboxed native validation, bounded decoder memory and
-process lifetime, active codec cancellation, stronger metadata/sidecar validation,
+The direct-conversion slice received a focused source follow-up. Fixed argument
+arrays, input protocol/demuxer restrictions, staged verification, and owned-process
+cleanup were reviewed. Completion now rechecks deadline/cancellation/output limits;
+stream metadata is included in preservation/loss accounting. Focused regressions
+cover those fixes. This does not add adversarial native-execution evidence.
+
+Remaining work includes sandboxed native validation, OS-enforced decoder memory
+limits, effects process limits/cancellation, stronger metadata/sidecar validation,
 and release/provider settings verification. Hostile concurrent directory/source
 replacement is outside the implemented filesystem guarantees. The future web UI
 requires its own exposure review before shipping.

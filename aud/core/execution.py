@@ -7,6 +7,7 @@ from pathlib import Path
 from aud.core.adapters.audio import AudioAdapter
 from aud.core.adapters.convert import ConversionAdapter
 from aud.core.adapters.filesystem import FileSystemAdapter
+from aud.core.ffmpeg import validate_conversion
 from aud.core.models import AudioFile
 from aud.core.operations.archive import Zip
 from aud.core.operations.audio.base import AudioOperation
@@ -81,6 +82,8 @@ def resolve(plan: Plan, overwrite: str) -> list[Step]:
             adapter = FileSystemAdapter
             in_place = False
         elif isinstance(operation, (ConvertFormat, ConvertToMono, ConvertToStereo)):
+            if isinstance(operation, ConvertFormat):
+                validate_conversion(operation)
             pairs = [(f.path, operation.apply(f).path) for f in files]
             adapter = ConversionAdapter
             in_place = True
@@ -127,11 +130,19 @@ def preview(steps: list[Step]) -> PlanPreview:
 
 
 def execute_steps(
-    steps: list[Step], result: BatchResult, *, continue_on_error=False, cancel=None
+    steps: list[Step],
+    result: BatchResult,
+    *,
+    continue_on_error=False,
+    cancel=None,
+    media_limits=None,
 ) -> None:
     failed_sources: set[str] = set()
     for step_index, step in enumerate(steps):
-        adapter = step.adapter_type(continue_on_error=continue_on_error, cancel=cancel)
+        options = {"continue_on_error": continue_on_error, "cancel": cancel}
+        if step.adapter_type is ConversionAdapter:
+            options["media_limits"] = media_limits
+        adapter = step.adapter_type(**options)
         operation = step.operation
         grouped = isinstance(operation, (Zip, AudioJoin))
         entries = []

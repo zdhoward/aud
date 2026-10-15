@@ -3,6 +3,10 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 
 
+class OperationCancelled(InterruptedError):
+    """An explicit cancellation, distinct from an interrupted filesystem syscall."""
+
+
 @dataclass(frozen=True)
 class FileResult:
     source: str | None
@@ -11,6 +15,7 @@ class FileResult:
     status: str
     error: str | None = None
     sources: tuple[str, ...] = ()
+    details: dict = field(default_factory=dict)
 
 
 @dataclass

@@ -157,7 +157,7 @@ d.convert_stereo()
 d.convert_format(
     target_format="mp3",
     sample_rate=44100,      # Optional: target sample rate in Hz
-    bit_depth=16,            # Optional: target bit depth (8, 16, or 32; others raise ConvertError)
+    bit_depth=16,            # Optional: WAV/raw 8/16/24/32; FLAC 16/24
     bit_rate=192,            # Optional: encoder bitrate in kbps (lossy formats only)
     tags={"artist": "Name", "album": "Album"},  # Optional: metadata tags
     cover="cover.jpg"        # Optional: album art file path
@@ -260,13 +260,46 @@ without selecting files again. `last_result` records `success`, `skipped`,
 a legacy method raises. New `execute` calls raise underlying errors by default;
 `continue_on_error=True` continues independent files and returns a false-valued
 result if any file failed. Cancellation accepts `cancel=event.is_set` and stops
-between files. Batches are not atomic transactions.
+between files or during an active conversion. Batches are not atomic transactions.
 
 Sources remain unchanged if export/validation fails before publication. Ordinary
 MP3/FLAC tags and nominal MP3 bitrates are retained by in-place processing; full
-artwork and VBR preset preservation are still pending. See
+artwork and VBR preset preservation for effects are still pending. See
 [the safe processing contract](docs/SAFE_PROCESSING.md) for filesystem and
 concurrency limits.
+
+### Direct conversion and encoding profiles (unreleased)
+
+```python
+from aud import Dir, MediaLimits
+from aud.core.operations.audio.convert import ConvertFormat
+
+d = Dir("masters", extensions=["wav", "flac"],
+        media_limits=MediaLimits(timeout=600, output_bytes=2 * 1024**3))
+plan = d.plan().add(ConvertFormat(
+    "mp3", profile="mp3-v0", output_directory="deliverables",
+    tags={"album": "Example"},
+))
+print(d.preview(plan))
+result = d.execute(plan, continue_on_error=True)
+print(result.to_dict())
+```
+
+`convert_format()` accepts the same keyword-only `output_directory`, `profile`,
+`allow_lossy`, `drop_artwork`, and `channels` options. Profiles are `flac-preserve`,
+`mp3-v0`, `mp3-v2`, and `mp3-320`; they require visibly lossless input unless
+`allow_lossy=True`. Do not combine a profile with an explicit `bit_rate`.
+Relative output paths resolve from the process working directory. Conversion
+updates the selection to successful outputs; `export_for()` keeps its source selection.
+
+Conversions retain ordinary container/audio-stream tags and MP3/FLAC attached
+artwork. Container tags win over matching stream tags; explicit tags win over
+both. Unsupported artwork requires explicit `drop_artwork=True`. Successful
+`FileResult.details` records effective encoder/profile/sample properties and
+`unmapped_tags`, including metadata the target cannot represent. Raw PCM carries
+no tags. Probe, encode, and verification each have their own `MediaLimits`
+deadline; limits are polled application controls. See the
+[conversion contract](docs/FFMPEG_CONVERSION.md) for validation and security limits.
 
 Most operations return `bool`:
 - `True`: Operation completed successfully (including no-op on an empty selection)

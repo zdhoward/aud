@@ -42,8 +42,11 @@ the configured CI matrix. Existing allowlist/default-selection semantics remain
 compatible. See [the processing contract](docs/SAFE_PROCESSING.md) and
 [initial security review](docs/SECURITY_REVIEW.md) for guarantees and limits.
 
-Batch decoding, bounded codec execution, comprehensive metadata/artwork handling,
-parallelism, recursive scanning, and the remaining milestone work are pending.
+The next slice implements direct FFmpeg conversions, 24-bit PCM, encoding profiles,
+tag/artwork handling, process/output limits, active cancellation, and effective
+settings in results. See [the conversion contract](docs/FFMPEG_CONVERSION.md).
+Effects migration/batching, comprehensive metadata mapping, hard OS resource
+limits, parallelism, recursive scanning, and remaining milestone work are pending.
 The tracker allocation below is preserved; this progress note does not close
 issues, tag a release, or change the package version.
 
@@ -133,11 +136,12 @@ execution layer to direct ffmpeg subprocess calls buys three things at once:
 
 * Python 3.13+ support without an audioop compatibility dependency (the
   current declared dependencies do not support it)
-* 24-bit output via codec parameters (today `bit_depth` accepts 8/16/32 only)
+* 24-bit output via codec parameters (implemented for unreleased direct conversions)
 * Streaming for large files (pydub decodes everything into memory)
 
-Sequencing: after v2.1.0, so the batching rework (#44) lands first and the
-migration reworks the same layer once, informed by the registry dispatch.
+The readiness review brings the conversion contract forward; effects migration
+and removal of pydub remain pending. Reassess release allocation when the complete
+backend contract and Python compatibility checks are ready.
 
 ## Housekeeping (no release vehicle)
 

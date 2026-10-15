@@ -38,6 +38,6 @@ def test_unsupported_bit_depth_raises_clear_error(populated_dir):
     d = Dir(populated_dir, extensions=["wav"])
 
     with pytest.raises(ConvertError) as excinfo:
-        d.convert_to_wav(bit_depth=24)
+        d.convert_to_wav(bit_depth=12)
 
-    assert "Unsupported bit depth: 24" in str(excinfo.value)
+    assert "Unsupported bit depth: 12" in str(excinfo.value)

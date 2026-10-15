@@ -220,7 +220,8 @@ aud/
 ## Status
 
 aud v2 has automated behavior tests and an 85% coverage gate. The current
-pydub backend targets Python 3.10-3.12; Python 3.13+ support remains planned.
+effects backend uses pydub and targets Python 3.10-3.12; Python 3.13+ support
+for the full package remains planned.
 
 Unreleased safety work adds collision policies, staged writes, link-safe
 scanning, narrowing glob selection, and public plan/preview/results APIs.
@@ -228,7 +229,11 @@ See [CHANGELOG.md](CHANGELOG.md) and the
 [safe processing contract](docs/SAFE_PROCESSING.md) before adapting existing
 scripts. Replacing an existing destination now requires explicit opt-in.
 
-The core architecture is complete. Planned work is tracked in
+Unreleased conversions use FFmpeg directly with verified 24-bit PCM, neutral
+encoding profiles, tag/artwork handling, process limits, and active cancellation.
+See the [conversion contract](docs/FFMPEG_CONVERSION.md) and [API examples](API.md).
+
+Remaining backend, naming profile, and product work is tracked in
 [ROADMAP.md](ROADMAP.md) and in the GitHub issue tracker: data-safety
 guards and performance work target v2.1.0, a real CLI targets v2.2.0,
 and an optional web UI is planned as a separate install.
