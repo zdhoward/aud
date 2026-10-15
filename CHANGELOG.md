@@ -4,6 +4,11 @@
 
 ### Added
 
+- Dependency-free CLI commands for list/inspect, convert, rename, native effects,
+  export copies, and album packages. Adds shared API dry runs, bounded JSON
+  configuration, structured output, stable exit codes, and Ctrl+C cancellation.
+  Legacy `aud DIRECTORY` remains available; live progress is pending.
+
 - Local album ZIP plans, previews, grouped results, checksums, and opaque sidecars.
   Generic packages preserve original bytes; delivery profiles prepare audio and
   artwork for Amuse, DistroKid, TuneCore, CD Baby, RouteNote, Ditto, LANDR, and

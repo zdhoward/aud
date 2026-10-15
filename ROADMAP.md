@@ -54,7 +54,9 @@ tree/collision checks. See [the naming contract](docs/NAMING_PROFILES.md).
 Album ZIP preparation now includes opaque sidecars, checksums, metadata, and
 versioned profiles for eight distributors. See [album packaging](docs/ALBUM_PACKAGING.md)
 for supported subsets and manual review requirements. Filename parsing and the
-real CLI remain pending; distributor account integration remains outside scope.
+CLI polish remain pending; distributor account integration remains outside scope.
+The first [CLI slice](docs/CLI.md) now exposes read/preview/execution commands,
+bounded JSON configuration, structured results, and cancellation over these APIs.
 Effects migration/batching, comprehensive metadata mapping, hard OS resource
 limits, parallelism, recursive scanning, and remaining milestone work are pending.
 The tracker allocation below is preserved; this progress note does not close
@@ -125,10 +127,12 @@ everything else can slide to a later v2.x without harm.
 
 ## v2.2.0: CLI
 
-The current `aud` console entry is a stub, while `click`, `rich`, and
-`questionary` are already declared in the `[cli]` extra. Build the real CLI:
-list/convert/rename/effects/export commands, `--dry-run` backed by
-`Plan.preview()`, and export presets.
+The first unreleased CLI slice replaces the stub with list/inspect, conversion,
+naming, native effects, export copies, and album packaging. It reuses core plans,
+previews/results, bounded JSON configuration, and cancellation. Standard-library
+argparse keeps the base install sufficient; existing `[cli]` extras stay optional.
+Remaining work includes live progress, interface polish, and versioned JSON
+schemas/conformance fixtures. See [the CLI contract](docs/CLI.md).
 
 ## v2.3.0: Optional web UI
 

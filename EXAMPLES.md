@@ -1,5 +1,7 @@
 # aud Examples
 
+For terminal equivalents of these workflows, see [CLI recipes](docs/CLI.md).
+
 For unreleased album archives and distributor preparation, see the example in
 [Album packaging](docs/ALBUM_PACKAGING.md). It covers explicit track metadata/order,
 artwork, sidecars, preview, execution, and checksums.
