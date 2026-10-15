@@ -62,8 +62,12 @@ artist identities, and release-type rules still need review in the upload form.
 
 Accepted source rate/depth are preserved. Unsupported properties use 44.1 kHz,
 16-bit stereo only with `allow_audio_changes=True`. Bit-depth reduction to 16
-bits uses triangular dither. Known lossy inputs require `allow_lossy=True` and
-are marked as derivatives; converting to WAV/FLAC does not restore lost detail.
+bits uses triangular dither. Recognized lossy inputs require `allow_lossy=True`
+and receive `lossy_source_derivative`. Unknown or ambiguous codecs, including
+WavPack's possible hybrid mode, also require this opt-in and receive
+`unverified_source_derivative`. The known-lossless codec allowlist excludes
+companded PCM (A-law, mu-law, VIDC); a `pcm_` name alone is not enough.
+Converting to WAV/FLAC does not restore lost detail.
 An unknown source depth is represented as unknown, with a planned 16-bit output.
 The tool cannot certify the source's earlier encoding history.
 

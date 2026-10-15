@@ -26,6 +26,11 @@ instead of being presented as preserved. Encoder-generated tags are not inherite
 Optional neutral profiles are `flac-preserve`, `mp3-v0`, `mp3-v2`, and `mp3-320`.
 Profiles require a visibly lossless source codec unless `allow_lossy=True` is
 explicit; this is a codec check, not certification of original source provenance.
+Only an explicit known-lossless allowlist satisfies that check. Companded PCM
+and ambiguous/unknown codecs, including WavPack, require opt-in. This can reject
+an actually lossless WavPack input until its mode can be established reliably.
+The policy follows the lossless/lossy distinctions in
+[FFmpeg codec descriptors](https://github.com/FFmpeg/FFmpeg/blob/master/libavcodec/codec_desc.c).
 The preservation profile rejects requested sample-property changes. Generic
 conversion retains its compatibility behavior and permits deliberate lossy inputs.
 VBR quality is explicit and is never inferred from average source bitrate.

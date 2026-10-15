@@ -137,7 +137,30 @@ class AudioInfo:
 
     @property
     def lossless(self) -> bool:
-        return self.codec.startswith("pcm_") or self.codec in {"flac", "alac", "wavpack", "ape"}
+        return self.codec in LOSSLESS_CODECS
+
+    @property
+    def lossy(self) -> bool:
+        return self.codec in LOSSY_CODECS
+
+
+# Conservative codec-level evidence only. Companded PCM is lossy; WavPack can
+# be hybrid/lossy, so its codec name alone cannot establish lossless input.
+# Source: FFmpeg libavcodec/codec_desc.c AV_CODEC_PROP_LOSSLESS/LOSSY flags.
+LOSSLESS_CODECS = frozenset("""
+    flac alac ape
+    pcm_s16le pcm_s16be pcm_u16le pcm_u16be pcm_s8 pcm_u8
+    pcm_s32le pcm_s32be pcm_u32le pcm_u32be
+    pcm_s24le pcm_s24be pcm_u24le pcm_u24be pcm_s24daud
+    pcm_s16le_planar pcm_s8_planar pcm_s24le_planar pcm_s32le_planar pcm_s16be_planar
+    pcm_dvd pcm_dvda pcm_bluray pcm_lxf s302m
+    pcm_f32be pcm_f32le pcm_f64be pcm_f64le pcm_s64le pcm_s64be
+    pcm_f16le pcm_f24le pcm_sga
+""".split())
+
+LOSSY_CODECS = frozenset(
+    {"pcm_alaw", "pcm_mulaw", "pcm_vidc", "mp3", "aac", "opus", "vorbis", "wmav1", "wmav2"}
+)
 
 
 PROFILES = {

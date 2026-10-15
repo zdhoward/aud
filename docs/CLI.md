@@ -136,6 +136,10 @@ supported flags include `--sample-rate`, `--bit-depth`, `--bit-rate` (kb/s),
 `--channels`, `--profile`, `--allow-lossy`, and `--drop-artwork`. See
 [audio chains](AUDIO_CHAINS.md) and [conversion](FFMPEG_CONVERSION.md) for limits.
 
+Explicit output options require `--format` even when their supplied value is
+zero; invalid values never silently fall back to in-place effects. Config parsing
+also rejects exponent overflow (for example `1e999`) as a non-finite number.
+
 `album.json`:
 
 ```json

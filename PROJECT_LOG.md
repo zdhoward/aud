@@ -1,5 +1,22 @@
 # Project log
 
+## 2026-10-15: Independent source follow-up and stack checkpoint
+
+- Reviewed the ten-layer draft stack at `918ce49`; every existing head was
+  mergeable and green in CI. Keep integration ordered; no merge or release action.
+- Independent delivery/interface reviewers found two correctness/data-policy
+  defects: companded PCM bypassed lossless consent, and zero CLI output options
+  could fall through to in-place effects. The maintainer traced both, corrected
+  them, and obtained source rechecks. WavPack/unknown codecs now fail conservatively
+  and receive unverified derivative labels when explicitly permitted.
+- Also reject JSON exponent overflow and extend CodeQL to stacked PR bases.
+  All 100 affected development checks pass; full local release tests stay deferred.
+  Exact-version OSV query: zero matches across 65 Python packages at 11:47 UTC.
+- No cross-principal defect confirmed in this focused source scope. Native
+  adversarial validation, FFmpeg patch maintenance, OS resource limits, and live
+  provider/release settings remain open. See the review checkpoint for gates.
+  No version bump, tag, release, or PyPI publication.
+
 ## 2026-10-15: Explicit filename candidate metadata
 
 - Added `feat/filename-parsing` above media conformance. `FilenamePattern` uses

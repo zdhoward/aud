@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import signal
 import sys
 from dataclasses import asdict
@@ -71,8 +72,19 @@ def _load(path):
     def constant(value):
         raise ValueError(f"Non-finite JSON number: {value}")
 
+    def finite_float(value):
+        parsed = float(value)
+        if not math.isfinite(parsed):
+            raise ValueError("Non-finite JSON number")
+        return parsed
+
     return _object(
-        json.loads(data.decode("utf-8-sig"), object_pairs_hook=pairs, parse_constant=constant),
+        json.loads(
+            data.decode("utf-8-sig"),
+            object_pairs_hook=pairs,
+            parse_constant=constant,
+            parse_float=finite_float,
+        ),
         "Configuration",
     )
 
@@ -201,17 +213,20 @@ def _plan(directory, args, cancel):
             if not isinstance(name, str) or name not in EFFECTS:
                 raise ValueError("Unknown effect type")
             effects.append(EFFECTS[name](**row))
-        if args.format is None and any(
-            (
-                args.output_directory,
-                args.profile,
-                args.sample_rate,
-                args.bit_depth,
-                args.bit_rate,
-                args.channels,
-                args.allow_lossy,
-                args.drop_artwork,
+        if args.format is None and (
+            any(
+                value is not None
+                for value in (
+                    args.output_directory,
+                    args.profile,
+                    args.sample_rate,
+                    args.bit_depth,
+                    args.bit_rate,
+                    args.channels,
+                )
             )
+            or args.allow_lossy
+            or args.drop_artwork
         ):
             raise ValueError("Effects output options require --format")
         return directory.plan().add(

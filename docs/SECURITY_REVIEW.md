@@ -1,4 +1,4 @@
-# Initial security review, 2026-10-14
+# Security review record
 
 The initial quick source audit reviewed commit `98a9a7c`, before implementation,
 across the local library, selection, adapters, operations, packaging and workflows.
@@ -73,6 +73,45 @@ constructors; it accepts no shell commands, dynamic imports, or raw filters.
 CLI paths are trusted local caller choices, not a containment boundary. Terminal
 path/tag/error strings are escaped. This focused source review does not provide
 independent security verification or adversarial native-execution evidence.
+
+## Independent follow-up, 2026-10-15
+
+Two independent source reviewers examined `918ce49`: one covered album delivery,
+archive members, stamps, consent/limits, and shared filesystem publication; the
+other covered CLI/config, naming/filename parsing, progress, JSON contracts, and
+facade integration. The maintainer agent separately reviewed native invocation,
+effects compilation, workflows, and stack state. This is focused source coverage,
+not a full re-audit of every legacy operation or adversarial decoder validation.
+
+The reviewers found no confirmed cross-principal vulnerability in those scopes.
+They did identify two correctness/data-policy defects, independently traced by
+the maintainer agent and fixed on `fix/review-follow-up`:
+
+- Every `pcm_*` codec was treated as lossless. Companded A-law/mu-law/VIDC now
+  require consent. WavPack can be hybrid/lossy, so its codec name is insufficient
+  too. The explicit allowlist now fails conservatively; package manifests
+  distinguish recognized lossy from unverified source derivatives. See
+  [FFmpeg's codec descriptors](https://github.com/FFmpeg/FFmpeg/blob/master/libavcodec/codec_desc.c).
+- Explicit zero-valued CLI output options were ignored for effects without a
+  final format, allowing unintended in-place work. Presence checks now reject
+  those options before execution. Config parsing also rejects exponent overflow.
+
+Both reviewers rechecked the corrections in source without executing target code.
+Separate ordinary development regressions passed 100 affected CLI/engine/media
+checks. These tests are not sandboxed adversarial audit evidence. New CodeQL PR
+coverage includes feature-branch bases; previously only the bottom stack layer
+received CodeQL analysis.
+
+An exact-version OSV batch query found zero matches among 65 installed third-party
+Python packages at 2026-10-15 11:47 UTC, including the newer JSON-schema tooling.
+No raw environment inventory or credentials are retained here. This is a dated
+inventory result, not a guarantee about other installations or future resolutions.
+The local native binary remains FFmpeg 8.0.1; the previously recorded patch gap
+is still open. No system binary or provider settings were changed.
+
+See [the stack checkpoint](REVIEW_CHECKPOINT.md) for release/port gates. Earlier
+author-only packaging/CLI notes above are historical; the focused independent
+source follow-up now covers those paths, with native/adversarial gaps unchanged.
 
 Remaining work includes sandboxed native validation, OS-enforced decoder memory
 limits, effects process limits/cancellation, stronger metadata/sidecar validation,

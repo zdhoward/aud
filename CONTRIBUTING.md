@@ -114,8 +114,8 @@ Category labels:
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `ci.yml` | push/PR to master | lint (black, ruff, mypy); test matrix Linux + macOS + Windows, Python 3.10-3.12; coverage gate at 85% with artifact upload |
-| `codeql.yml` | push/PR, weekly | Python security scanning |
+| `ci.yml` | main/master push, all PR bases | lint (black, ruff, mypy); test matrix Linux + macOS + Windows, Python 3.10-3.12; coverage gate at 85% with artifact upload |
+| `codeql.yml` | main/master push, all PR bases, weekly | Python security scanning, including stacked PRs |
 | `publish.yml` | maintainer manual dispatch | validates an existing release tag/version/changelog, builds, `twine check`, and publishes to PyPI via trusted publishing |
 | Dependabot | weekly | pip and github-actions updates, PRs with full CI |
 
