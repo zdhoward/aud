@@ -66,6 +66,10 @@
 
 ### Changed
 
+- Candidate and publishing builds now share bounded distribution validation,
+  including wheel RECORD hashes, metadata/entry points, archive paths, and matching
+  wheel/sdist package contents before artifact review.
+
 - Added manual release-candidate evidence automation for source/secret/dependency
   scans and wheel/sdist build, member-path checks, and clean installation smoke
   checks. It cannot publish and does not run during ordinary development.
