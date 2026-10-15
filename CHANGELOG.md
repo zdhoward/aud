@@ -66,6 +66,10 @@
 
 ### Changed
 
+- Added manual release-candidate evidence automation for source/secret/dependency
+  scans and wheel/sdist build, member-path checks, and clean installation smoke
+  checks. It cannot publish and does not run during ordinary development.
+
 - Defined an aud-specific 22-check pre-publication security gate and evidence
   template. Candidate scans and full tests remain separate from scoped development
   checks. Manual publishing separates read-only building from OIDC upload and

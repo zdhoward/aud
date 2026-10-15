@@ -12,6 +12,37 @@ unreviewed finding, or unavailable sandbox is an incomplete check, not a pass.
 An exclusion requires source evidence, applicability, rationale, owner, and
 expiry/recheck trigger. No blanket scanner suppression or automatic dependency fix.
 
+## Manual evidence workflow
+
+Dispatch `release-candidate.yml` only from a reviewed trusted workflow ref. It checks
+out that dispatch commit, not an arbitrary candidate input. Record the full SHA
+and run URL. The workflow is manual-only, read-only, and cannot publish. It runs
+Bandit, Semgrep, full-history/working-tree Gitleaks, and pip-audit against the
+resolved development/CLI/runtime dependencies. Findings fail their steps; later
+checks still run and evidence uploads on failure. Failed installs, service errors,
+and missing reports are incomplete checks, never clean results.
+
+The independent distribution job builds wheel/sdist, checks metadata, inventories
+members, rejects unsafe paths/links/private build directories, and installs each
+artifact into a fresh environment outside the checkout. It checks import location,
+version, bundled schema, and dependency consistency. This is a packaging smoke
+check, not the installed regression suite or an import-side-effect sandbox.
+
+Tool versions are pinned and their resolved Python dependencies are recorded;
+Gitleaks binaries are checked against a pinned upstream SHA-256. Transitive tool
+and candidate/build dependencies are not locked. Semgrep's `p/python` registry is
+mutable: rule snapshot/replay evidence still needs review before approving a
+candidate. These initial automation checks do not complete all 22 gates, scan
+unpacked artifact contents for secrets, test native adversarial inputs, or replace
+the supported-platform CI/full final-candidate suite.
+
+Artifacts expire after 14 days and may be accessible to repository readers.
+Gitleaks reports are redacted; other reports contain public source excerpts and
+dependency metadata. Never add private credentials or private candidate inputs to
+this workflow. Transfer reviewed evidence to the candidate record before expiry.
+Candidate artifacts are evidence only; the publication workflow builds its own
+files, which must be validated separately before its environment approval.
+
 ## aud's actual trust boundaries
 
 - Caller-selected source/output directories are intentional local API inputs.
