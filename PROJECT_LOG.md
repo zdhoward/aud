@@ -1,5 +1,20 @@
 # Project log
 
+## 2026-10-15: Media and recovery conformance corpus
+
+- Added `test/media-conformance` above JSON contracts. Data-only media fixtures
+  record exact decoded PCM, metadata/artwork pixels, lossy settings, recovery
+  outcomes, collisions, album payload/checksum behavior, and local delivery rules.
+  The Python reference runner validates actual results against the v1 schema.
+- Controlled failure/cancellation injection happens after staging and before
+  publication. Cases preserve sources/existing destinations and check owned
+  cleanup. Duration boundaries use policy checks without encoding hours of audio.
+- All 28 new corpus cases passed across scoped runs (20 initial cases; then the
+  eight added delivery cases and two changed MP3 assertions). Lint/format checks
+  pass. Runtime behavior is unchanged; full local release tests remain deferred.
+  Broader media/effect/alias coverage and independent security validation remain
+  open. No version bump, merge, tag, release, or PyPI publication.
+
 ## 2026-10-15: Versioned JSON contracts and initial corpus
 
 - Added `feat/json-contracts` above progress. Opt-in v1 envelopes and a bundled

@@ -67,7 +67,9 @@ Error text, timings, absolute paths, and encoder versions vary by environment.
 The archive manifest's existing version is separate; its full schema is not
 included in this first interchange contract.
 
-The [portable corpus](../conformance/v1/README.md) starts the port conformance
-gate with deterministic copy, naming, status, and document cases. Add metadata
-alias, audio fidelity, recovery, sidecar, and provider-specific cases before
-claiming complete cross-language equivalence. Wider release tests remain required.
+The [portable corpus](../conformance/v1/README.md) covers representative copy,
+naming, status/document, PCM fidelity, metadata/artwork, lossy settings, recovery,
+album/sidecar, and delivery-policy cases. Broader alias/effect/media combinations,
+active process cancellation, and provider-specific end-to-end behavior still need
+coverage before claiming complete cross-language equivalence. Wider release
+tests remain required.
