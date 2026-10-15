@@ -281,41 +281,42 @@ class FFmpegEngine:
             ),
         )
 
-    def _decoded_duration(self, source: Path) -> float:
-        progress = self.runner.run(
-            [
-                self._tool("ffmpeg"),
-                "-nostdin",
-                "-v",
-                "error",
-                "-xerror",
-                "-max_alloc",
-                "67108864",
-                *self._input(source),
-                "-map",
-                "0:a:0",
-                "-threads",
-                "1",
-                "-progress",
-                "pipe:1",
-                "-stats_period",
-                "60",
-                "-f",
-                "null",
-                "-",
-            ]
-        )
-        times = [
-            line.partition(b"=")[2]
-            for line in progress.splitlines()
-            if line.startswith(b"out_time_us=")
-        ]
-        if not times:
-            raise ValueError("Decoded duration is unavailable")
-        duration = int(times[-1]) / 1_000_000
-        if not math.isfinite(duration) or duration < 0:
-            raise ValueError("Invalid decoded duration")
-        return duration
+    def _decoded_duration(self, source: Path, info: AudioInfo | None = None) -> float:
+        info = info or self.probe(source)
+        with tempfile.TemporaryDirectory(prefix="aud-analysis-") as directory:
+            pcm = Path(directory) / "duration.pcm"
+            self.runner.run(
+                [
+                    self._tool("ffmpeg"),
+                    "-nostdin",
+                    "-v",
+                    "error",
+                    "-y",
+                    "-xerror",
+                    "-max_alloc",
+                    "67108864",
+                    *self._input(source),
+                    "-map",
+                    "0:a:0",
+                    "-threads",
+                    "1",
+                    "-c:a",
+                    "pcm_s16le",
+                    "-ar",
+                    str(info.sample_rate),
+                    "-ac",
+                    str(info.channels),
+                    "-f",
+                    "s16le",
+                    str(pcm),
+                ],
+                output=pcm,
+            )
+            size = pcm.stat().st_size
+            frame_size = info.channels * 2
+            if size % frame_size:
+                raise ValueError("Duration analysis output is not frame-aligned")
+            return size / (info.sample_rate * frame_size)
 
     def convert(self, source: Path, operation, destination: Destination, *, effects=()) -> dict:
         from aud.core.effect_chain import compile_effects, validate_effects
@@ -329,7 +330,7 @@ class FFmpegEngine:
             if any(isinstance(effect, Fade) and effect.fade_out for effect in effects) and (
                 not info.lossless or duration is None
             ):
-                duration = self._decoded_duration(source)
+                duration = self._decoded_duration(source, info)
         filters, expected_duration = (
             compile_effects(effects, info.sample_rate, info.channels, duration)
             if effects

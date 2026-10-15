@@ -41,7 +41,9 @@ even), and fade-out is measured from the current duration after preceding pads.
 A fade-out longer than the known track duration is rejected.
 For fade-out on lossy input or unavailable header duration, a bounded analysis
 decode measures actual duration first, avoiding encoder-padding timing errors.
-This analysis adds a decode pass; it does not create an intermediate encode.
+It counts frames in a temporary 16-bit PCM file, constrained by the same output
+byte cap and timeout and removed on success, failure, or cancellation. This adds
+a decode pass and scratch disk use; it does not create a lossy generation.
 Left/right phase inversion requires stereo; `both` applies to all channels. Filter cutoffs must be
 positive and below source Nyquist. No user-supplied filter strings are accepted.
 

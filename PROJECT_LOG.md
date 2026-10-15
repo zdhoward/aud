@@ -15,6 +15,8 @@
 - Focused source review found missing-field preflight and lossy fade timing gaps.
   Validate required fields explicitly; measure decoded duration for timing-sensitive
   lossy chains using the bounded runner. Regression checks cover both corrections.
+- Linux CI exposed version-dependent progress timestamps. Timing analysis now
+  counts bounded temporary PCM frames so fade endpoints follow decoded samples.
 - Remaining effects and pydub removal are incomplete. No release, tag, merge, or
   PyPI publication; version remains 2.0.2.
 

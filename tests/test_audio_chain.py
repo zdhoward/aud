@@ -109,6 +109,35 @@ def test_lossy_fade_out_uses_decoded_duration(populated_dir):
     assert rms(samples[-220:]) < rms(samples[4400:4620]) * 0.1
 
 
+@pytest.mark.parametrize("cancelled", [False, True])
+def test_duration_analysis_removes_scratch_on_failure(tmp_path, monkeypatch, cancelled):
+    import tempfile
+
+    from aud.core.ffmpeg import AudioInfo
+    from aud.core.results import OperationCancelled
+
+    temporary_directory = tempfile.TemporaryDirectory
+    monkeypatch.setattr(
+        "aud.core.ffmpeg.tempfile.TemporaryDirectory",
+        lambda **kwargs: temporary_directory(dir=tmp_path, **kwargs),
+    )
+    engine = FFmpegEngine()
+    monkeypatch.setattr(engine, "_tool", lambda name: name)
+    source = tmp_path / "source.mp3"
+    source.write_bytes(b"source")
+    error = OperationCancelled if cancelled else ValueError
+
+    def fail(arguments, output=None):
+        output.write_bytes(b"partial")
+        raise error("stopped")
+
+    monkeypatch.setattr(engine.runner, "run", fail)
+    with pytest.raises(error):
+        engine._decoded_duration(source, AudioInfo("mp3", 44100, 2, None, 0.25, 320000))
+    assert not list(tmp_path.glob("aud-analysis-*"))
+    assert source.read_bytes() == b"source"
+
+
 def test_chain_failure_does_not_publish_or_run_dependent_names(populated_dir, monkeypatch):
     original = (populated_dir / "bloop.wav").read_bytes()
 
