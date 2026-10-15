@@ -1,5 +1,11 @@
 # Safe processing contract
 
+Unreleased [album packages](ALBUM_PACKAGING.md) use the same destination policy
+and staged publication for one ZIP. Their grouped result leaves source selection
+unchanged. Archive members receive portable path/tree collision checks; sidecars
+are copied without interpreting references. Failed/cancelled packages clean only
+their owned ZIP/conversion staging files.
+
 This implementation slice preserves existing boolean convenience methods and
 allowlist override behavior. New options are keyword-only: `overwrite` defaults
 to `error`, `follow_symlinks` defaults to false, and `pattern` narrows the selection

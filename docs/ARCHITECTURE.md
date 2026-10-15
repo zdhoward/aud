@@ -98,6 +98,13 @@ do not reach later steps. A batch does not roll back completed outputs.
 
 ## Known limitations
 
+Album preparation is a grouped `AlbumPackage` plan alongside per-file `Plan`.
+`packaging.py` owns portable archive members, input snapshots, staged ZIP
+publication, manifest/checksums, and bounded sidecar copies. `delivery.py` stores
+versioned provider subsets and source guides; conversion reuses `FFmpegEngine`.
+Generic packaging copies originals; service packages create explicit derivatives.
+See [the packaging contract](ALBUM_PACKAGING.md).
+
 * Non-recursive scanning only (recursive option planned).
 * Effects still decode entire files through pydub and lack active cancellation;
   direct conversions avoid loading decoded tracks into Python memory.

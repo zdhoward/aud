@@ -4,6 +4,14 @@
 
 ### Added
 
+- Local album ZIP plans, previews, grouped results, checksums, and opaque sidecars.
+  Generic packages preserve original bytes; delivery profiles prepare audio and
+  artwork for Amuse, DistroKid, TuneCore, CD Baby, RouteNote, Ditto, LANDR, and
+  UnitedMasters. Profile revisions cite dated provider guides. Sample changes
+  and lossy inputs require explicit consent; portal review remains manual.
+- Service packaging strips embedded metadata/artwork and applies triangular
+  dither when reducing to 16-bit. Ordinary conversions keep their existing defaults.
+
 - Reusable `NamingProfile` directory/filename templates over canonical metadata,
   with disc-aware numbering, explicit defaults, case/spacing/ASCII options, and
   missing-field error/skip policies. `plan_naming()` snapshots metadata for safe

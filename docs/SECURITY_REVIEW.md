@@ -56,6 +56,16 @@ naming also rejects distinct root aliases. Case/Unicode regressions cover the fi
 No further concrete blocker was found in this source scope. No adversarial target
 execution was performed for this follow-up.
 
+The album packaging source follow-up checked archive traversal/portable aliases,
+input changes, copied sidecar references, bounded writes, conversion flags, and
+publication cleanup. Prepared packages now revalidate profile revisions, output
+settings, explicit consent, source coverage, and release metadata. Ordinary
+regressions cover these checks, cancellation, and preserved existing output.
+Artwork parsing uses a bounded JPEG subset followed by the existing restricted
+decoder. Checksums establish file integrity, not provenance or trust. This was
+a maintainer-agent source review; independent packaging review and sandboxed
+adversarial native execution remain outstanding.
+
 Remaining work includes sandboxed native validation, OS-enforced decoder memory
 limits, effects process limits/cancellation, stronger metadata/sidecar validation,
 and release/provider settings verification. Hostile concurrent directory/source
