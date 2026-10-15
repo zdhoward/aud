@@ -10,6 +10,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from aud import AudioChain, AudioMetadata, Dir, MediaLimits, NamingProfile, __version__
+from aud.contracts import json_document
 from aud.core.ffmpeg import FORMATS, PROFILES, FFmpegEngine
 from aud.core.operations.audio.convert import ConvertFormat
 from aud.core.operations.audio.effects import (
@@ -124,6 +125,9 @@ def _parser():
         command.add_argument("--pattern", help="Narrow selection with a filename glob")
         command.add_argument("--json", action="store_true", help="Emit one JSON document on stdout")
         command.add_argument(
+            "--json-version", type=int, choices=[1], help="Opt into versioned --json output"
+        )
+        command.add_argument(
             "--progress", action="store_true", help="Write file-level progress to stderr"
         )
         command.add_argument("--timeout", type=float, default=300.0, help="Per-process seconds")
@@ -234,7 +238,9 @@ def _plan(directory, args, cancel):
     return directory.plan_album(args.target, service=args.service, cancel=cancel, **config)
 
 
-def _emit(data, machine):
+def _emit(data, machine, *, version=None, kind=None):
+    if version is not None:
+        data = json_document(kind, data, version=version)
     if machine:
         print(json.dumps(data, ensure_ascii=True, allow_nan=False))
     else:
@@ -256,6 +262,8 @@ def run(argv=None, *, cancel=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     try:
         args = _parser().parse_args(argv)
+        if args.json_version is not None and not args.json:
+            raise UsageError("--json-version requires --json")
     except UsageError as error:
         data = {"succeeded": False, "error": str(error), "exit_code": 2, "result": None}
         if "--json" in argv:
@@ -309,13 +317,22 @@ def run(argv=None, *, cancel=None):
                 result = directory.execute(
                     plan, cancel=cancel, continue_on_error=args.continue_on_error, progress=progress
                 )
-                _emit(result.to_dict(), args.json)
+                _emit(result.to_dict(), args.json, version=args.json_version, kind="result")
                 return (
                     130
                     if any(item.status == "cancelled" for item in result.items)
                     else (0 if result else 1)
                 )
-        _emit(data, args.json)
+        if args.json_version is not None and "dry_run" in data:
+            payload = data["preview"]
+            _emit(
+                payload,
+                True,
+                version=args.json_version,
+                kind="album_preview" if payload.get("operation") == "AlbumPackage" else "preview",
+            )
+        else:
+            _emit(data, args.json, version=args.json_version, kind=args.command)
         return 0
     except (Exception, KeyboardInterrupt) as error:
         cancelled = isinstance(error, (OperationCancelled, KeyboardInterrupt))
@@ -328,7 +345,7 @@ def run(argv=None, *, cancel=None):
             "result": result,
         }
         if args.json:
-            _emit(data, True)
+            _emit(data, True, version=args.json_version, kind="error")
         else:
             print(json.dumps(data, ensure_ascii=True, indent=2), file=sys.stderr)
         return code

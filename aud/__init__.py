@@ -4,6 +4,7 @@ __version__ = "2.0.2"
 
 # Import the Dir class from the aud module
 from aud.aud import Dir
+from aud.contracts import json_document, json_schema
 from aud.core.delivery import DELIVERY_PROFILES, DeliveryProfile, delivery_profile
 from aud.core.ffmpeg import MediaLimits
 from aud.core.metadata import AudioMetadata
@@ -14,6 +15,8 @@ from aud.core.progress import ProgressEvent
 
 __all__ = [
     "Dir",
+    "json_document",
+    "json_schema",
     "MediaLimits",
     "AudioChain",
     "AudioMetadata",

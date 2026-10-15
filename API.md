@@ -328,6 +328,11 @@ Configuration getters return their respective values:
 
 ## Notes
 
+`json_document(kind, payload, version=1)` snapshots a versioned interchange
+envelope; `json_schema(version=1)` reads its bundled schema without network I/O.
+Existing `to_dict()` outputs stay unchanged. See [JSON contracts](docs/JSON_CONTRACTS.md)
+for kind selection, external validation, extensibility, and compatibility limits.
+
 `Dir.execute(plan, progress=callback)` and `package_album(..., progress=callback)`
 optionally emit immutable `ProgressEvent` objects (`to_dict()` is JSON-safe).
 Fields are `phase`, `operation`, `completed`, `total`, `source`, `target`, and

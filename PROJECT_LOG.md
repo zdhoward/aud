@@ -1,5 +1,19 @@
 # Project log
 
+## 2026-10-15: Versioned JSON contracts and initial corpus
+
+- Added `feat/json-contracts` above progress. Opt-in v1 envelopes and a bundled
+  Draft 2020-12 schema give integrations/ports a concrete output contract while
+  preserving Python `to_dict()` and plain CLI JSON. Schema version is separate
+  from package SemVer; executable job replay remains outside scope.
+- Added portable copy/naming/status fixtures and actual-output schema checks.
+  Core fields are fixed; settings/details and complete provider/media semantics
+  remain extensible. The initial corpus is not the full port acceptance gate.
+- All 55 focused contract/CLI/progress tests passed. Full local release testing
+  remains deferred. Touched-source lint/types pass; an isolated wheel build and
+  separate target installation verified bundled schema access. No release,
+  version bump, tag, merge, or PyPI publication.
+
 ## 2026-10-15: Observational execution progress
 
 - Added `feat/cli-progress` above the CLI layer. Immutable progress events report

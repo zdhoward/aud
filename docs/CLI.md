@@ -30,6 +30,10 @@ available, including its empty default selection; use `list` for useful output.
 
 ## Commands and output
 
+Opt into versioned interchange with `--json --json-version 1`. See
+[JSON contracts](JSON_CONTRACTS.md) for envelopes and compatibility; plain
+`--json` is unchanged.
+
 | Command | Behavior |
 | --- | --- |
 | `list` | Selected filenames, without decoding media. |
@@ -150,8 +154,9 @@ before sharing it.
 ## Remaining interface work
 
 This CLI has no interactive menus, saved job
-replay, or arbitrary multi-operation configuration. Finer media-time progress and stable
-versioned cross-language JSON schemas remain part of the readiness work. Optional
+replay, or arbitrary multi-operation configuration. Opt-in v1 JSON contracts and
+initial portable fixtures are available; broader cross-language conformance and
+finer media-time progress remain part of readiness work. Optional
 `[cli]` dependencies remain available for compatibility but are not imported.
 The implementation uses Python 3.10-compatible
 [argparse](https://docs.python.org/3.10/library/argparse.html) and

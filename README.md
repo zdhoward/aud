@@ -249,6 +249,9 @@ and an optional web UI is planned as a separate install.
 
 ## Documentation
 
+Unreleased [versioned JSON contracts](docs/JSON_CONTRACTS.md) and a portable
+conformance corpus provide a starting reference for integrations and future ports.
+
 The unreleased [command line interface](docs/CLI.md) supports list/inspect,
 conversion, naming, effects, export copies, and album packages with dry runs
 and JSON output. For example: `aud list audio --extensions wav flac --json`.

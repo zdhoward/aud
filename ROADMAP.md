@@ -132,8 +132,10 @@ naming, native effects, export copies, and album packaging. It reuses core plans
 previews/results, bounded JSON configuration, and cancellation. Standard-library
 argparse keeps the base install sufficient; existing `[cli]` extras stay optional.
 File-level progress callbacks and opt-in CLI stderr reporting are implemented.
-Remaining work includes finer media-time progress, interface polish, and versioned JSON
-schemas/conformance fixtures. See [the CLI contract](docs/CLI.md).
+Opt-in [v1 JSON contracts](docs/JSON_CONTRACTS.md) and initial portable conformance
+fixtures now cover core outputs. Remaining work includes finer media-time
+progress, interface polish, and broader media/operation conformance coverage.
+See [the CLI contract](docs/CLI.md).
 
 ## v2.3.0: Optional web UI
 

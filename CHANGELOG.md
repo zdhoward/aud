@@ -4,6 +4,11 @@
 
 ### Added
 
+- Opt-in v1 JSON envelopes, a bundled Draft 2020-12 schema, and portable
+  copy/naming/result conformance fixtures. CLI `--json-version 1` preserves plain
+  `--json` compatibility; Python helpers add no runtime dependencies. Full port
+  equivalence and complete operation-specific schemas remain pending.
+
 - Optional file-level `ProgressEvent` callbacks for execution and album packages,
   plus CLI `--progress` output on stderr. JSON stdout stays unchanged. Album
   payloads report staging separately from final archive publication.
