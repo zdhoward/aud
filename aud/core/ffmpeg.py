@@ -5,7 +5,7 @@ import math
 import os
 import shutil
 import signal
-import subprocess
+import subprocess  # nosec B404
 import sys
 import tempfile
 import time
@@ -57,12 +57,13 @@ class ProcessRunner:
         else:
             options = {"start_new_session": True}
         with tempfile.TemporaryFile() as stdout, tempfile.TemporaryFile() as stderr:
+            # Resolved native executables receive separate argv values without shell expansion.
             process = subprocess.Popen(
                 arguments,
                 stdin=subprocess.DEVNULL,
                 stdout=stdout,
                 stderr=stderr,
-                shell=False,
+                shell=False,  # nosec B603
                 env=environment,
                 **options,
             )

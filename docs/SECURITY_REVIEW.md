@@ -122,3 +122,29 @@ requires its own exposure review before shipping.
 Detailed reports, the coverage ledger, and findings/validation records are retained
 in the maintainer's local audit archive. Raw environment inventories, machine-specific
 locations, and audit scratch data are not committed in this public repository.
+
+## Hosted development evidence, 2026-10-15
+
+After integration at `683286e`, CI and CodeQL passed. The first evidence run exposed
+report-upload and POSIX venv-selection defects in the workflow. The follow-up run
+[`38751474633`](https://github.com/zdhoward/aud/actions/runs/38751474633) retained
+reports and passed distribution integrity, clean installs, import observations,
+and selected installed regressions for both wheel and sdist. Semgrep reported zero
+findings/errors using the retained rule snapshot; Gitleaks reported zero findings
+for full history and the working tree; pip-audit reported zero advisories among
+42 resolved dependencies. These are dated development results, not release approval.
+
+Bandit 1.9.4 reported four low-severity items. Replaced the internal open-archive
+assertion with an explicit exception so optimized Python retains the check. The
+remaining three sites have specific inline exclusions, not disabled rule classes:
+
+| Site / rule | Source-grounded disposition | Recheck trigger |
+| --- | --- | --- |
+| `core/adapters/audio.py`, B311 | Random watermark intervals select audio placement only; no secrets, names, identities, or authorization depend on unpredictability. | Watermark randomness acquires a security purpose or the operation changes. |
+| `core/ffmpeg.py` import, B404 | Import enables the intentional native execution backend. Tool lookup is trusted local configuration, not media-controlled program selection. | Executable resolution, caller trust, or environment policy changes. |
+| `core/ffmpeg.py` Popen, B603 | Engine resolves native tools to absolute paths, uses fixed structured argument construction, `shell=False`, and an allowlisted environment. This does not protect against native decoder flaws or a compromised local toolchain. | Any runner caller, command/argument builder, input protocol, tool lookup, or environment policy changes. |
+
+Review owner: project maintainer. Recheck each site on the next candidate and on
+the triggers above; these dispositions expire at the next release review. Scanner
+exclusion does not accept a demonstrated vulnerability or close native isolation
+gaps. Archive assertion remediation and excluded-site scanning require a fresh run.

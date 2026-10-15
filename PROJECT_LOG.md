@@ -15,6 +15,11 @@
   explicit evidence paths and preserved the venv interpreter path; one focused
   regression passed. Bandit findings need retained-report triage; other scanners,
   archive checks, clean installs, and import observations completed successfully.
+- Follow-up run `38751474633` retained reports and passed both installed artifact
+  jobs. Semgrep/Gitleaks found no findings; pip-audit found no advisories for 42
+  resolved dependencies. Triaged four low-severity Bandit items: replaced an
+  archive assertion and documented three exact-site exclusions with recheck rules.
+  No blanket scanner suppression or native-security certification.
 
 ## 2026-10-15: Documentation review and integration authorization
 
