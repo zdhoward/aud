@@ -4,6 +4,12 @@ The conversion adapter uses FFmpeg directly; effects remain on the existing pydu
 backend during this migration. This slice does not claim Python 3.13+ support for
 the complete package. Existing conversion methods and boolean helpers stay available.
 
+Install both `ffmpeg` and `ffprobe` from a maintained build. MP3 encoding requires
+`libmp3lame`; Ogg/Vorbis encoding requires `libvorbis`. Inspect the available
+encoders with `ffmpeg -encoders`. On macOS, use `brew install ffmpeg-full` and add
+`$(brew --prefix ffmpeg-full)/bin` to PATH; the standard Homebrew build may omit
+Vorbis encoding. See [Homebrew's full formula](https://formulae.brew.sh/formula/ffmpeg-full).
+
 Conversion probes a regular local input, writes to an owned staging file, probes
 and decodes the output, and publishes only after verification. Output rate/channels
 and PCM depth must match the effective request. Lossless-input WAV/FLAC conversions

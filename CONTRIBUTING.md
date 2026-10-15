@@ -10,6 +10,9 @@ pip install -e .[dev]
 ```
 
 ffmpeg must be on `PATH` for audio operations and the test suite.
+The conversion tests also require `ffprobe`, `libmp3lame`, and `libvorbis`; see
+[the FFmpeg setup contract](docs/FFMPEG_CONVERSION.md). macOS CI selects
+Homebrew's `ffmpeg-full` binaries explicitly.
 
 ```
 pytest tests/test_names.py   # example: targeted development check
