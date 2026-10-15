@@ -116,6 +116,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # Project specific
+.release-evidence/
 backups/
 exports/
 *.zip

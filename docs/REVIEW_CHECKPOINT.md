@@ -29,6 +29,12 @@ green checks on prior heads do not certify a later combination.
 
 ## Gates still open
 
+The [aud-specific release security process](RELEASE_SECURITY.md) and
+[22-item evidence template](RELEASE_EVIDENCE_TEMPLATE.md) define candidate checks.
+They are not a completed scanner run or approval. Publication now separates build
+from OIDC upload; reviewed-artifact handoff and provider attestations remain open
+automation gates before production use.
+
 - A maintainer-reviewed release scope, SemVer choice, consistent version/tag/log,
   and the full local release suite on the final candidate. Development checks
   remain focused; no release candidate is declared by this checkpoint.
