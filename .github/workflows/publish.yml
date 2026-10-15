@@ -76,6 +76,28 @@ jobs:
       - name: Check package metadata
         run: twine check dist/*
 
+      - name: Record distribution hashes for review
+        run: |
+          python - <<'PY'
+          import hashlib
+          import os
+          from pathlib import Path
+
+          files = sorted(Path("dist").iterdir())
+          assert len(files) == 2, "expected one wheel and one source distribution"
+          assert sum(p.name.endswith(".whl") for p in files) == 1
+          assert sum(p.name.endswith(".tar.gz") for p in files) == 1
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+              summary.write("## Distribution review\n\n")
+              summary.write("Complete the release evidence checklist against these files before approving the pypi deployment.\n\n")
+              summary.write("```text\n")
+              for path in files:
+                  assert path.is_file() and not path.is_symlink()
+                  digest = hashlib.sha256(path.read_bytes()).hexdigest()
+                  summary.write(f"{digest}  {path.name}\n")
+              summary.write("```\n")
+          PY
+
       - name: Store distributions for the publishing job
         id: distributions
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
@@ -85,8 +107,20 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Record immutable artifact identity
+        env:
+          ARTIFACT_ID: ${{ steps.distributions.outputs.artifact-id }}
+          ARTIFACT_URL: ${{ steps.distributions.outputs.artifact-url }}
+          ARTIFACT_DIGEST: ${{ steps.distributions.outputs.artifact-digest }}
+        run: |
+          test -n "$ARTIFACT_ID"
+          printf '\nArtifact ID: `%s`\n\nDownload: %s\n\nArtifact archive SHA-256: `%s`\n' \
+            "$ARTIFACT_ID" "$ARTIFACT_URL" "$ARTIFACT_DIGEST" >> "$GITHUB_STEP_SUMMARY"
+
   publish:
     needs: build
+    environment:
+      name: pypi
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

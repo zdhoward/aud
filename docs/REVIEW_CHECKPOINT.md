@@ -32,8 +32,9 @@ green checks on prior heads do not certify a later combination.
 The [aud-specific release security process](RELEASE_SECURITY.md) and
 [22-item evidence template](RELEASE_EVIDENCE_TEMPLATE.md) define candidate checks.
 They are not a completed scanner run or approval. Publication now separates build
-from OIDC upload; reviewed-artifact handoff and provider attestations remain open
-automation gates before production use.
+from OIDC upload. The build records artifact identity/hashes and the upload job
+targets `pypi` for approval of the same files. Live environment protections,
+publisher binding, and provider attestations remain open gates before production use.
 
 - A maintainer-reviewed release scope, SemVer choice, consistent version/tag/log,
   and the full local release suite on the final candidate. Development checks
