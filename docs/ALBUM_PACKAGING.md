@@ -123,7 +123,8 @@ are polled application controls, not an OS sandbox or hard memory quotas.
 
 Manifest schema version 1 records release/track metadata, ordered members,
 source/output properties, transformations, profile revision/sources, payload
-sizes and SHA-256 hashes, artwork review status, and a manual checklist.
+sizes and SHA-256 hashes, effective encoder/version and dither policy for
+converted payloads, artwork review status, and a manual checklist.
 Generated manifest paths are archive-relative; caller-supplied metadata and
 sidecars can still contain personal information. Review them before sharing.
 The checksum file covers payloads and manifest, excluding itself. ZIP timestamps

@@ -16,6 +16,8 @@
   packaging/conversion checks: 56 passed; touched-source lint/type checks pass.
   Full local release validation remains deferred; version stays 2.0.2. No merge,
   tag, release, or PyPI upload.
+- Draft PR #78 is linked above the naming layer. CI lint and all nine supported
+  Linux/macOS/Windows Python 3.10-3.12 jobs passed for implementation `fdabd15`.
 
 ## 2026-10-14: Metadata naming profiles
 
