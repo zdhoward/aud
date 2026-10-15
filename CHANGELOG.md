@@ -66,6 +66,10 @@
 
 ### Changed
 
+- Manual candidate validation now runs selected naming and JSON-contract
+  regressions against clean wheel/sdist installations outside the checkout, with
+  module-location guards and retained test reports.
+
 - Candidate and publishing builds now share bounded distribution validation,
   including wheel RECORD hashes, metadata/entry points, archive paths, and matching
   wheel/sdist package contents before artifact review.

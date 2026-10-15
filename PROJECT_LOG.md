@@ -1,5 +1,18 @@
 # Project log
 
+## 2026-10-15: Installed artifact regression checks
+
+- Added copied naming/parser/JSON-contract regressions for both candidate wheel
+  and sdist installs. Isolated Python/importlib-mode pytest and start/end guards
+  reject checkout imports; reports and installed/native versions are retained.
+- GitHub rejected the candidate workflow dispatch with HTTP 404 because the new
+  workflow is absent from the default branch. Documented this integration gate;
+  no merge or trigger workaround was attempted. Scanner results remain pending.
+- Local validation covers the new runner and selected installed-wheel regressions,
+  not a full suite or adversarial native execution: 98 passed, 2 platform skips.
+  Positive/negative checks cover regular and namespace module locations. Prior
+  #88 CI/CodeQL passed. No release/provider changes.
+
 ## 2026-10-15: Shared distribution integrity gate
 
 - Added a non-extracting aud-specific archive validator to candidate and publishing
