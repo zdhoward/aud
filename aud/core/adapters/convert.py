@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from aud.core.adapters.audio_io import AudioIO
+from aud.core.adapters.batch import BatchAdapter
+from aud.core.ffmpeg import FFmpegEngine
 from aud.core.models import AudioFile
 from aud.core.operations.audio.convert import (
     ConvertFormat,
@@ -10,10 +11,14 @@ from aud.core.operations.audio.convert import (
 from aud.core.safety import destinations
 
 
-class ConversionAdapter(AudioIO):
+class ConversionAdapter(BatchAdapter):
     """
-    Executes format / channel conversions using pydub.
+    Executes format/channel conversions without decoding tracks into Python.
     """
+
+    def __init__(self, *, media_limits=None, **kwargs):
+        super().__init__(**kwargs)
+        self.engine = FFmpegEngine(media_limits, cancel=self.cancel)
 
     def export_to(self, operation, inputs, directory):
         pairs = [
@@ -34,63 +39,15 @@ class ConversionAdapter(AudioIO):
 
     def execute_resolved(self, operation, inputs, entries):
         def process(entry):
-            self.destination = entry
-            self._execute_conversion(operation, [AudioFile(entry.source)])
+            conversion = operation
+            if isinstance(operation, (ConvertToMono, ConvertToStereo)):
+                conversion = ConvertFormat(
+                    entry.source.suffix.lstrip("."),
+                    channels=1 if isinstance(operation, ConvertToMono) else 2,
+                )
+            return self.engine.convert(entry.source, conversion, entry)
 
         return self.perform(operation, entries, process)
-
-    def _execute_conversion(self, operation, inputs):
-        if isinstance(operation, ConvertFormat):
-            return self._convert_format(operation, inputs)
-        if isinstance(operation, ConvertToMono):
-            return self._mono(inputs)
-        if isinstance(operation, ConvertToStereo):
-            return self._stereo(inputs)
-
-        raise TypeError(f"Unsupported conversion operation: {operation}")
-
-    def _convert_format(self, op: ConvertFormat, files):
-        outputs: list[AudioFile] = []
-
-        for file in files:
-            audio = self._load(file)
-
-            if op.sample_rate:
-                audio = audio.set_frame_rate(op.sample_rate)
-
-            if op.bit_depth:
-                audio = audio.set_sample_width(self._bit_depth_to_width(op.bit_depth))
-
-            target = file.with_path(file.path.with_suffix(f".{op.target_format}"))
-            export_kwargs = {}
-            if op.bit_rate:
-                export_kwargs["bitrate"] = f"{op.bit_rate}k"
-            self._export(
-                audio,
-                target,
-                format=op.target_format,
-                tags=op.tags,
-                cover=op.cover,
-                **export_kwargs,
-            )
-
-            outputs.append(target)
-
-        return outputs
-
-    def _mono(self, files):
-        for file in files:
-            audio = self._load(file)
-            audio = audio.set_channels(1)
-            self._export(audio, file)
-        return files
-
-    def _stereo(self, files):
-        for file in files:
-            audio = self._load(file)
-            audio = audio.set_channels(2)
-            self._export(audio, file)
-        return files
 
     @staticmethod
     def _bit_depth_to_width(bit_depth: int) -> int:
@@ -98,9 +55,8 @@ class ConversionAdapter(AudioIO):
             return 1
         if bit_depth == 16:
             return 2
+        if bit_depth == 24:
+            return 3
         if bit_depth == 32:
             return 4
-        raise ValueError(
-            f"Unsupported bit depth: {bit_depth} "
-            f"(pydub cannot encode {bit_depth}-bit audio; use 8, 16, or 32)"
-        )
+        raise ValueError(f"Unsupported bit depth: {bit_depth} " "(use 8, 16, 24, or 32)")

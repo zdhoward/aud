@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from aud.core.models import AudioFile
-from aud.core.results import BatchResult, FileResult
+from aud.core.results import BatchResult, FileResult, OperationCancelled
 from aud.core.safety import Destination, validate_policy
 
 
@@ -15,7 +15,7 @@ class BatchAdapter:
         self.cancel = cancel
 
     def perform(
-        self, operation, entries: list[Destination], action: Callable[[Destination], None]
+        self, operation, entries: list[Destination], action: Callable[[Destination], dict | None]
     ) -> list[AudioFile]:
         self.result = BatchResult()
         outputs = []
@@ -41,15 +41,36 @@ class BatchAdapter:
                     outputs.append(AudioFile(entry.source))
                 continue
             try:
-                action(entry)
+                details = action(entry) or {}
                 outputs.append(AudioFile(entry.target))
-                self.result.items.append(FileResult(source, str(entry.target), name, "success"))
+                self.result.items.append(
+                    FileResult(source, str(entry.target), name, "success", details=details)
+                )
             except Exception as error:
                 self.result.items.append(
-                    FileResult(source, str(entry.target), name, "failed", str(error))
+                    FileResult(
+                        source,
+                        str(entry.target),
+                        name,
+                        "cancelled" if isinstance(error, OperationCancelled) else "failed",
+                        str(error),
+                    )
                 )
                 if entry.source is not None and entry.source.exists():
                     outputs.append(AudioFile(entry.source))
+                if isinstance(error, OperationCancelled):
+                    for remaining in entries[index + 1 :]:
+                        self.result.items.append(
+                            FileResult(
+                                str(remaining.source) if remaining.source is not None else None,
+                                str(remaining.target),
+                                name,
+                                "cancelled",
+                            )
+                        )
+                        if remaining.source is not None and remaining.source.exists():
+                            outputs.append(AudioFile(remaining.source))
+                    break
                 if not self.continue_on_error:
                     for remaining in entries[index + 1 :]:
                         self.result.items.append(

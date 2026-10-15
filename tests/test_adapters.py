@@ -50,6 +50,7 @@ def test_zip_apply_returns_archive():
     [
         (8, 1),
         (16, 2),
+        (24, 3),
         (32, 4),
     ],
 )
@@ -57,7 +58,7 @@ def test_bit_depth_to_width(bit_depth, expected_width):
     assert ConversionAdapter._bit_depth_to_width(bit_depth) == expected_width
 
 
-@pytest.mark.parametrize("bit_depth", [12, 24, 64])
+@pytest.mark.parametrize("bit_depth", [12, 64])
 def test_bit_depth_to_width_rejects_unsupported_depth(bit_depth):
     with pytest.raises(ValueError) as excinfo:
         ConversionAdapter._bit_depth_to_width(bit_depth)

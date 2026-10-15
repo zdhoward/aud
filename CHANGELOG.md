@@ -4,6 +4,14 @@
 
 ### Added
 
+- Direct FFmpeg conversions with true 24-bit PCM, explicit encoding profiles
+  (`flac-preserve`, `mp3-v0`, `mp3-v2`, `mp3-320`), output directories, and
+  channel selection. `MediaLimits` bounds process time and output sizes;
+  active conversion cancellation cleans staging and records cancelled outcomes.
+- Conversion results report effective encoder settings and unmapped metadata.
+  Container/audio-stream tags and MP3/FLAC artwork survive supported conversions;
+  unsupported artwork requires explicit opt-in to drop it.
+
 - Overwrite policies (`error`, `skip`, `overwrite`, `auto-rename`), link-safe
   scanning, and a narrowing filename `pattern` glob on `Dir`.
 - Public `plan()`, validated `preview()`, and `execute()` APIs with per-file

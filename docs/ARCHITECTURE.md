@@ -17,7 +17,7 @@ Plan (aud/core/plan.py) -- a file set + an ordered list of Operations
   v
 FileSystemAdapter | AudioAdapter | ConversionAdapter
   |                    |                |
-  shutil/path ops     pydub (ffmpeg)  pydub (ffmpeg)
+  shutil/path ops     pydub (ffmpeg)  FFmpegEngine
 ```
 
 ### Dir
@@ -33,7 +33,7 @@ directory is re-scanned on construction and after every `config_set_*` call.
 
 ### Operations
 
-Operations (`aud/core/operations/`) are immutable intent objects. Their
+Operations (`aud/core/operations/`) describe intent. Their
 `apply(file)` is a **pure function**: it returns the `AudioFile` (or path)
 the file would become, and performs no I/O. This is what makes
 `Plan.preview()` safe. Since v2.0.2, preview also copies operations, so
@@ -48,9 +48,10 @@ results are computed by the adapter, not by the intent object.
 
 Adapters (`aud/core/adapters/`) execute a plan's operations and perform all
 I/O. Dispatch is by `isinstance` on the operation type; unknown operations
-raise `TypeError`. Audio and conversion adapters wrap pydub, which shells out
-to ffmpeg (ffmpeg must be installed for audio work). Adapters return the
-updated file list, which becomes the new selection.
+raise `TypeError`. Effects use pydub; conversions use `FFmpegEngine` with explicit
+argument arrays, probe/encode/decode verification, process limits, and cancellation.
+Both require FFmpeg on PATH. The shared executor preflights all steps and records
+per-file results; only successful transitions change the selection.
 
 Operations on an empty selection are no-ops (since v2.0.2: no empty archives,
 no placeholder audio files).
@@ -65,9 +66,10 @@ so plans can be built fluently.
 
 `Dir` methods raise typed exceptions (`FilenameError`, `FileError`,
 `AudioFXError`, `ConvertError`, `ExportError`) that wrap and chain the
-original cause (`raise ... from e` since v2.0.2). One bad file aborts the
-batch; a per-file results API is planned for v2.1.0 (see
-[ROADMAP.md](../ROADMAP.md)).
+original cause (`raise ... from e` since v2.0.2). Convenience methods fail fast
+and retain partial outcomes in `last_result`. `Dir.execute()` returns per-file
+results and optionally continues independent files. Failed/cancelled dependencies
+do not reach later steps. A batch does not roll back completed outputs.
 
 ## Extension points
 
@@ -91,8 +93,11 @@ batch; a per-file results API is planned for v2.1.0 (see
 ## Known limitations
 
 * Non-recursive scanning only (recursive option planned).
-* pydub decodes entire files into memory; very large files are costly
-  (streaming is backlog).
-* Silent-overwrite behavior in rename/copy/move is a known data-loss risk
-  being addressed by the overwrite policy in v2.1.0.
-* The scanner follows symlinks (guard planned for v2.1.0).
+* Effects still decode entire files through pydub and lack active cancellation;
+  direct conversions avoid loading decoded tracks into Python memory.
+* Conversion limits are application controls, not OS quotas or a sandbox.
+* Source editing and ancestor replacement during processing are unsupported.
+* Full Python 3.13+ support requires effects migration and removal of pydub.
+
+The unreleased [filesystem](SAFE_PROCESSING.md) and
+[conversion](FFMPEG_CONVERSION.md) contracts define the implemented guarantees.
