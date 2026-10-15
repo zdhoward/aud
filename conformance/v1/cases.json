@@ -1,0 +1,31 @@
+{
+  "corpus_version": 1,
+  "copy": {
+    "input_name": "input.flac",
+    "input_text": "Project-owned copy fixture\n",
+    "preview": {
+      "schema_version": 1, "kind": "preview", "payload": {"steps": [{
+        "operation": "Copy", "sources": ["$ROOT/input.flac"], "targets": ["$ROOT/out/input.flac"],
+        "statuses": ["ready"], "settings": {"target_dir": "$ROOT/out"}
+      }]}
+    },
+    "result": {
+      "schema_version": 1, "kind": "result", "payload": {"succeeded": true, "items": [{
+        "source": "$ROOT/input.flac", "target": "$ROOT/out/input.flac", "operation": "Copy",
+        "status": "success", "error": null, "sources": [], "details": {}
+      }]}
+    }
+  },
+  "naming": [
+    {"metadata": {"album_artist": "Artist", "album": "Album", "disc_number": 2, "track_number": 3, "title": "Title"}, "profile": {"directory": "{album_artist} - {album}/Disc {disc_number:02}", "filename": "{track_number:02} - {title}"}, "extension": "flac", "expected": "Artist - Album/Disc 02/03 - Title.flac"},
+    {"metadata": {"title": "Café", "track_number": 1}, "profile": {"directory": "", "filename": "{track_number:02} - {title}", "case": "lower", "ascii_only": true, "space_replacement": "_"}, "extension": "wav", "expected": "01_-_cafe.wav"}
+  ],
+  "results": [
+    {"statuses": ["success", "skipped"], "succeeded": true},
+    {"statuses": ["success", "failed", "not_run"], "succeeded": false},
+    {"statuses": ["cancelled"], "succeeded": false},
+    {"statuses": [], "succeeded": true}
+  ],
+  "progress": {"schema_version": 1, "kind": "progress", "payload": {"phase": "finish", "operation": "AlbumPayload", "completed": 1, "total": 2, "source": null, "target": "audio/0001.wav", "status": "staged"}},
+  "error": {"schema_version": 1, "kind": "error", "payload": {"succeeded": false, "error": "Example preparation error", "exit_code": 2, "result": null}}
+}
