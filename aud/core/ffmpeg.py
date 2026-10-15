@@ -318,11 +318,24 @@ class FFmpegEngine:
                 raise ValueError("Duration analysis output is not frame-aligned")
             return size / (info.sample_rate * frame_size)
 
-    def convert(self, source: Path, operation, destination: Destination, *, effects=()) -> dict:
+    def convert(
+        self,
+        source: Path,
+        operation,
+        destination: Destination,
+        *,
+        effects=(),
+        strip_metadata: bool = False,
+        dither: bool = False,
+    ) -> dict:
         from aud.core.effect_chain import compile_effects, validate_effects
         from aud.core.operations.audio.effects import Fade
 
         validate_conversion(operation)
+        if not isinstance(strip_metadata, bool) or not isinstance(dither, bool):
+            raise ValueError("Metadata stripping and dither flags must be booleans")
+        if strip_metadata and operation.tags:
+            raise ValueError("Cannot combine metadata stripping with explicit tags")
         info = self.probe(source)
         duration = info.duration
         if effects:
@@ -344,6 +357,10 @@ class FFmpegEngine:
         rate = operation.sample_rate or info.sample_rate
         channels = operation.channels or info.channels
         depth = operation.bit_depth or info.bit_depth or 16
+        if dither:
+            if depth != 16:
+                raise ValueError("TPDF delivery dither currently targets 16-bit output")
+            filters.append(f"aresample={rate}:osf=s16:ochl={channels}c:dither_method=triangular")
         if operation.profile == "flac-preserve" and (
             rate != info.sample_rate
             or channels != info.channels
@@ -416,9 +433,9 @@ class FFmpegEngine:
                 "-map",
                 "0:a:0",
                 "-map_metadata",
-                "0",
+                "-1" if strip_metadata else "0",
                 "-map_metadata:g",
-                "0:s:a:0",
+                "-1" if strip_metadata else "0:s:a:0",
                 "-metadata",
                 "encoder=",
                 "-c:a",
@@ -431,6 +448,8 @@ class FFmpegEngine:
                 "1",
             ]
         )
+        if strip_metadata:
+            args.extend(["-map_metadata:s:a", "-1", "-fflags", "+bitexact"])
         art_count = 0
         if has_art and not operation.drop_artwork:
             if cover is not None:
@@ -560,6 +579,8 @@ class FFmpegEngine:
             "artwork": art_count,
             "unmapped_tags": unmapped,
             "effects": [type(effect).__name__ for effect in effects],
+            "metadata_policy": "strip" if strip_metadata else "preserve",
+            "dither": "triangular" if dither else None,
             "source_metadata": info.metadata.to_dict(),
             "output_metadata": output_info.metadata.to_dict() if output_info is not None else None,
         }

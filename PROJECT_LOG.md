@@ -1,5 +1,22 @@
 # Project log
 
+## 2026-10-15: Album packaging and distributor preparation
+
+- Added grouped album plans on `feat/album-packaging`, stacked on naming profiles.
+  One staged ZIP provides a clear publication boundary; generic audio remains
+  byte-exact, with explicitly selected opaque sidecars and SHA-256 checksums.
+- Added revisioned, dated preparation subsets for Amuse, DistroKid, TuneCore,
+  CD Baby, RouteNote, Ditto, LANDR, and UnitedMasters from official guides.
+  Manual portal upload/review stays explicit; this is not account integration.
+- Preserve supported input properties; require consent for sample changes/lossy
+  derivatives. Service audio strips embedded metadata/artwork and dithers depth
+  reductions. Shared artwork policy deliberately accepts a narrow JPEG subset.
+- Source follow-up tightened prepared-plan revalidation. Independent packaging
+  review and sandboxed adversarial decoder validation remain open. Focused
+  packaging/conversion checks: 56 passed; touched-source lint/type checks pass.
+  Full local release validation remains deferred; version stays 2.0.2. No merge,
+  tag, release, or PyPI upload.
+
 ## 2026-10-14: Metadata naming profiles
 
 - Added reusable profiles on `feat/naming-profiles`, stacked on audio chains.

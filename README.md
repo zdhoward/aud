@@ -25,6 +25,11 @@ Key changes:
 
 Platform-specific export presets (`export_for`) are implemented as of v2.0.2, along with a broad set of correctness and validation fixes (see [CHANGELOG.md](CHANGELOG.md)).
 
+Unreleased work also adds [album packaging](docs/ALBUM_PACKAGING.md), including
+byte-preserving generic archives and preparation profiles for Amuse, DistroKid,
+TuneCore, CD Baby, RouteNote, Ditto, LANDR, and UnitedMasters. Packages include
+ordered audio, standalone artwork, metadata, and checksums for manual upload.
+
 ---
 
 ## Installation

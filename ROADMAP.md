@@ -51,7 +51,10 @@ See [the chain contract](docs/AUDIO_CHAINS.md) for supported effects and boundar
 Reusable naming profiles now render directory/filename templates over metadata
 snapshots, with disc numbering, explicit defaults, transformations, and portable
 tree/collision checks. See [the naming contract](docs/NAMING_PROFILES.md).
-Filename parsing, album sidecar packaging, and the real CLI remain pending.
+Album ZIP preparation now includes opaque sidecars, checksums, metadata, and
+versioned profiles for eight distributors. See [album packaging](docs/ALBUM_PACKAGING.md)
+for supported subsets and manual review requirements. Filename parsing and the
+real CLI remain pending; distributor account integration remains outside scope.
 Effects migration/batching, comprehensive metadata mapping, hard OS resource
 limits, parallelism, recursive scanning, and remaining milestone work are pending.
 The tracker allocation below is preserved; this progress note does not close

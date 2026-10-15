@@ -1,5 +1,9 @@
 # aud Examples
 
+For unreleased album archives and distributor preparation, see the example in
+[Album packaging](docs/ALBUM_PACKAGING.md). It covers explicit track metadata/order,
+artwork, sidecars, preview, execution, and checksums.
+
 ## Organize tagged albums with a naming profile (unreleased)
 
 ```python

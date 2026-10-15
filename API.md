@@ -328,6 +328,17 @@ Configuration getters return their respective values:
 
 ## Notes
 
+Unreleased album preparation uses `plan_album(target, *, service="generic",
+release, metadata=None, track_order=None, **options) -> AlbumPackage`,
+`preview(package) -> AlbumPreview`, and `execute(package) -> BatchResult`.
+`package_album()` combines these steps. Options include `artwork`, `sidecars`,
+`default_disc`, `audio_format`, `allow_audio_changes`, `allow_lossy`, and `naming`.
+Preparation and execution accept `cancel`; the convenience method and execution
+also accept `continue_on_error`. Sources and selection stay intact.
+Public `DELIVERY_PROFILES` and `delivery_profile(name)` expose versioned settings.
+See the [contract and examples](docs/ALBUM_PACKAGING.md) for path resolution,
+metadata requirements, supported services, resource limits, and manual review.
+
 - All operations are applied to the currently selected files
 - File selection can be modified at any time using `config_set_*` methods
 - Operations modify files in-place unless using `copy()`, `move()`, or `backup()`

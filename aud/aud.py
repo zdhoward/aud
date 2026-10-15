@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Iterator, Mapping
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from fnmatch import fnmatchcase
 from pathlib import Path
@@ -53,8 +53,9 @@ from aud.core.operations.names import (
     Uppercase,
 )
 from aud.core.operations.naming import NameWithProfile
+from aud.core.packaging import AlbumPackage, prepare_album
 from aud.core.plan import Plan
-from aud.core.results import BatchResult
+from aud.core.results import BatchResult, FileResult, OperationCancelled
 from aud.core.safety import path_key, validate_policy
 from aud.core.selection.composite import CompositePolicy
 
@@ -267,6 +268,70 @@ class Dir:
     def _plan(self) -> Plan:
         return Plan(list(self._files))
 
+    def plan_album(
+        self,
+        target: str | Path,
+        *,
+        service="generic",
+        release: Mapping,
+        metadata: Mapping[str | Path, AudioMetadata] | None = None,
+        track_order: Sequence[str | Path] | None = None,
+        **options,
+    ) -> AlbumPackage:
+        """Prepare a local album ZIP without changing selected sources."""
+        prepared = (
+            None
+            if metadata is None
+            else {self.directory / Path(path): value for path, value in metadata.items()}
+        )
+        order = (
+            None if track_order is None else [self.directory / Path(path) for path in track_order]
+        )
+        return prepare_album(
+            list(self._files),
+            target,
+            service=service,
+            release=release,
+            metadata=prepared,
+            track_order=order,
+            limits=self.media_limits,
+            overwrite=self.overwrite,
+            **options,
+        )
+
+    def package_album(
+        self,
+        target: str | Path,
+        *,
+        service="generic",
+        release: Mapping,
+        cancel: Callable[[], bool] | None = None,
+        continue_on_error: bool = False,
+        **options,
+    ) -> BatchResult:
+        """Prepare and execute a package; selection and source files stay unchanged."""
+        self.last_result = BatchResult()
+        try:
+            plan = self.plan_album(
+                target, service=service, release=release, cancel=cancel, **options
+            )
+            return self.execute(plan, cancel=cancel, continue_on_error=continue_on_error)
+        except Exception as error:
+            if not self.last_result.items:
+                self.last_result.items.append(
+                    FileResult(
+                        None,
+                        str(target),
+                        "AlbumPackage",
+                        "cancelled" if isinstance(error, OperationCancelled) else "failed",
+                        str(error),
+                        tuple(str(file.path) for file in self._files),
+                    )
+                )
+            if not isinstance(error, OperationCancelled) and not continue_on_error:
+                raise
+            return self.last_result
+
     def plan(self) -> Plan:
         """Snapshot the selection without executing any operations."""
         return self._plan()
@@ -308,6 +373,8 @@ class Dir:
             raise FilenameError("profile", error) from error
 
     def preview(self, operation_or_plan):
+        if isinstance(operation_or_plan, AlbumPackage):
+            return operation_or_plan.preview()
         plan = (
             self._plan().add(operation_or_plan)
             if isinstance(operation_or_plan, Operation)
@@ -319,12 +386,17 @@ class Dir:
 
     def execute(
         self,
-        plan: Plan,
+        plan: Plan | AlbumPackage,
         *,
         continue_on_error: bool = False,
         cancel: Callable[[], bool] | None = None,
     ) -> BatchResult:
         """Execute a snapshot, recording partial success even when an error is raised."""
+        if isinstance(plan, AlbumPackage):
+            self.last_result = BatchResult()
+            return plan.execute(
+                self.last_result, continue_on_error=continue_on_error, cancel=cancel
+            )
         if not isinstance(plan, Plan):
             raise TypeError("Expected a Plan")
         self.last_result = BatchResult()
