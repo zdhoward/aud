@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import asdict, dataclass, field, is_dataclass, replace
 from pathlib import Path
 
 from aud.core.adapters.audio import AudioAdapter
@@ -10,6 +10,7 @@ from aud.core.adapters.filesystem import FileSystemAdapter
 from aud.core.effect_chain import validate_effects
 from aud.core.ffmpeg import validate_conversion
 from aud.core.models import AudioFile
+from aud.core.naming import validate_naming_tree
 from aud.core.operations.archive import Zip
 from aud.core.operations.audio.base import AudioOperation
 from aud.core.operations.audio.chain import AudioChain
@@ -25,6 +26,7 @@ from aud.core.operations.names import (
     ReplaceSpaces,
     Uppercase,
 )
+from aud.core.operations.naming import NameWithProfile
 from aud.core.plan import Plan
 from aud.core.results import BatchResult, FileResult
 from aud.core.safety import Destination, destinations, path_key
@@ -62,6 +64,7 @@ def resolve(plan: Plan, overwrite: str) -> list[Step]:
     steps = []
     original_paths = [f.path for f in files]
     for operation in copy.deepcopy(plan.operations):
+        skipped = set()
         pairs: list[tuple[Path | None, Path]]
         adapter: type
         if isinstance(operation, (Zip, AudioJoin)):
@@ -75,6 +78,16 @@ def resolve(plan: Plan, overwrite: str) -> list[Step]:
             pairs = [(None, target)] if files else []
             adapter = FileSystemAdapter if isinstance(operation, Zip) else AudioAdapter
             in_place = False
+        elif isinstance(operation, NameWithProfile):
+            operation.validate()
+            targets = [operation.target(file) for file in files]
+            skipped = {index for index, target in enumerate(targets) if target is None}
+            pairs = [
+                (file.path, target or file.path)
+                for file, target in zip(files, targets, strict=True)
+            ]
+            adapter = FileSystemAdapter
+            in_place = not operation.copy
         elif isinstance(operation, NAME_OPERATIONS):
             pairs = [(f.path, operation.apply(f).path) for f in files]
             adapter = FileSystemAdapter
@@ -103,9 +116,23 @@ def resolve(plan: Plan, overwrite: str) -> list[Step]:
             in_place = True
         else:
             raise TypeError(f"Unsupported operation: {type(operation).__name__}")
-        entries = destinations(
-            pairs, overwrite, protected=original_paths + [f.path for f in files], in_place=in_place
+        ready = iter(
+            destinations(
+                [pair for index, pair in enumerate(pairs) if index not in skipped],
+                overwrite,
+                protected=original_paths + [f.path for f in files],
+                in_place=in_place,
+            )
         )
+        entries = [
+            Destination(source, target, "skipped") if index in skipped else next(ready)
+            for index, (source, target) in enumerate(pairs)
+        ]
+        if isinstance(operation, NameWithProfile):
+            validate_naming_tree(
+                operation.output_directory,
+                [entry.target for entry in entries if entry.status == "ready"],
+            )
         steps.append(Step(operation, files, entries, adapter))
         files = [
             AudioFile(e.source if e.status == "skipped" and e.source else e.target)
@@ -123,6 +150,8 @@ def preview(steps: list[Step]) -> PlanPreview:
             return {str(k): value(v) for k, v in item.items()}
         if isinstance(item, (tuple, list)):
             return [value(v) for v in item]
+        if is_dataclass(item) and not isinstance(item, type):
+            return value(asdict(item))
         if isinstance(item, AudioOperation):
             return {"operation": type(item).__name__, "settings": value(vars(item))}
         return item

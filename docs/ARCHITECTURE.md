@@ -55,6 +55,9 @@ per-file results; only successful transitions change the selection.
 `AudioChain` is routed through the conversion adapter and compiles supported
 effect intents into numeric FFmpeg filters, retaining one staged output per file.
 It does not automatically fuse existing separate plan steps or legacy calls.
+`Dir.plan_naming()` prepares supplied/probed canonical metadata snapshots.
+`NameWithProfile.apply()` renders paths without I/O; the resolver validates the
+whole destination tree, then the filesystem adapter publishes copy/move outputs.
 
 Operations on an empty selection are no-ops (since v2.0.2: no empty archives,
 no placeholder audio files).

@@ -81,6 +81,13 @@ d.config_set_log_file("operations.log")
 
 ## File Name Operations
 
+Unreleased metadata-based naming uses `NamingProfile`, `Dir.plan_naming()`, and
+`Dir.name_profile()`. It supports directory/filename templates, disc-aware numbers,
+case/spacing/ASCII options, explicit defaults, and missing-field policies. See
+[naming profiles](docs/NAMING_PROFILES.md) for copy/move examples and portability
+limits. Preparation snapshots supplied or probed metadata; preview and execution
+validate all destinations before writes. Naming preserves audio bytes and tags.
+
 ```python
 # Convert all filenames to uppercase
 d.name_upper()

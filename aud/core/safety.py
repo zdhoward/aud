@@ -77,7 +77,14 @@ def destinations(
             and not os.path.samefile(source, target)
         ):
             raise FileExistsError(f"Destination exists as a different case/Unicode alias: {target}")
-        if same and in_place:
+        if same and in_place and source is not None:
+            source_parent = Path(os.path.abspath(source.parent))
+            if source_parent != target.parent and not (
+                source_parent.exists()
+                and target.parent.exists()
+                and os.path.samefile(source_parent, target.parent)
+            ):
+                raise FileExistsError("In-place paths refer to distinct directory aliases")
             if path_key(target) in reserved:
                 raise FileExistsError(f"Duplicate in-place destination: {target}")
             result.append(Destination(source, target, replace=True))

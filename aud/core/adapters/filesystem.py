@@ -18,6 +18,7 @@ from aud.core.operations.names import (
     ReplaceSpaces,
     Uppercase,
 )
+from aud.core.operations.naming import NameWithProfile
 from aud.core.safety import check_path, destinations, path_key, staged_write
 
 
@@ -35,6 +36,12 @@ class FileSystemAdapter(BatchAdapter):
         path.mkdir(parents=True, exist_ok=True)
 
     def execute(self, operation, inputs: list[AudioFile]) -> list[AudioFile]:
+        if isinstance(operation, NameWithProfile):
+            from aud.core.execution import resolve
+            from aud.core.plan import Plan
+
+            step = resolve(Plan(inputs).add(operation), self.overwrite)[0]
+            return self.execute_resolved(step.operation, step.files, step.entries)
         # Naming / rename operations
         if isinstance(
             operation,
@@ -103,7 +110,17 @@ class FileSystemAdapter(BatchAdapter):
 
     def execute_resolved(self, operation, inputs, entries):
         naming = isinstance(
-            operation, (Uppercase, Lowercase, Append, Prepend, Replace, ReplaceSpaces, Iterate)
+            operation,
+            (
+                Uppercase,
+                Lowercase,
+                Append,
+                Prepend,
+                Replace,
+                ReplaceSpaces,
+                Iterate,
+                NameWithProfile,
+            ),
         )
         if isinstance(operation, Zip):
 
@@ -134,7 +151,9 @@ class FileSystemAdapter(BatchAdapter):
                     return
                 with staged_write(entry) as temporary:
                     shutil.copy2(entry.source, temporary)
-                if naming or isinstance(operation, Move):
+                if (
+                    naming and not (isinstance(operation, NameWithProfile) and operation.copy)
+                ) or isinstance(operation, Move):
                     entry.source.unlink()
 
         return self.perform(operation, entries, action)
