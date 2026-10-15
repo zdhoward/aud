@@ -28,6 +28,18 @@ artifact into a fresh environment outside the checkout. It checks import locatio
 version, bundled schema, and dependency consistency. This is a packaging smoke
 check, not the installed regression suite or an import-side-effect sandbox.
 
+Both candidate and publishing builds run `tools/check_distributions.py` before
+installation or artifact review. This aud-specific validator checks expected
+filenames, package name/version, pure-Python wheel tags, console entry points,
+license presence, complete SHA-256/size RECORD entries, and byte-identical `aud/`
+payloads in wheel and sdist. It rejects duplicate/unsafe paths, links/special files,
+unexpected wheel installation locations, private build directories, and unexpected
+compiled payloads. Inspection never extracts archives or imports aud. Limits are
+5,000 members and 128 MiB compressed/expanded per archive; these are release-policy
+limits for aud, not a general-purpose hostile-archive sandbox. Wheel signatures
+and alternate wheel layouts are outside this project's current release policy.
+Manual content/secret review and installed regression checks are still required.
+
 Tool versions are pinned and their resolved Python dependencies are recorded;
 Gitleaks binaries are checked against a pinned upstream SHA-256. Transitive tool
 and candidate/build dependencies are not locked. Semgrep's `p/python` registry is

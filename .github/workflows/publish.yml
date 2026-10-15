@@ -76,6 +76,9 @@ jobs:
       - name: Check package metadata
         run: twine check dist/*
 
+      - name: Validate distribution integrity before review
+        run: python tools/check_distributions.py --output "$RUNNER_TEMP/distribution-integrity.json"
+
       - name: Record distribution hashes for review
         run: |
           python - <<'PY'

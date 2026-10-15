@@ -1,5 +1,17 @@
 # Project log
 
+## 2026-10-15: Shared distribution integrity gate
+
+- Added a non-extracting aud-specific archive validator to candidate and publishing
+  builds. It checks metadata, installation locations, RECORD hashes/sizes, and
+  identical wheel/sdist package payloads, with explicit member/byte limits.
+- Focused synthetic tests cover valid archives, path attacks, tampering, missing
+  records, payload mismatch, unexpected install locations, and metadata defects.
+  A real temporary wheel/sdist build passed using Hatchling 1.32.4. No runtime
+  package was imported by archive validation; no full local suite was run.
+- Prior #87 CI/CodeQL passed. Release review, native isolation, live environment
+  settings, and attestations remain separate gates. No release or publication.
+
 ## 2026-10-15: Manual candidate evidence automation
 
 - Added a read-only manual workflow for Bandit, Semgrep, Gitleaks, and pip-audit,

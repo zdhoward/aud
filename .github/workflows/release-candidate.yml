@@ -83,36 +83,8 @@ jobs:
           python -m build
           python -m twine check dist/*
           sha256sum dist/* > .release-evidence/distribution-sha256.txt
-      - name: Record archive inventories and check member paths
-        run: |
-          python - <<'PY'
-          import json
-          import tarfile
-          import zipfile
-          from pathlib import Path, PurePosixPath
-
-          inventories = {}
-          archives = sorted(Path("dist").iterdir())
-          assert len(archives) == 2 and sum(p.suffix == ".whl" for p in archives) == 1
-          for archive in archives:
-              if archive.suffix == ".whl":
-                  with zipfile.ZipFile(archive) as package:
-                      names = package.namelist()
-                      assert all((i.external_attr >> 16) & 0o170000 != 0o120000 for i in package.infolist()), "wheel contains symlink"
-              else:
-                  assert archive.name.endswith(".tar.gz"), "unexpected distribution"
-                  with tarfile.open(archive) as package:
-                      members = package.getmembers()
-                      assert all(m.isfile() or m.isdir() for m in members), "sdist contains links or special files"
-                      names = [m.name for m in members]
-              assert len(names) == len(set(names)), "duplicate archive paths"
-              for name in names:
-                  path = PurePosixPath(name)
-                  assert not path.is_absolute() and ".." not in path.parts and "\\" not in name and ":" not in name, "unsafe archive path"
-                  assert not any(p in {".env", ".git", ".release-evidence"} for p in path.parts), "private build data in distribution"
-              inventories[archive.name] = names
-          Path(".release-evidence/archive-members.json").write_text(json.dumps(inventories, indent=2))
-          PY
+      - name: Validate archive metadata, paths, RECORD, and package consistency
+        run: python tools/check_distributions.py --output .release-evidence/archive-members.json
       - name: Install wheel and sdist outside checkout
         run: |
           for kind in wheel source; do
