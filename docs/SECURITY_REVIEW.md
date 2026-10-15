@@ -42,6 +42,13 @@ cleanup were reviewed. Completion now rechecks deadline/cancellation/output limi
 stream metadata is included in preservation/loss accounting. Focused regressions
 cover those fixes. This does not add adversarial native-execution evidence.
 
+The explicit chain follow-up reviewed numeric-only filter compilation, metadata
+parsing, and publication/results handling. Required effect fields are now checked
+explicitly during structural preflight, including caller-mutated operations.
+Timing-sensitive lossy fade-out measures decoded duration through the same bounded
+runner. Ordinary regressions cover these corrections; source review does not
+substitute for sandboxed adversarial decoder validation.
+
 Remaining work includes sandboxed native validation, OS-enforced decoder memory
 limits, effects process limits/cancellation, stronger metadata/sidecar validation,
 and release/provider settings verification. Hostile concurrent directory/source

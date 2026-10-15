@@ -270,6 +270,12 @@ concurrency limits.
 
 ### Direct conversion and encoding profiles (unreleased)
 
+`AudioChain` groups supported effects and an optional conversion into one final
+encode per file. `Dir.afx_chain(effects, output=conversion)` is the boolean helper;
+`Dir.execute(plan.add(AudioChain(...)))` provides results and cancellation. See
+[the chain and metadata contract](docs/AUDIO_CHAINS.md) for examples and supported
+effects. `AudioChain` and `AudioMetadata` are exported from `aud`.
+
 ```python
 from aud import Dir, MediaLimits
 from aud.core.operations.audio.convert import ConvertFormat
@@ -300,6 +306,10 @@ both. Unsupported artwork requires explicit `drop_artwork=True`. Successful
 no tags. Probe, encode, and verification each have their own `MediaLimits`
 deadline; limits are polled application controls. See the
 [conversion contract](docs/FFMPEG_CONVERSION.md) for validation and security limits.
+
+Details also include canonical `source_metadata` and `output_metadata`, with
+nullable fields, original tags, and parsing issues. This read-only view supports
+explicit future naming templates without deriving artist/year from filenames.
 
 Most operations return `bool`:
 - `True`: Operation completed successfully (including no-op on an empty selection)

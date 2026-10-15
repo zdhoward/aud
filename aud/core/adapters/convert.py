@@ -3,6 +3,7 @@ from __future__ import annotations
 from aud.core.adapters.batch import BatchAdapter
 from aud.core.ffmpeg import FFmpegEngine
 from aud.core.models import AudioFile
+from aud.core.operations.audio.chain import AudioChain
 from aud.core.operations.audio.convert import (
     ConvertFormat,
     ConvertToMono,
@@ -29,7 +30,7 @@ class ConversionAdapter(BatchAdapter):
         return self.execute_resolved(operation, inputs, entries)
 
     def execute(self, operation, inputs: list[AudioFile]) -> list[AudioFile]:
-        if not isinstance(operation, (ConvertFormat, ConvertToMono, ConvertToStereo)):
+        if not isinstance(operation, (ConvertFormat, ConvertToMono, ConvertToStereo, AudioChain)):
             raise TypeError(f"Unsupported conversion operation: {operation}")
         pairs = [(f.path, operation.apply(f).path) for f in inputs]
         entries = destinations(
@@ -40,6 +41,11 @@ class ConversionAdapter(BatchAdapter):
     def execute_resolved(self, operation, inputs, entries):
         def process(entry):
             conversion = operation
+            if isinstance(operation, AudioChain):
+                conversion = operation.output or ConvertFormat(entry.source.suffix.lstrip("."))
+                return self.engine.convert(
+                    entry.source, conversion, entry, effects=operation.effects
+                )
             if isinstance(operation, (ConvertToMono, ConvertToStereo)):
                 conversion = ConvertFormat(
                     entry.source.suffix.lstrip("."),

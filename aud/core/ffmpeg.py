@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from aud.core.metadata import AudioMetadata
 from aud.core.results import OperationCancelled
 from aud.core.safety import Destination, check_path, staged_write
 
@@ -123,6 +124,10 @@ class AudioInfo:
     bit_rate: int | None
     tags: dict[str, str] = field(default_factory=dict)
     artwork: tuple[int, ...] = ()
+
+    @property
+    def metadata(self) -> AudioMetadata:
+        return AudioMetadata.from_tags(self.tags)
 
     @property
     def lossless(self) -> bool:
@@ -276,9 +281,60 @@ class FFmpegEngine:
             ),
         )
 
-    def convert(self, source: Path, operation, destination: Destination) -> dict:
+    def _decoded_duration(self, source: Path) -> float:
+        progress = self.runner.run(
+            [
+                self._tool("ffmpeg"),
+                "-nostdin",
+                "-v",
+                "error",
+                "-xerror",
+                "-max_alloc",
+                "67108864",
+                *self._input(source),
+                "-map",
+                "0:a:0",
+                "-threads",
+                "1",
+                "-progress",
+                "pipe:1",
+                "-stats_period",
+                "60",
+                "-f",
+                "null",
+                "-",
+            ]
+        )
+        times = [
+            line.partition(b"=")[2]
+            for line in progress.splitlines()
+            if line.startswith(b"out_time_us=")
+        ]
+        if not times:
+            raise ValueError("Decoded duration is unavailable")
+        duration = int(times[-1]) / 1_000_000
+        if not math.isfinite(duration) or duration < 0:
+            raise ValueError("Invalid decoded duration")
+        return duration
+
+    def convert(self, source: Path, operation, destination: Destination, *, effects=()) -> dict:
+        from aud.core.effect_chain import compile_effects, validate_effects
+        from aud.core.operations.audio.effects import Fade
+
         validate_conversion(operation)
         info = self.probe(source)
+        duration = info.duration
+        if effects:
+            validate_effects(effects)
+            if any(isinstance(effect, Fade) and effect.fade_out for effect in effects) and (
+                not info.lossless or duration is None
+            ):
+                duration = self._decoded_duration(source)
+        filters, expected_duration = (
+            compile_effects(effects, info.sample_rate, info.channels, duration)
+            if effects
+            else ([], info.duration)
+        )
         format = operation.target_format
         if operation.profile and not info.lossless and not operation.allow_lossy:
             raise ValueError(
@@ -389,9 +445,9 @@ class FFmpegEngine:
                 ["-sample_fmt", "s16" if depth == 16 else "s32", "-bits_per_raw_sample", str(depth)]
             )
         elif format in {"mp3", "ogg"} and operation.bit_depth is not None:
-            args.extend(
-                ["-af", f"aformat=sample_fmts={ {8:'u8',16:'s16',24:'s32',32:'s32'}[depth] }"]
-            )
+            filters.append(f"aformat=sample_fmts={ {8:'u8',16:'s16',24:'s32',32:'s32'}[depth] }")
+        if filters:
+            args.extend(["-af", ",".join(filters)])
         mode = None
         bit_rate = operation.bit_rate
         if operation.profile:
@@ -448,12 +504,12 @@ class FFmpegEngine:
                     raise ValueError("Output bit-depth validation failed")
                 if (
                     info.lossless
-                    and info.duration is not None
-                    and info.duration > 0
+                    and expected_duration is not None
+                    and expected_duration > 0
                     and format in {"wav", "flac"}
                 ):
                     if output_info.duration is None or abs(
-                        output_info.duration - info.duration
+                        output_info.duration - expected_duration
                     ) > max(0.001, 2 / rate):
                         raise ValueError("Output duration validation failed")
                 if len(output_info.artwork) != art_count:
@@ -502,4 +558,7 @@ class FFmpegEngine:
             "input_codec": info.codec,
             "artwork": art_count,
             "unmapped_tags": unmapped,
+            "effects": [type(effect).__name__ for effect in effects],
+            "source_metadata": info.metadata.to_dict(),
+            "output_metadata": output_info.metadata.to_dict() if output_info is not None else None,
         }

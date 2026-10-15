@@ -4,6 +4,13 @@
 
 ### Added
 
+- Explicit `AudioChain` batches gain, fade, pad, low/high-pass filtering, and phase
+  inversion with an optional conversion in one final encode. Preview/result JSON,
+  safe publication, artwork retention, and active cancellation use the shared engine.
+- `AudioMetadata` provides canonical album/track/disc fields while retaining
+  original tags and reporting invalid/conflicting values. Conversion and chain
+  results include source/output metadata views.
+
 - Direct FFmpeg conversions with true 24-bit PCM, explicit encoding profiles
   (`flac-preserve`, `mp3-v0`, `mp3-v2`, `mp3-320`), output directories, and
   channel selection. `MediaLimits` bounds process time and output sizes;
