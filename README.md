@@ -219,7 +219,14 @@ aud/
 
 ## Status
 
-aud v2 is stable and fully tested (74 tests, 92% coverage, 85% CI gate).
+aud v2 has automated behavior tests and an 85% coverage gate. The current
+pydub backend targets Python 3.10-3.12; Python 3.13+ support remains planned.
+
+Unreleased safety work adds collision policies, staged writes, link-safe
+scanning, narrowing glob selection, and public plan/preview/results APIs.
+See [CHANGELOG.md](CHANGELOG.md) and the
+[safe processing contract](docs/SAFE_PROCESSING.md) before adapting existing
+scripts. Replacing an existing destination now requires explicit opt-in.
 
 The core architecture is complete. Planned work is tracked in
 [ROADMAP.md](ROADMAP.md) and in the GitHub issue tracker: data-safety

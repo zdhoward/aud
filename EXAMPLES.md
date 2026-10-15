@@ -114,8 +114,7 @@ d.archive_zip("archives/project_final.zip")
 from aud import Dir
 
 # Only process files matching a pattern
-d = Dir("mixed", extensions=["wav"])
-d.config_set_allowlist(regex=r"^master_.*\.wav$")
+d = Dir("mixed", extensions=["wav"], pattern="master_*.wav")
 d.afx_normalize()
 ```
 
@@ -138,8 +137,7 @@ d.config_set_denylist(names=["scratch.wav", "test.mp3"], regex=r"^temp_.*")
 from aud import Dir
 
 # 1. Select only final mixes
-d = Dir("project/mixes", extensions=["wav"])
-d.config_set_allowlist(regex=r"^mix_final_.*\.wav$")
+d = Dir("project/mixes", extensions=["wav"], pattern="mix_final_*.wav")
 
 # 2. Normalize audio
 d.afx_normalize(target_level=-0.3, passes=2)
@@ -243,7 +241,7 @@ d.copy("distribution/mp3")
 ```python
 from aud import Dir
 
-# Convert old MP3s to modern high-quality format
+# Decode MP3s to FLAC for compatibility; this cannot restore lost information
 d = Dir("old_library", extensions=["mp3"])
 d.convert_format("flac", sample_rate=44100, bit_depth=16)
 ```

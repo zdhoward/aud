@@ -1,15 +1,18 @@
 name: Publish
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing reviewed release tag (vMAJOR.MINOR.PATCH)'
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: publish-${{ github.ref }}
+  group: publish-${{ inputs.release_tag }}
   cancel-in-progress: false
 
 jobs:
@@ -23,6 +26,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.release_tag }}
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -30,15 +37,25 @@ jobs:
           python-version: "3.12"
 
       - name: Verify tag matches package version and changelog
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
           python - <<'PY'
+          import os
           import re
+          import subprocess
+          import tomllib
 
-          tag = "${{ github.ref_name }}".removeprefix("v")
+          release_tag = os.environ["RELEASE_TAG"]
+          assert re.fullmatch(r"v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)", release_tag), "expected vMAJOR.MINOR.PATCH"
+          tagged = subprocess.check_output(["git", "rev-parse", f"refs/tags/{release_tag}^{{commit}}"], text=True).strip()
+          head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          assert tagged == head, "checkout must point to the requested release tag"
+          tag = release_tag.removeprefix("v")
           init = re.search(r'__version__ = "([^"]+)"',
                            open("aud/__init__.py").read()).group(1)
-          pyproject = re.search(r'version = "([^"]+)"',
-                                open("pyproject.toml").read()).group(1)
+          with open("pyproject.toml", "rb") as file:
+              pyproject = tomllib.load(file)["project"]["version"]
 
           assert tag == init == pyproject, (
               f"release discipline violated: tag v{tag}, "

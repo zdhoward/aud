@@ -12,8 +12,8 @@ pip install -e .[dev]
 ffmpeg must be on `PATH` for audio operations and the test suite.
 
 ```
-pytest                      # fast run
-pytest --cov=aud            # with coverage (85% gate)
+pytest tests/test_names.py   # example: targeted development check
+pytest --cov=aud            # full suite and coverage before a release
 black --check . && ruff check . && mypy aud   # lint gates (same as CI)
 ```
 
@@ -23,21 +23,40 @@ Pre-commit hooks (formatting, line endings, lint) run on every commit:
 pre-commit install
 ```
 
+During development, test the behavior changed since the last passing check.
+Include affected callers or integrations when shared code changes, and broaden
+the scope only when failures or unresolved concerns justify it. Do not repeatedly
+run the full suite or coverage after every edit. Run the complete suite and release
+checks before a new release. CI may continue to run its configured full matrix.
+Apply the same scope discipline to local formatting and lint checks.
+
 Line endings are LF everywhere (`.gitattributes` normalizes; the pre-commit
 `mixed-line-ending --fix=lf` hook enforces).
 
 ## Commit and release discipline
+
+aud is a public open-source project. Develop on descriptive feature, fix, or
+documentation branches and submit pull requests against `master`. Do not push
+development commits directly to `master` or rewrite shared history. Stacked work
+must name its prerequisite branch/PR and keep each review focused.
+
+Update the API reference, examples, architecture notes, and changelog whenever
+their documented behavior changes. Use repository-relative links in public docs;
+keep local environment inventories and audit scratch evidence outside the repo.
 
 aud is deliberately conservative about history and versions:
 
 * **Commits:** one logical unit per commit, imperative subject line, body with
   the "why". Never mix unrelated changes into a commit. Version bumps never
   ride along with feature work.
-* **Versions:** numbers change only at planned milestones or hotfixes. The
-  bump lives in the same commit that is tagged. Pushing the tag publishes to
-  PyPI automatically via `.github/workflows/publish.yml`, which also verifies
-  that the tag, `pyproject.toml`, `__version__`, and the CHANGELOG section all
-  agree. The GitHub release entry with notes is created in the same session.
+* **Versions:** use Semantic Versioning for reviewed milestones or hotfixes.
+  Prepare a dedicated release change, run the full release checks, and tag its
+  merged commit with an annotated `vMAJOR.MINOR.PATCH` tag. The version declarations,
+  changelog, tag, and GitHub release notes must agree. Do not tag intermediate work.
+* **PyPI:** publication is a separate maintainer-controlled action at significant
+  release points. A tag must not automatically publish. The optional manually
+  dispatched `publish.yml` validates an existing release tag before building and
+  publishing it; the maintainer decides whether and when to run that flow.
 * **Behavior changes:** any change to what an existing call does (not just
   what it accepts) must ship with a `DeprecationWarning` window when feasible,
   a CHANGELOG entry under **Changed**, and regression tests. Example: the
@@ -85,16 +104,16 @@ Category labels:
 
 * Bugs and accepted features get a version milestone (`v2.x.0`).
 * Housekeeping may stay milestone-less until it's slotted.
-* A milestone ships when its issues close; the version bump, tag, release,
-  and publish then happen together.
+* A milestone ships after its scoped issues and release checks complete. Version,
+  tag, and GitHub release stay aligned; PyPI publication remains a separate decision.
 
 ## Automation
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `ci.yml` | push/PR to master | lint (black, ruff, mypy); test matrix Linux + macOS, Python 3.10-3.12; coverage gate at 85% with artifact upload |
+| `ci.yml` | push/PR to master | lint (black, ruff, mypy); test matrix Linux + macOS + Windows, Python 3.10-3.12; coverage gate at 85% with artifact upload |
 | `codeql.yml` | push/PR, weekly | Python security scanning |
-| `publish.yml` | `v*` tag push | verifies tag/pyproject/`__version__`/CHANGELOG agreement, builds, `twine check`, publishes to PyPI via trusted publishing |
+| `publish.yml` | maintainer manual dispatch | validates an existing release tag/version/changelog, builds, `twine check`, and publishes to PyPI via trusted publishing |
 | Dependabot | weekly | pip and github-actions updates, PRs with full CI |
 
 ## Writing style
@@ -106,6 +125,7 @@ phrasing. Code comments describe behavior, not reasoning.
 
 ## Pull requests
 
-* Tests for changed behavior; `pytest` and the lint gates pass locally.
+* Tests for changed behavior; affected tests and relevant lint checks pass locally.
+  A full local suite is required before a release, not for every development change.
 * CHANGELOG entry for anything user-facing.
 * Don't bump versions in a PR unless the PR *is* the release.

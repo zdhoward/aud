@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import os
 import shutil
 from pathlib import Path
 from zipfile import ZipFile
 
+from aud.core.adapters.batch import BatchAdapter
 from aud.core.models import AudioFile
 from aud.core.operations.archive import Zip
 from aud.core.operations.files import Backup, Copy, Move
@@ -16,9 +18,10 @@ from aud.core.operations.names import (
     ReplaceSpaces,
     Uppercase,
 )
+from aud.core.safety import check_path, destinations, path_key, staged_write
 
 
-class FileSystemAdapter:
+class FileSystemAdapter(BatchAdapter):
     """
     Executes filesystem-related operations.
 
@@ -57,46 +60,33 @@ class FileSystemAdapter:
     # ------------------------------------------------------------------
 
     def _rename(self, operation, inputs: list[AudioFile]) -> list[AudioFile]:
-        outputs: list[AudioFile] = []
-
-        for file in inputs:
-            new_file = operation.apply(file)
-
-            # Ensure target directory exists (paranoia-safe)
-            self.ensure_dir(new_file.path.parent)
-
-            # Perform rename on disk
-            file.path.rename(new_file.path)
-
-            outputs.append(new_file)
-
-        return outputs
+        entries = destinations(
+            [(f.path, operation.apply(f).path) for f in inputs],
+            self.overwrite,
+            protected=[f.path for f in inputs],
+            in_place=True,
+        )
+        return self.execute_resolved(operation, inputs, entries)
 
     # ------------------------------------------------------------------
     # file movement operations
     # ------------------------------------------------------------------
 
     def _copy(self, operation, inputs: list[AudioFile]) -> list[AudioFile]:
-        self.ensure_dir(operation.target_dir)
-        outputs: list[AudioFile] = []
-
-        for file in inputs:
-            dest = operation.target_dir / file.path.name
-            shutil.copy2(file.path, dest)
-            outputs.append(file.with_path(dest))
-
-        return outputs
+        entries = destinations(
+            [(f.path, operation.target_dir / f.path.name) for f in inputs],
+            self.overwrite,
+            protected=[f.path for f in inputs],
+        )
+        return self.execute_resolved(operation, inputs, entries)
 
     def _move(self, operation, inputs: list[AudioFile]) -> list[AudioFile]:
-        self.ensure_dir(operation.target_dir)
-        outputs: list[AudioFile] = []
-
-        for file in inputs:
-            dest = operation.target_dir / file.path.name
-            shutil.move(file.path, dest)
-            outputs.append(file.with_path(dest))
-
-        return outputs
+        entries = destinations(
+            [(f.path, operation.target_dir / f.path.name) for f in inputs],
+            self.overwrite,
+            protected=[f.path for f in inputs],
+        )
+        return self.execute_resolved(operation, inputs, entries)
 
     # ------------------------------------------------------------------
     # archive operations
@@ -106,11 +96,45 @@ class FileSystemAdapter:
         if not inputs:
             return []
 
-        archive = operation.archive_path
-        self.ensure_dir(archive.parent)
+        entries = destinations(
+            [(None, operation.archive_path)], self.overwrite, protected=[f.path for f in inputs]
+        )
+        return self.execute_resolved(operation, inputs, entries)
 
-        with ZipFile(archive, "w") as zipf:
-            for file in inputs:
-                zipf.write(file.path, arcname=file.path.name)
+    def execute_resolved(self, operation, inputs, entries):
+        naming = isinstance(
+            operation, (Uppercase, Lowercase, Append, Prepend, Replace, ReplaceSpaces, Iterate)
+        )
+        if isinstance(operation, Zip):
 
-        return [AudioFile(archive)]
+            def action(entry):
+                if len({path_key(Path(f.name)) for f in inputs}) != len(inputs):
+                    raise ValueError("Duplicate archive member names")
+                with staged_write(entry) as temporary:
+                    with ZipFile(temporary, "w") as zipf:
+                        for file in inputs:
+                            check_path(file.path)
+                            zipf.write(file.path, arcname=file.name)
+
+        else:
+
+            def action(entry):
+                check_path(entry.source)
+                if naming and path_key(entry.source) == path_key(entry.target):
+                    if entry.source.name != entry.target.name:
+                        if os.name == "nt" or (
+                            entry.target.exists() and os.path.samefile(entry.source, entry.target)
+                        ):
+                            # Case-insensitive POSIX volumes already expose the target
+                            # as this source; linking would fail with EEXIST.
+                            os.rename(entry.source, entry.target)
+                        else:
+                            os.link(entry.source, entry.target)
+                            entry.source.unlink()
+                    return
+                with staged_write(entry) as temporary:
+                    shutil.copy2(entry.source, temporary)
+                if naming or isinstance(operation, Move):
+                    entry.source.unlink()
+
+        return self.perform(operation, entries, action)
