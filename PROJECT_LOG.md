@@ -1,5 +1,23 @@
 # Project log
 
+## 2026-10-15: Aud-specific pre-publication security process
+
+- Adapted the supplied general checklist into 22 aud release-candidate gates,
+  with concrete source paths/tool commands, evidence fields, applicability, and
+  residual-risk rules. Intentional caller-selected paths are distinguished from
+  generated path/archive containment. Native adversarial checks still need the
+  verified isolation boundary; no prior development result is a candidate pass.
+- Split manual publishing into read-only build/metadata/artifact storage and a
+  minimal download/PyPI job with OIDC. Pinned all publishing-workflow actions to
+  upstream commit SHAs resolved on this date. No live provider settings changed.
+- Bound publication to the build's immutable artifact ID and included attempt
+  numbers in upload names, avoiding artifact collisions on workflow retries.
+- Documented open reviewed-artifact handoff and attestation gates. The workflow
+  still rebuilds at dispatch, so the process does not claim that an unchecked
+  rebuild is a reviewed candidate artifact. Evidence output is ignored by Git.
+- This is process/workflow work, not a release candidate. No scanner runs,
+  full local test suite, publishing dispatch, tag, version bump, or PyPI upload.
+
 ## 2026-10-15: Independent source follow-up and stack checkpoint
 
 - Reviewed the ten-layer draft stack at `918ce49`; every existing head was

@@ -249,6 +249,9 @@ and an optional web UI is planned as a separate install.
 
 ## Documentation
 
+Maintainers: use the [pre-publication security gate](docs/RELEASE_SECURITY.md)
+and its evidence template for release candidates. Development testing stays scoped.
+
 Unreleased [explicit filename parsing](docs/FILENAME_PARSING.md) can provide
 candidate metadata to naming and album preparation through caller-defined patterns.
 

@@ -66,6 +66,12 @@
 
 ### Changed
 
+- Defined an aud-specific 22-check pre-publication security gate and evidence
+  template. Candidate scans and full tests remain separate from scoped development
+  checks. Manual publishing separates read-only building from OIDC upload and
+  pins its third-party actions to commit SHAs; artifact-review handoff and
+  attestation verification remain explicit open gates.
+
 - Lossless-input consent now uses an explicit codec allowlist. Companded PCM
   requires opt-in, as do ambiguous/unknown codecs such as WavPack. Package manifests
   distinguish known lossy derivatives from unverified source derivatives.

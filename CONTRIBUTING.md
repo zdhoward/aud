@@ -60,6 +60,10 @@ aud is deliberately conservative about history and versions:
   release points. A tag must not automatically publish. The optional manually
   dispatched `publish.yml` validates an existing release tag before building and
   publishing it; the maintainer decides whether and when to run that flow.
+  Complete the [release security gate](docs/RELEASE_SECURITY.md) and retain
+  candidate-specific [evidence](docs/RELEASE_EVIDENCE_TEMPLATE.md) first. The
+  workflow's build job is read-only; only its artifact-upload-to-PyPI job has OIDC.
+  Resolve the documented reviewed-artifact handoff gap before production use.
 * **Behavior changes:** any change to what an existing call does (not just
   what it accepts) must ship with a `DeprecationWarning` window when feasible,
   a CHANGELOG entry under **Changed**, and regression tests. Example: the

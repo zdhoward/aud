@@ -176,6 +176,11 @@ backend contract and Python compatibility checks are ready.
 
 ## Maintainer settings actions
 
+* Apply the [release security gate](docs/RELEASE_SECURITY.md) to the final candidate,
+  including scanners, clean artifact testing, and recorded decisions. The manual
+  publishing workflow separates its read-only build and OIDC upload jobs; finish
+  reviewed-artifact handoff/provenance automation before production publication.
+
 * Review PyPI trusted publishing configuration (#71). Publication is manually
   initiated by the maintainer when a significant release is ready; do not infer
   that every tagged release should be uploaded.
