@@ -1,5 +1,14 @@
 # Project log
 
+## 2026-10-14: Cross-platform CI follow-up
+
+- The first remote matrix passed on Linux and Windows; macOS exposed case-only
+  renames attempting to hard-link an already identical file on its case-insensitive
+  volume. Use rename for a verified same-file destination and keep exclusive linking
+  when the destination is absent on case-sensitive POSIX volumes.
+- Added focused branch coverage and enabled CI for all PR bases so stacked feature
+  branches receive checks. This fixes observed failures without broad local retesting.
+
 ## 2026-10-14: Public contribution and release policy
 
 - Corrected stale private-project/direct-push guidance. Preserved all seven local

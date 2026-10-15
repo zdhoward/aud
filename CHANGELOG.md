@@ -11,6 +11,9 @@
 
 ### Changed
 
+- Case-only renames handle case-insensitive POSIX volumes, including default macOS
+  filesystems. CI also runs for stacked PRs targeting feature branches.
+
 - File and audio outputs are staged before publication. Collisions now raise
   by default; scripts relying on replacement must explicitly opt into
   `overwrite="overwrite"`. This data-loss guard takes effect immediately

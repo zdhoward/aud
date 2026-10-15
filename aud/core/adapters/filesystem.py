@@ -122,7 +122,11 @@ class FileSystemAdapter(BatchAdapter):
                 check_path(entry.source)
                 if naming and path_key(entry.source) == path_key(entry.target):
                     if entry.source.name != entry.target.name:
-                        if os.name == "nt":
+                        if os.name == "nt" or (
+                            entry.target.exists() and os.path.samefile(entry.source, entry.target)
+                        ):
+                            # Case-insensitive POSIX volumes already expose the target
+                            # as this source; linking would fail with EEXIST.
                             os.rename(entry.source, entry.target)
                         else:
                             os.link(entry.source, entry.target)
