@@ -55,6 +55,7 @@ from aud.core.operations.names import (
 from aud.core.operations.naming import NameWithProfile
 from aud.core.packaging import AlbumPackage, prepare_album
 from aud.core.plan import Plan
+from aud.core.progress import ProgressReporter
 from aud.core.results import BatchResult, FileResult, OperationCancelled
 from aud.core.safety import path_key, validate_policy
 from aud.core.selection.composite import CompositePolicy
@@ -307,6 +308,7 @@ class Dir:
         release: Mapping,
         cancel: Callable[[], bool] | None = None,
         continue_on_error: bool = False,
+        progress=None,
         **options,
     ) -> BatchResult:
         """Prepare and execute a package; selection and source files stay unchanged."""
@@ -315,7 +317,9 @@ class Dir:
             plan = self.plan_album(
                 target, service=service, release=release, cancel=cancel, **options
             )
-            return self.execute(plan, cancel=cancel, continue_on_error=continue_on_error)
+            return self.execute(
+                plan, cancel=cancel, continue_on_error=continue_on_error, progress=progress
+            )
         except Exception as error:
             if not self.last_result.items:
                 self.last_result.items.append(
@@ -390,12 +394,17 @@ class Dir:
         *,
         continue_on_error: bool = False,
         cancel: Callable[[], bool] | None = None,
+        progress=None,
     ) -> BatchResult:
         """Execute a snapshot, recording partial success even when an error is raised."""
+        progress = ProgressReporter.wrap(progress)
         if isinstance(plan, AlbumPackage):
             self.last_result = BatchResult()
             return plan.execute(
-                self.last_result, continue_on_error=continue_on_error, cancel=cancel
+                self.last_result,
+                continue_on_error=continue_on_error,
+                cancel=cancel,
+                progress=progress,
             )
         if not isinstance(plan, Plan):
             raise TypeError("Expected a Plan")
@@ -417,6 +426,7 @@ class Dir:
                 continue_on_error=continue_on_error,
                 cancel=cancel,
                 media_limits=self.media_limits,
+                progress=progress,
             )
         finally:
             if steps:

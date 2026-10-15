@@ -1,5 +1,19 @@
 # Project log
 
+## 2026-10-15: Observational execution progress
+
+- Added `feat/cli-progress` above the CLI layer. Immutable progress events report
+  adapter file decisions and package payload staging; final package success is
+  emitted only after publication. Results remain authoritative, with counters
+  scoped to each adapter operation rather than speculative time percentages.
+- CLI `--progress` writes escaped, flushed lines on stderr and preserves JSON
+  stdout. Reporting is opt-in. Ordinary callback errors disable that reporter
+  with a static warning rather than changing file/result outcomes.
+- All 86 focused progress/CLI/package/execution checks passed. Touched-source
+  static checks passed. Full local release tests remain deferred. Versioned
+  conformance schemas and finer media-time progress remain open; no release,
+  merge, version bump, tag, or PyPI publication.
+
 ## 2026-10-15: CLI preparation and execution
 
 - Added `feat/cli` above album packaging: list/inspect, conversion, naming,

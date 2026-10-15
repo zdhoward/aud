@@ -20,6 +20,7 @@ from aud.core.operations.audio.effects import (
     LowPassFilter,
     Pad,
 )
+from aud.core.progress import ProgressEvent, ProgressReporter
 from aud.core.results import OperationCancelled
 
 COMMANDS = ("list", "inspect", "convert", "rename", "effects", "export", "album")
@@ -122,6 +123,9 @@ def _parser():
         )
         command.add_argument("--pattern", help="Narrow selection with a filename glob")
         command.add_argument("--json", action="store_true", help="Emit one JSON document on stdout")
+        command.add_argument(
+            "--progress", action="store_true", help="Write file-level progress to stderr"
+        )
         command.add_argument("--timeout", type=float, default=300.0, help="Per-process seconds")
         command.add_argument("--output-bytes", type=int, default=MediaLimits().output_bytes)
         if name in {"list", "inspect"}:
@@ -238,6 +242,15 @@ def _emit(data, machine):
         print(json.dumps(data, ensure_ascii=True, allow_nan=False, indent=2))
 
 
+def _progress(event):
+    target = json.dumps(event.target or event.source or "", ensure_ascii=True)
+    print(
+        f"{event.operation} {event.completed}/{event.total} {event.status or event.phase} {target}",
+        file=sys.stderr,
+        flush=True,
+    )
+
+
 def run(argv=None, *, cancel=None):
     """Run a command; return 0 success, 1 failure, 2 usage/config, or 130 cancelled."""
     argv = list(sys.argv[1:] if argv is None else argv)
@@ -251,6 +264,7 @@ def run(argv=None, *, cancel=None):
             print("aud: " + json.dumps(str(error), ensure_ascii=True), file=sys.stderr)
         return 2
     directory = None
+    progress = ProgressReporter(_progress if args.progress else None)
     try:
         directory = Dir(
             args.directory,
@@ -265,12 +279,24 @@ def run(argv=None, *, cancel=None):
             data = {"files": directory.get_all()}
         elif args.command == "inspect":
             engine = FFmpegEngine(directory.media_limits, cancel)
-            data = {
-                "files": [
-                    {"path": str(file.path), **asdict(engine.probe(file.path))}
-                    for file in directory
-                ]
-            }
+            inspected = []
+            files = list(directory)
+            for index, file in enumerate(files):
+                progress(
+                    ProgressEvent("start", "Inspect", index, len(files), source=str(file.path))
+                )
+                inspected.append({"path": str(file.path), **asdict(engine.probe(file.path))})
+                progress(
+                    ProgressEvent(
+                        "finish",
+                        "Inspect",
+                        index + 1,
+                        len(files),
+                        source=str(file.path),
+                        status="success",
+                    )
+                )
+            data = {"files": inspected}
         else:
             if not directory.get_all():
                 raise ValueError("No selected files; specify --extensions and check --pattern")
@@ -281,7 +307,7 @@ def run(argv=None, *, cancel=None):
                 data = {"dry_run": True, "preview": directory.preview(plan).to_dict()}
             else:
                 result = directory.execute(
-                    plan, cancel=cancel, continue_on_error=args.continue_on_error
+                    plan, cancel=cancel, continue_on_error=args.continue_on_error, progress=progress
                 )
                 _emit(result.to_dict(), args.json)
                 return (

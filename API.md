@@ -328,6 +328,17 @@ Configuration getters return their respective values:
 
 ## Notes
 
+`Dir.execute(plan, progress=callback)` and `package_album(..., progress=callback)`
+optionally emit immutable `ProgressEvent` objects (`to_dict()` is JSON-safe).
+Fields are `phase`, `operation`, `completed`, `total`, `source`, `target`, and
+`status`. Counters reset per adapter operation; finish counts include terminal
+decisions rather than only successes. Dependency-blocked later steps and preflight
+failures are represented by results and may have no progress events. Album payload
+`staged` events do not establish archive publication; use the final package result.
+Callbacks run synchronously; keep them quick and observational. Ordinary callback
+exceptions disable further events with a static warning, without changing work
+outcomes. Cancellation belongs in `cancel`, not a progress callback.
+
 The unreleased console interface wraps these APIs; see [CLI usage](docs/CLI.md)
 for command selection, JSON configuration, dry runs, and exit codes.
 

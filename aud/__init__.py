@@ -10,6 +10,7 @@ from aud.core.metadata import AudioMetadata
 from aud.core.naming import NamingProfile
 from aud.core.operations.audio.chain import AudioChain
 from aud.core.packaging import AlbumPackage
+from aud.core.progress import ProgressEvent
 
 __all__ = [
     "Dir",
@@ -18,6 +19,7 @@ __all__ = [
     "AudioMetadata",
     "NamingProfile",
     "AlbumPackage",
+    "ProgressEvent",
     "DELIVERY_PROFILES",
     "DeliveryProfile",
     "delivery_profile",

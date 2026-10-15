@@ -131,7 +131,8 @@ The first unreleased CLI slice replaces the stub with list/inspect, conversion,
 naming, native effects, export copies, and album packaging. It reuses core plans,
 previews/results, bounded JSON configuration, and cancellation. Standard-library
 argparse keeps the base install sufficient; existing `[cli]` extras stay optional.
-Remaining work includes live progress, interface polish, and versioned JSON
+File-level progress callbacks and opt-in CLI stderr reporting are implemented.
+Remaining work includes finer media-time progress, interface polish, and versioned JSON
 schemas/conformance fixtures. See [the CLI contract](docs/CLI.md).
 
 ## v2.3.0: Optional web UI

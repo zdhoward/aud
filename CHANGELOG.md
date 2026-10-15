@@ -4,6 +4,10 @@
 
 ### Added
 
+- Optional file-level `ProgressEvent` callbacks for execution and album packages,
+  plus CLI `--progress` output on stderr. JSON stdout stays unchanged. Album
+  payloads report staging separately from final archive publication.
+
 - Dependency-free CLI commands for list/inspect, convert, rename, native effects,
   export copies, and album packages. Adds shared API dry runs, bounded JSON
   configuration, structured output, stable exit codes, and Ctrl+C cancellation.
